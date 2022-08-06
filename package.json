@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build" : "tsc"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/bit-dream/can-dbc/issues"
   },
-  "homepage": "https://github.com/bit-dream/can-dbc#readme"
+  "homepage": "https://github.com/bit-dream/can-dbc#readme",
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
 }
