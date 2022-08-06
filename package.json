@@ -2,12 +2,18 @@
   "name": "can-dbc",
   "version": "1.0.0",
   "description": "A zero dependency CAN DBC parsing library for javascript/typescript",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "prepare" : "npm run build",
+    "prepublishOnly" : "npm test && npm run lint",
+    "preversion" : "npm run lint",
+    "version" : "npm run format && git add -A src",
+    "postversion" : "git push && git push --tags"
   },
   "files": [
     "lib/**/*"
@@ -16,8 +22,8 @@
     "type": "git",
     "url": "git+https://github.com/bit-dream/can-dbc.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["dbc","can","can-dbc","parser","vector"],
+  "author": "Derek Black",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/bit-dream/can-dbc/issues"
