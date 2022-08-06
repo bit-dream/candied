@@ -14,7 +14,7 @@
     "preversion" : "npm run lint",
     "version" : "npm run format && git add -A src",
     "postversion" : "git push && git push --tags",
-    "go": "node lib/index.js"
+    "go": "tsc && node lib/index.js"
   },
   "files": [
     "lib/**/*"

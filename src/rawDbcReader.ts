@@ -1,7 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 
-export async function readFileLines(file: string) {
+export async function readFileLines(file: string, fn: Function) {
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -11,7 +11,9 @@ export async function readFileLines(file: string) {
         crlfDelay: Infinity
     });
 
+    let lineNumber = 1;
     for await (const line of rl) {
-        console.log(`${line}`)
+        fn(line,lineNumber)
+        lineNumber++;
     }
-}
+};

@@ -1,11 +1,12 @@
-const baseTokens = {
+const tokens = {
     VERSION: {
         name: 'version',
         description: 'Version of the document',
-        dataFormat: `VERSION "(?P<versionNumber>.*)"`,
+        dataFormat: /VERSION "(?<versionNumber>.*)"/,
         tokenStart: null,
         tokenEnd: null,
-        multiLine: false
+        multiLine: false,
+        multiLineStopToken: null
     },
     NS_: {
         name: 'nameSpace',
@@ -13,7 +14,8 @@ const baseTokens = {
         dataFormat: '',
         tokenStart: null,
         tokenEnd: ' :',
-        multiLine: true
+        multiLine: true,
+        multiLineStopToken: null
     },
     BS_: {
         name: 'busSpeed',
@@ -21,9 +23,10 @@ const baseTokens = {
         dataFormat: '',
         tokenStart: null,
         tokenEnd: null,
-        multiLine: false
+        multiLine: false,
+        multiLineStopToken: null
     },
 
 }
 
-export default baseTokens
+export default tokens
