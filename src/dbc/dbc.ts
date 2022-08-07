@@ -99,7 +99,7 @@ class Dbc {
                 messageTokens = [line.match(this.tokens[token].dataFormat)];
                 return;
             // Catch indented tokens
-            } else if (line.startsWith(token,4) && token === 'SG_') {
+            } else if (line.trimStart().startsWith(token) && token === 'SG_') {
                 foundToken = token;
                 messageTokens = [line.match(this.tokens[token].dataFormat)];
                 return;
@@ -146,19 +146,19 @@ class Dbc {
                     message = data.messages[data.messages.length - 1];
                     let signal: Signal = {
                         name: groups.name,
-                        multiplexed: false,
+                        multiplexed: groups.plex,
                         multiplexerIdentifier: 'hello',
-                        startBit: 0,
-                        length: 0,
-                        endianness: 'motorola',
-                        signed: false,
-                        factor: 0,
-                        offset: 0,
-                        min: 0,
-                        max: 0,
-                        unit: 'Hello',
-                        receivingNodes: [],
-                        description: ''
+                        startBit: groups.startBit,
+                        length: groups.length,
+                        endianness: groups.endian,
+                        signed: groups.signed,
+                        factor: groups.factor,
+                        offset: groups.offset,
+                        min: groups.min,
+                        max: groups.max,
+                        unit: groups.unit,
+                        receivingNodes: groups.recevingNodes,
+                        description: null
                     }
                     message.signals.push(signal)
                     break;
