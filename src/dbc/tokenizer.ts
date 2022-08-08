@@ -1,30 +1,26 @@
-import tokens from "./tokens";
+import tokens from './tokens';
 
 const tokenizeLine = (line: string, lineNumber: any) => {
-    const baseTokens = Object.keys(tokens);
-    
-    let foundToken = null;
-    baseTokens.forEach(token => {
-        if (line.startsWith(token)) {
-            foundToken = token;
-            return;
-        }
-    })
+  const baseTokens = Object.keys(tokens);
 
-    return {
-        line: line,
-        lineNumber: lineNumber,
-        foundBaseToken: foundToken,
-        subTokens: null
+  let foundToken = null;
+  baseTokens.forEach((token) => {
+    if (line.startsWith(token)) {
+      foundToken = token;
+      return;
     }
+  });
+
+  return {
+    line: line,
+    lineNumber: lineNumber,
+    foundBaseToken: foundToken,
+    subTokens: null,
+  };
 };
 
-const pullOutSubTokens = (token: any, line: string) => {
-    
-}
+const pullOutSubTokens = (token: any, line: string) => {};
 
-const multiLineToken = () => {
+const multiLineToken = () => {};
 
-}
-
-export default tokenizeLine
+export default tokenizeLine;
