@@ -6,8 +6,7 @@ const readline = require('readline');
 
 interface Signal {
     name: string;
-    multiplexed: boolean;
-    multiplexerIdentifier: string | null;
+    multiplex: string;
     startBit: number;
     length: number;
     endianness: string;
@@ -26,16 +25,16 @@ interface Message {
     id: number;
     dlc: number;
     sendingNode: string;
-    signals: Array<Signal>;
+    signals: Map<string,Signal>;
     description: string | null;
 }
 
 interface DbcData {
     version: string | null;
-    messages: Array<Message>;
+    messages: Map<string,Message>;
     description: string | null;
     namespace: Array<string>;
-    busConfiguration: string | null;
+    busConfiguration: number | null;
     canNodes: Array<string>;
 }
 
@@ -51,7 +50,7 @@ class Dbc {
 
         this.data = {
             version: null,
-            messages: new Array(),
+            messages: new Map(),
             description: null,
             namespace: new Array(),
             busConfiguration: null,
@@ -72,7 +71,7 @@ class Dbc {
         let lineInfo = null;
         let data: DbcData = {
             version: null,
-            messages: new Array(),
+            messages: new Map(),
             description: null,
             namespace: new Array(),
             busConfiguration: null,
@@ -80,7 +79,7 @@ class Dbc {
         }
         for await (const line of rl) {
             lineInfo = this.basicTokenization(line, this.tokens);
-            data = this.addToDataTable(lineInfo, this.tokens, data)
+            data = this.addToDataTable(lineInfo, this.tokens, data);
         }
 
         // Add table data to class instance for future referencing
@@ -116,52 +115,59 @@ class Dbc {
     addToDataTable(lineInfo: any, tokens: any, data: DbcData) {
         if (lineInfo.baseToken !== null) {
             const baseTokens = Object.keys(tokens);
-            let groups = null;
+            let groups;
+            try {
+                groups = lineInfo.messageTokens[0].groups;
+            } catch (error) {
+                return data;
+            }
             switch (lineInfo.baseToken) {
                 case 'VERSION':
-                    groups = lineInfo.messageTokens[0].groups;
                     // TODO: Enforce array length should be one for this token set
                     data.version = groups.version;
                     break;
                 case 'BO_':
-                    groups = lineInfo.messageTokens[0].groups;
                     let message: Message = {
                         name: groups.messageName,
-                        id: groups.id,
-                        dlc: groups.dlc,
+                        id: parseInt(groups.id),
+                        dlc: parseInt(groups.dlc),
                         sendingNode: groups.sendingNode,
-                        signals: [],
+                        signals: new Map(),
                         description: null
                     }
-                    data.messages.push(message);
+                    data.messages.set(groups.messageName,message);
                     break;
                 case 'SG_':
                     //Signals come directly after a message tag, so we can just append
                     //the current signal instance to the last message found in the array
-                    try {
-                        groups = lineInfo.messageTokens[0].groups;
-                    } catch (error) {
-                        break;
+                    let messageList = Array.from(data.messages.keys());
+                    let lastKey = messageList[messageList.length - 1];
+                    if (data.messages.has(lastKey)) {
+                        let msg = data.messages.get(lastKey);
+                        let signal: Signal = {
+                            name: groups.name,
+                            multiplex: groups.plex,
+                            startBit: parseInt(groups.startBit),
+                            length: parseInt(groups.length),
+                            endianness: groups.endian,
+                            signed: groups.signed,
+                            factor: parseInt(groups.factor),
+                            offset: parseInt(groups.offset),
+                            min: parseInt(groups.min),
+                            max: parseInt(groups.max),
+                            unit: groups.unit,
+                            receivingNodes: groups.recevingNodes,
+                            description: null
+                        }
+                        if (msg){
+                            msg.signals.set(groups.name,signal);
+                        }
                     }
-                    message = data.messages[data.messages.length - 1];
-                    let signal: Signal = {
-                        name: groups.name,
-                        multiplexed: groups.plex,
-                        multiplexerIdentifier: 'hello',
-                        startBit: groups.startBit,
-                        length: groups.length,
-                        endianness: groups.endian,
-                        signed: groups.signed,
-                        factor: groups.factor,
-                        offset: groups.offset,
-                        min: groups.min,
-                        max: groups.max,
-                        unit: groups.unit,
-                        receivingNodes: groups.recevingNodes,
-                        description: null
-                    }
-                    message.signals.push(signal)
                     break;
+                case 'BU_':
+                    data.canNodes = groups.nodes.trim().split(' ');
+                case 'BS_':
+                    data.busConfiguration = parseInt(groups.speed);
                 default:
                     break;
             }
@@ -173,7 +179,13 @@ class Dbc {
         // TODO
     };
 
+    decode(id: number, extended: boolean, dlc: number, payload: Array<number>) {
 
+    }
+
+    encode(message: Message) {
+
+    }
 
 };
 
