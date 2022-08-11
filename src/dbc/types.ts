@@ -23,7 +23,7 @@ export interface Message {
   name: string;
   id: number;
   dlc: number;
-  sendingNode: string;
+  sendingNode: string | null;
   signals: Map<string, Signal>;
   description: string | null;
 }

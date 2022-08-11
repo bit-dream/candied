@@ -19,7 +19,7 @@ import {
 } from './types';
 import tokens from './tokens';
 
-class Tokenize {
+class Parser {
   tokens: Tokens;
 
   constructor() {
@@ -156,4 +156,4 @@ class Tokenize {
   }
 }
 
-export default Tokenize;
+export default Parser;

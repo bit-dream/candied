@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 import { Message, Signal } from './types';
-import Tokenize from './tokenize';
+import Parser from './parser';
+import { MessageDoesNotExist } from './errors';
 
 interface DbcData {
   version: string | null;
@@ -12,7 +13,7 @@ interface DbcData {
   canNodes: string[];
 }
 
-class Dbc extends Tokenize {
+class Dbc extends Parser {
   data: DbcData;
 
   constructor() {
@@ -44,7 +45,17 @@ class Dbc extends Tokenize {
     this.data.description = description;
   }
 
-  createMessage() {}
+  createMessage(name: string, id: number, dlc: number, sendingNode = null, description = null) {
+    let message: Message = {
+      name: name,
+      id: id,
+      dlc: dlc,
+      sendingNode: sendingNode,
+      signals: new Map(),
+      description: description,
+    };
+    return message;
+  }
 
   addMessage(message: Message) {
     this.data.messages.set(message.name, message);
@@ -57,12 +68,22 @@ class Dbc extends Tokenize {
     message?.signals.set(signal.name, signal);
   }
 
-  findMessageById(id: number) {
+  getMessageById(id: number) {
     const messages = this.data.messages;
     for (const [name, message] of messages) {
       if (message.id === id) {
         return message;
       }
+    }
+    throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
+  }
+
+  getMessageByName(name: string) {
+    try {
+      const msg = this.data.messages.get(name);
+      return msg;
+    } catch (e) {
+      throw new MessageDoesNotExist(`No message with name ${name} exists in the database.`);
     }
   }
 
