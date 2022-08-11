@@ -57,6 +57,15 @@ class Dbc extends Tokenize {
     message?.signals.set(signal.name, signal);
   }
 
+  findMessageById(id: number) {
+    const messages = this.data.messages;
+    for (const [name, message] of messages) {
+      if (message.id === id) {
+        return message;
+      }
+    }
+  }
+
   async load(file: string) {
     const fileStream = fs.createReadStream(file);
 

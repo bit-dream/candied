@@ -38,7 +38,7 @@ const tokens = {
   SG_: {
     name: 'signal',
     dataFormat:
-      /\s*SG_ (?<name>([a-zA-Z0-9]+))\s?(?<plex>.*) : (?<startBit>\d{1,2})\|(?<length>\d{1,2})@(?<endian>\d)(?<signed>.) \((?<factor>.*),(?<offset>.*)\) \[(?<min>.*)\|(?<max>.*)\] "(?<unit>.*)" (?<receivingNodes>.*)/,
+      /\s*SG_ (?<name>([a-zA-Z0-9_]+))\s?(?<plex>.*) : (?<startBit>\d{1,2})\|(?<length>\d{1,2})@(?<endian>\d)(?<signed>.) \((?<factor>.*),(?<offset>.*)\) \[(?<min>.*)\|(?<max>.*)\] "(?<unit>.*)" (?<receivingNodes>.*)/,
   },
   CM_: {
     name: 'description',
