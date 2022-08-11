@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 import { Message, Signal } from './types';
-import Tokenize from './tokenize'
+import Tokenize from './tokenize';
 
 interface DbcData {
   version: string | null;
@@ -13,7 +13,6 @@ interface DbcData {
 }
 
 class Dbc extends Tokenize {
-
   data: DbcData;
 
   constructor() {
@@ -45,17 +44,13 @@ class Dbc extends Tokenize {
     this.data.description = description;
   }
 
-  createMessage() {
-
-  }
+  createMessage() {}
 
   addMessage(message: Message) {
     this.data.messages.set(message.name, message);
   }
 
-  createSignal() {
-    
-  }
+  createSignal() {}
 
   addSignal(messageName: string, signal: Signal) {
     let message = this.data.messages.get(messageName);

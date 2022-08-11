@@ -1,23 +1,23 @@
 /**
- * 
+ *
  * Public defined list of tokens as defined by the DBC specification with
  * their relative regex data formats
  */
 const tokens = {
   VERSION: {
     name: 'version',
-    dataFormat: /VERSION "(?<version>.*)"/
+    dataFormat: /VERSION "(?<version>.*)"/,
   },
   NS_: {
     name: 'namespace',
-    dataFormat: /NS_/
+    dataFormat: /NS_/,
   },
   /*
         Defines the bus speed (kbit)
     */
   BS_: {
     name: 'speed',
-    dataFormat: /BS_: (?<speed>.*)/
+    dataFormat: /BS_: (?<speed>.*)/,
   },
   /*
         Defines the list of CAN nodes
@@ -25,7 +25,7 @@ const tokens = {
     */
   BU_: {
     name: 'nodes',
-    dataFormat: /BU_:(?<nodes> .* ?)/
+    dataFormat: /BU_:(?<nodes> .* ?)/,
   },
   /* 
         Defines the data object (message) that contains individual signals
@@ -33,7 +33,7 @@ const tokens = {
     */
   BO_: {
     name: 'message',
-    dataFormat: /BO_ (?<id>\d*) (?<messageName>.*): (?<dlc>\d) (?<sendingNode>.*)/
+    dataFormat: /BO_ (?<id>\d*) (?<messageName>.*): (?<dlc>\d) (?<sendingNode>.*)/,
   },
   SG_: {
     name: 'signal',
@@ -42,32 +42,32 @@ const tokens = {
   },
   CM_: {
     name: 'description',
-    dataFormat: /CM_/
+    dataFormat: /CM_/,
   },
   BA_DEF_: {
     name: 'attribute',
-    dataFormat: /BA_DEF_/
+    dataFormat: /BA_DEF_/,
   },
   BA_: {
     name: 'attributeValue',
-    dataFormat: /BA_/
+    dataFormat: /BA_/,
   },
   VAL_: {
     name: 'busSpeed',
-    dataFormat: /VAL_/
+    dataFormat: /VAL_/,
   },
   VAL_TABLE_: {
     name: 'busSpeed',
-    dataFormat: /VAL_TABLE/
+    dataFormat: /VAL_TABLE/,
   },
   BO_TX_BU_: {
     name: 'busSpeed',
-    dataFormat: /BO_TX_BU_/
+    dataFormat: /BO_TX_BU_/,
   },
   SIG_GROUP_: {
     name: 'busSpeed',
-    dataFormat: /SIG_GROUP_/
-  }
+    dataFormat: /SIG_GROUP_/,
+  },
 };
 
 export default tokens;
