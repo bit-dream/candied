@@ -37,6 +37,15 @@ export type Token = {
     dataFormat: RegExp;
 };
 
+export interface DbcData {
+    version: string | null;
+    messages: Map<string, Message>;
+    description: string | null;
+    namespace: string[];
+    busConfiguration: number | null;
+    canNodes: string[];
+  }
+
 export type MessageRegex = {
     messageName: string;
     id: string;

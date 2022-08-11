@@ -1,10 +1,16 @@
+/**
+ * 
+ * Utility class that main the DBC class will extend from to provide
+ * tokenization and parsing utility functions
+ * 
+ */
+
 import { 
     Token, Tokens, Message, Signal, 
     MessageRegex, SignalRegex, VersionRegex, 
-    CanConfigRegex, CanNodesRegex 
+    CanConfigRegex, CanNodesRegex, DbcData 
 } from './types';
-import tokens from './tokens'
-
+import tokens from './tokens';
 
 class Tokenize {
     tokens: Tokens;
@@ -17,20 +23,29 @@ class Tokenize {
         this.tokens[tokenName] = tokenData;
     }
 
-    protected tokenizeLine(line: string) {
+    /**
+     * 
+     * @param line Raw line from dbc file
+     * @returns {
+          line: line,
+          baseToken: foundToken,
+          regexMatch: regexMatch,
+        }
+     */
+    protected parseLine(line: string) {
         const baseTokens = Object.keys(this.tokens);
     
-        let foundToken = null;
-        let messageTokens = null;
+        let foundToken: string | null = null;
+        let regexMatch = null;
         baseTokens.forEach((token) => {
           if (line.startsWith(token)) {
             foundToken = token;
-            messageTokens = [line.match(this.tokens[token].dataFormat)];
+            regexMatch = [line.match(this.tokens[token].dataFormat)];
             return;
             // Catch indented tokens
           } else if (line.trimStart().startsWith(token) && token === 'SG_') {
             foundToken = token;
-            messageTokens = [line.match(this.tokens[token].dataFormat)];
+            regexMatch = [line.match(this.tokens[token].dataFormat)];
             return;
           }
 
@@ -40,7 +55,7 @@ class Tokenize {
         return {
           line: line,
           baseToken: foundToken,
-          messageTokens: messageTokens,
+          regexMatch: regexMatch,
         };
     } 
 
@@ -50,12 +65,12 @@ class Tokenize {
      * @param data 
      * @returns 
      */
-    protected parseLine(lineInfo: any, data: any) {
+    protected parseLineFromBaseToken(lineInfo: any, data: DbcData) {
         if (lineInfo.baseToken !== null) {
         const baseTokens = Object.keys(this.tokens);
         let groups;
         try {
-            groups = lineInfo.messageTokens[0].groups;
+            groups = lineInfo.regexMatch[0].groups;
         } catch (error) {
             return data;
         }
@@ -73,9 +88,7 @@ class Tokenize {
             const lastKey = messageList[messageList.length - 1];
             if (data.messages.has(lastKey)) {
                 const msg = data.messages.get(lastKey);
-                if (msg) {
-                msg.signals.set(groups.name, this.parseSignal(groups));
-                }
+                msg?.signals.set(groups.name, this.parseSignal(groups));
             }
             break;
             case 'BU_':

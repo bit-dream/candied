@@ -82,8 +82,8 @@ class Dbc extends Tokenize {
       canNodes: new Array(),
     };
     for await (const line of rl) {
-      lineInfo = this.tokenizeLine(line);
-      data = this.parseLine(lineInfo, data);
+      lineInfo = this.parseLine(line);
+      data = this.parseLineFromBaseToken(lineInfo, data);
     }
 
     // Add table data to class instance for future referencing
