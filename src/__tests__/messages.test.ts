@@ -29,3 +29,13 @@ test('tesla_can.dbc: Correct Message Count', () => {
   })
 
 });
+
+test('DBC_template.dbc: Correct Message Names', () => {
+
+  const dbc = new Dbc();
+  dbc.load('src/__tests__/testFiles/DBC_template.dbc')
+  .then(data => {
+    expect(Array.from(data.messages.keys()).sort()).toEqual(['CANMessage','CANMultiplexed'].sort());
+  })
+
+});
