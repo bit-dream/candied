@@ -40,14 +40,6 @@ const tokens = {
     dataFormat:
       /\s*SG_ (?<name>([a-zA-Z0-9_]+))\s?(?<plex>.*) : (?<startBit>\d{1,2})\|(?<length>\d{1,2})@(?<endian>\d)(?<signed>.) \((?<factor>.*),(?<offset>.*)\) \[(?<min>.*)\|(?<max>.*)\] "(?<unit>.*)" (?<receivingNodes>.*)/,
   },
-  CM_: {
-    name: 'description',
-    dataFormat: /CM_/,
-  },
-  BA_DEF_: {
-    name: 'attribute',
-    dataFormat: /BA_DEF_/,
-  },
   BA_: {
     name: 'attributeValue',
     dataFormat: /BA_/,
@@ -67,6 +59,38 @@ const tokens = {
   SIG_GROUP_: {
     name: 'busSpeed',
     dataFormat: /SIG_GROUP_/,
+  },
+  BA_DEF_: {
+    name: 'attribute',
+    dataFormat: /BA_DEF_/,
+  },
+  'BA_DEF_ BO_': {
+    name: 'busSpeed',
+    dataFormat: /SIG_GROUP_/,
+  },
+  'BA_DEF_ BU_': {
+    name: 'busSpeed',
+    dataFormat: /SIG_GROUP_/,
+  },
+  'BA_DEF_ SG_': {
+    name: 'busSpeed',
+    dataFormat: /SIG_GROUP_/,
+  },
+  CM_: {
+    name: 'description',
+    dataFormat: /CM_ "(?<comment>.*)"/,
+  },
+  'CM_ SG_': {
+    name: 'description',
+    dataFormat: /CM_ SG_ (?<id>.*) (?<name>.*) "(?<comment>.*)"/,
+  },
+  'CM_ BU_': {
+    name: 'description',
+    dataFormat: /CM_ BU_ (?<node>.*) "(?<comment>.*)"/,
+  },
+  'CM_ BO_': {
+    name: 'description',
+    dataFormat: /CM_ BO_ (?<id>.*) "(?<comment>.*)"/,
   },
 };
 
