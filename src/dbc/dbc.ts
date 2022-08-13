@@ -61,7 +61,7 @@ class Dbc extends Parser {
     this.data.messages.set(message.name, message);
   }
 
-  createSignal() {}
+  createSignal(name: string, startBit: number, type: string) {}
 
   addSignal(messageName: string, signal: Signal) {
     let message = this.data.messages.get(messageName);
@@ -116,7 +116,7 @@ class Dbc extends Parser {
     return data;
   }
 
-  decode(id: number, extended: boolean, dlc: number, payload: number[]) {
+  decode(message: Message) {
     // TODO
   }
 

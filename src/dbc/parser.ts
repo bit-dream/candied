@@ -23,6 +23,9 @@ class Parser {
   tokens: Tokens;
 
   constructor() {
+    /* Sort tokens by string length on
+    init so that we make the right matches when parsing,
+    i.e. VAL_ vs VAL_DEF_ */
     this.tokens = tokens;
   }
 
@@ -44,25 +47,29 @@ class Parser {
 
     let foundToken: string | null = null;
     let regexMatch = null;
+    let foundTokens = new Map();
+    let keys = new Array();
     baseTokens.forEach((token) => {
       if (line.startsWith(token)) {
         foundToken = token;
         regexMatch = [line.match(this.tokens[token].dataFormat)];
-        return;
+        foundTokens.set(token,regexMatch);
         // Catch indented tokens
-      } else if (line.trimStart().startsWith(token) && token === 'SG_') {
+      } else if (line.trimStart().startsWith(token)) {
         foundToken = token;
         regexMatch = [line.match(this.tokens[token].dataFormat)];
-        return;
+        foundTokens.set(token,regexMatch);
       }
-
       // TODO: Do exception handling for when line doesn't have token
     });
 
+    keys = Array.from(foundTokens.keys());
+    keys = keys.sort((a,b) => b.length - a.length);
+
     return {
       line: line,
-      baseToken: foundToken,
-      regexMatch: regexMatch,
+      baseToken: keys[0],
+      regexMatch: foundTokens.get(keys[0])
     };
   }
 
@@ -75,6 +82,8 @@ class Parser {
   protected parseLineFromBaseToken(lineInfo: any, data: DbcData) {
     if (lineInfo.baseToken !== null) {
       const baseTokens = Object.keys(this.tokens);
+
+      let msg: Message | undefined;
       let groups;
       try {
         groups = lineInfo.regexMatch[0].groups;
@@ -102,11 +111,42 @@ class Parser {
           data.canNodes = this.parseCanNodes(groups);
         case 'BS_':
           data.busConfiguration = this.parseCanConfiguration(groups);
+        case 'CM_':
+          data.description = groups.comment;
+          break;
+        case 'CM_ BU_':
+          break;
+        case 'CM_ BO_':
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
+          if (msg) {msg.description = groups.comment;};
+          break
+        case 'CM_ SG_':
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
+          if (msg) {
+            let signal = this.getSignalByNameFromData(msg, groups.name);
+            if (signal) {signal.description = groups.comment;};
+          };
+          break
         default:
           break;
       }
     }
     return data;
+  }
+
+  getSignalByNameFromData(msg: Message, name: string) {
+    let signals = msg.signals;
+    let signal = signals.get(name);
+    return signal
+  }
+
+  getMessageByIdFromData(data: DbcData, id: number) {
+    const messages = data.messages;
+    for (const [name, message] of messages) {
+      if (message.id === id) {
+        return message;
+      }
+    }
   }
 
   protected parseMessage(obj: MessageRegex) {
