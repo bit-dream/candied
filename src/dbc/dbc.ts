@@ -29,7 +29,7 @@ class Dbc extends Parser {
     this.data.busConfiguration = speed;
   }
 
-  set canNodes(nodes: Array<string>) {
+  set canNodes(nodes: (string)[]) {
     this.data.canNodes = nodes;
   }
 
@@ -38,13 +38,13 @@ class Dbc extends Parser {
   }
 
   createMessage(name: string, id: number, dlc: number, sendingNode = null, description = null) {
-    let message: Message = {
-      name: name,
-      id: id,
-      dlc: dlc,
-      sendingNode: sendingNode,
-      signals: new Map(),
-      description: description,
+    const message: Message = {
+      'name': name,
+      'id': id,
+      'dlc': dlc,
+      'sendingNode': sendingNode,
+      'signals': new Map(),
+      'description': description,
     };
     return message;
   }
@@ -53,10 +53,12 @@ class Dbc extends Parser {
     this.data.messages.set(message.name, message);
   }
 
-  createSignal(name: string, startBit: number, type: string) {}
+  createSignal(name: string, startBit: number, type: string) {
+    // TODO
+  }
 
   addSignal(messageName: string, signal: Signal) {
-    let message = this.data.messages.get(messageName);
+    const message = this.data.messages.get(messageName);
     message?.signals.set(signal.name, signal);
   }
 
