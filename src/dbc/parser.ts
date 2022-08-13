@@ -131,6 +131,17 @@ class Parser {
             }
           }
           break;
+        case 'VAL_TABLE_':
+          const regEx = /(?<value>[0-9-]+) "(?<description>[a-zA-Z_]+)"/gi;
+          const matches = groups.definition.matchAll(regEx);
+          let definitions = new Map();
+          for (let match of matches) {
+            definitions.set(
+              parseInt(match.groups.value,10),
+              match.groups.description
+            );
+          }
+          data.valueTables?.set(groups.name,definitions)
         default:
           break;
       }

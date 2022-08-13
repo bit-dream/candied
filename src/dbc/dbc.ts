@@ -1,17 +1,8 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { Message, Signal } from './types';
+import { Message, Signal, DbcData } from './types';
 import Parser from './parser';
 import { MessageDoesNotExist } from './errors';
-
-interface DbcData {
-  version: string | null;
-  messages: Map<string, Message>;
-  description: string | null;
-  namespace: string[];
-  busConfiguration: number | null;
-  canNodes: string[];
-}
 
 class Dbc extends Parser {
   data: DbcData;
@@ -26,6 +17,7 @@ class Dbc extends Parser {
       namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
+      valueTables: null
     };
   }
 
@@ -105,6 +97,7 @@ class Dbc extends Parser {
       namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
+      valueTables: new Map()
     };
     for await (const line of rl) {
       lineInfo = this.parseLine(line);

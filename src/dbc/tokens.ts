@@ -50,31 +50,7 @@ const tokens = {
   },
   VAL_TABLE_: {
     name: 'busSpeed',
-    dataFormat: /VAL_TABLE/,
-  },
-  BO_TX_BU_: {
-    name: 'busSpeed',
-    dataFormat: /BO_TX_BU_/,
-  },
-  SIG_GROUP_: {
-    name: 'busSpeed',
-    dataFormat: /SIG_GROUP_/,
-  },
-  BA_DEF_: {
-    name: 'attribute',
-    dataFormat: /BA_DEF_/,
-  },
-  'BA_DEF_ BO_': {
-    name: 'busSpeed',
-    dataFormat: /SIG_GROUP_/,
-  },
-  'BA_DEF_ BU_': {
-    name: 'busSpeed',
-    dataFormat: /SIG_GROUP_/,
-  },
-  'BA_DEF_ SG_': {
-    name: 'busSpeed',
-    dataFormat: /SIG_GROUP_/,
+    dataFormat: /VAL_TABLE_ (?<name>[a-zA-Z0-9_]+) (?<definition>.*);/,
   },
   CM_: {
     name: 'description',
