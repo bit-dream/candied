@@ -53,23 +53,23 @@ class Parser {
       if (line.startsWith(token)) {
         foundToken = token;
         regexMatch = [line.match(this.tokens[token].dataFormat)];
-        foundTokens.set(token,regexMatch);
+        foundTokens.set(token, regexMatch);
         // Catch indented tokens
       } else if (line.trimStart().startsWith(token)) {
         foundToken = token;
         regexMatch = [line.match(this.tokens[token].dataFormat)];
-        foundTokens.set(token,regexMatch);
+        foundTokens.set(token, regexMatch);
       }
       // TODO: Do exception handling for when line doesn't have token
     });
 
     keys = Array.from(foundTokens.keys());
-    keys = keys.sort((a,b) => b.length - a.length);
+    keys = keys.sort((a, b) => b.length - a.length);
 
     return {
       line: line,
       baseToken: keys[0],
-      regexMatch: foundTokens.get(keys[0])
+      regexMatch: foundTokens.get(keys[0]),
     };
   }
 
@@ -117,16 +117,20 @@ class Parser {
         case 'CM_ BU_':
           break;
         case 'CM_ BO_':
-          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
-          if (msg) {msg.description = groups.comment;};
-          break
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
+          if (msg) {
+            msg.description = groups.comment;
+          }
+          break;
         case 'CM_ SG_':
-          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
             let signal = this.getSignalByNameFromData(msg, groups.name);
-            if (signal) {signal.description = groups.comment;};
-          };
-          break
+            if (signal) {
+              signal.description = groups.comment;
+            }
+          }
+          break;
         default:
           break;
       }
@@ -137,7 +141,7 @@ class Parser {
   getSignalByNameFromData(msg: Message, name: string) {
     let signals = msg.signals;
     let signal = signals.get(name);
-    return signal
+    return signal;
   }
 
   getMessageByIdFromData(data: DbcData, id: number) {
