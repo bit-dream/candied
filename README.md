@@ -1,6 +1,30 @@
 # CAN-DBC
 ### A zero dependency, lightly weight parser, written in pure Javascript/Typescript
 
+## Motivation
+### What is a DBC file?
+The DBC file is an ASCII based translation file used to apply identifying names, scaling, offsets, and defining information, to data transmitted within a CAN frame. 
+
+Simply put, it helps decode raw CAN (Controller Area Network) frames into something that is human readable.
+
+### What are the goals of CAN-DBC
+To develop and deploy a very simple, lightweight library that doesn't relay on external dependecies.
+You should be able to do the following with this library:
+1. Load and parse a .dbc file so that its contents can be analysed (messages, signals, etc.)
+2. Create your own .dbc file by creating messages, signals, value tables, enumerations.
+3. Decode individual CAN frames into human readable content.
+4. Encode to a raw CAN frame from a DBC message
+5. Use utility functions to help analyize DBC files.
+
+As of the time of writing, only 1 and 5 are supported with the aimed goal of acheiving all 5 (and more).
+
+## Usage
+
+### Loading a dbc
+
+
+## Contributing
+
 
 ## NPM Publishing
 package.json includes four utility functions that will be run before publishing to NPM
