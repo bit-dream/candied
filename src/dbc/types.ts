@@ -45,10 +45,10 @@ export interface DbcData {
   namespace: string[];
   busConfiguration: number | null;
   canNodes: string[];
-  valueTables: Map<string,ValueTable> | null;
+  valueTables: Map<string, ValueTable> | null;
 }
 
-export type ValueTable = Map<number,string>
+export type ValueTable = Map<number, string>;
 
 export type MessageRegex = {
   messageName: string;

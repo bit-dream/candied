@@ -16,7 +16,7 @@ import {
   CanConfigRegex,
   CanNodesRegex,
   DbcData,
-  DefinitionRegex
+  DefinitionRegex,
 } from './types';
 import tokens from './tokens';
 
@@ -134,11 +134,11 @@ class Parser {
           break;
         case 'VAL_TABLE_':
           let definitions = this.extractDefinition(groups);
-          data.valueTables?.set(groups.name,definitions);
+          data.valueTables?.set(groups.name, definitions);
           break;
         case 'VAL_':
           let definition = this.extractDefinition(groups);
-          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
             let signal = this.getSignalByNameFromData(msg, groups.name);
             if (signal) {
@@ -146,7 +146,7 @@ class Parser {
             }
           }
           break;
-          
+
         default:
           break;
       }
@@ -176,13 +176,11 @@ class Parser {
 
     for (let match of matches) {
       if (match.groups) {
-        definitions.set(
-          parseInt(match.groups.value,10),
-          match.groups.description
-        )
-      }};
-      return definitions
-  };
+        definitions.set(parseInt(match.groups.value, 10), match.groups.description);
+      }
+    }
+    return definitions;
+  }
 
   protected parseMessage(obj: MessageRegex) {
     const message: Message = {
@@ -194,7 +192,7 @@ class Parser {
       description: null,
     };
     return message;
-  };
+  }
 
   protected parseSignal(obj: SignalRegex) {
     const signal: Signal = {
@@ -211,7 +209,7 @@ class Parser {
       unit: obj.unit,
       receivingNodes: obj.receivingNodes.trim().split(' '),
       description: null,
-      valueTable: null
+      valueTable: null,
     };
     return signal;
   }

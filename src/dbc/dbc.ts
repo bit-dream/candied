@@ -17,7 +17,7 @@ class Dbc extends Parser {
       namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
-      valueTables: null
+      valueTables: null,
     };
   }
 
@@ -97,7 +97,7 @@ class Dbc extends Parser {
       namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
-      valueTables: new Map()
+      valueTables: new Map(),
     };
     for await (const line of rl) {
       lineInfo = this.parseLine(line);
