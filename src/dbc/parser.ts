@@ -48,7 +48,7 @@ class Parser {
 
     let foundToken: string | null = null;
     let regexMatch = null;
-    let foundTokens = new Map();
+    const foundTokens = new Map();
     let keys = new Array();
     baseTokens.forEach((token) => {
       if (line.startsWith(token)) {
@@ -68,9 +68,9 @@ class Parser {
     keys = keys.sort((a, b) => b.length - a.length);
 
     return {
-      line: line,
-      baseToken: keys[0],
-      regexMatch: foundTokens.get(keys[0]),
+      'line': line,
+      'baseToken': keys[0],
+      'regexMatch': foundTokens.get(keys[0]),
     };
   }
 
@@ -104,7 +104,7 @@ class Parser {
           const messageList = Array.from(data.messages.keys());
           const lastKey = messageList[messageList.length - 1];
           if (data.messages.has(lastKey)) {
-            const msg = data.messages.get(lastKey);
+            msg = data.messages.get(lastKey);
             msg?.signals.set(groups.name, this.parseSignal(groups));
           }
           break;
@@ -126,21 +126,21 @@ class Parser {
         case 'CM_ SG_':
           msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
-            let signal = this.getSignalByNameFromData(msg, groups.name);
+            const signal = this.getSignalByNameFromData(msg, groups.name);
             if (signal) {
               signal.description = groups.comment;
             }
           }
           break;
         case 'VAL_TABLE_':
-          let definitions = this.extractDefinition(groups);
+          const definitions = this.extractDefinition(groups);
           data.valueTables?.set(groups.name, definitions);
           break;
         case 'VAL_':
-          let definition = this.extractDefinition(groups);
+          const definition = this.extractDefinition(groups);
           msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
-            let signal = this.getSignalByNameFromData(msg, groups.name);
+            const signal = this.getSignalByNameFromData(msg, groups.name);
             if (signal) {
               signal.valueTable = definition;
             }
@@ -155,8 +155,8 @@ class Parser {
   }
 
   getSignalByNameFromData(msg: Message, name: string) {
-    let signals = msg.signals;
-    let signal = signals.get(name);
+    const signals = msg.signals;
+    const signal = signals.get(name);
     return signal;
   }
 
@@ -172,9 +172,9 @@ class Parser {
   protected extractDefinition(obj: DefinitionRegex) {
     const regEx = /(?<value>[0-9-]+) "(?<description>[a-zA-Z_]+)"/gi;
     const matches = obj.definition.matchAll(regEx);
-    let definitions = new Map();
+    const definitions = new Map();
 
-    for (let match of matches) {
+    for (const match of matches) {
       if (match.groups) {
         definitions.set(parseInt(match.groups.value, 10), match.groups.description);
       }
@@ -220,7 +220,7 @@ class Parser {
   }
 
   protected parseCanNodes(obj: CanNodesRegex) {
-    const canNodes: Array<string> = obj.nodes.trim().split(' ');
+    const canNodes: (string)[] = obj.nodes.trim().split(' ');
     return canNodes;
   }
 
