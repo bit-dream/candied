@@ -16,6 +16,7 @@ import {
   CanConfigRegex,
   CanNodesRegex,
   DbcData,
+  DefinitionRegex
 } from './types';
 import tokens from './tokens';
 
@@ -132,16 +133,20 @@ class Parser {
           }
           break;
         case 'VAL_TABLE_':
-          const regEx = /(?<value>[0-9-]+) "(?<description>[a-zA-Z_]+)"/gi;
-          const matches = groups.definition.matchAll(regEx);
-          let definitions = new Map();
-          for (let match of matches) {
-            definitions.set(
-              parseInt(match.groups.value,10),
-              match.groups.description
-            );
+          let definitions = this.extractDefinition(groups);
+          data.valueTables?.set(groups.name,definitions);
+          break;
+        case 'VAL_':
+          let definition = this.extractDefinition(groups);
+          msg = this.getMessageByIdFromData(data, parseInt(groups.id,10));
+          if (msg) {
+            let signal = this.getSignalByNameFromData(msg, groups.name);
+            if (signal) {
+              signal.valueTable = definition;
+            }
           }
-          data.valueTables?.set(groups.name,definitions)
+          break;
+          
         default:
           break;
       }
@@ -164,6 +169,21 @@ class Parser {
     }
   }
 
+  protected extractDefinition(obj: DefinitionRegex) {
+    const regEx = /(?<value>[0-9-]+) "(?<description>[a-zA-Z_]+)"/gi;
+    const matches = obj.definition.matchAll(regEx);
+    let definitions = new Map();
+
+    for (let match of matches) {
+      if (match.groups) {
+        definitions.set(
+          parseInt(match.groups.value,10),
+          match.groups.description
+        )
+      }};
+      return definitions
+  };
+
   protected parseMessage(obj: MessageRegex) {
     const message: Message = {
       name: obj.messageName,
@@ -174,7 +194,7 @@ class Parser {
       description: null,
     };
     return message;
-  }
+  };
 
   protected parseSignal(obj: SignalRegex) {
     const signal: Signal = {
@@ -191,6 +211,7 @@ class Parser {
       unit: obj.unit,
       receivingNodes: obj.receivingNodes.trim().split(' '),
       description: null,
+      valueTable: null
     };
     return signal;
   }

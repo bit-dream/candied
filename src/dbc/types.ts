@@ -17,6 +17,7 @@ export interface Signal {
   unit: string;
   receivingNodes: string[];
   description: string | null;
+  valueTable: ValueTable | null;
 }
 
 export interface Message {
@@ -81,4 +82,8 @@ export type CanConfigRegex = {
 
 export type CanNodesRegex = {
   nodes: string;
+};
+
+export type DefinitionRegex = {
+  definition: string;
 };

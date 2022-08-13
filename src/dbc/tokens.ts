@@ -45,27 +45,27 @@ const tokens = {
     dataFormat: /BA_/,
   },
   VAL_: {
-    name: 'busSpeed',
-    dataFormat: /VAL_/,
+    name: 'signalValue',
+    dataFormat: /VAL_ (?<id>\d+) (?<name>[a-zA-Z0-9_]+) (?<definition>.*);/,
   },
   VAL_TABLE_: {
-    name: 'busSpeed',
+    name: 'tableValue',
     dataFormat: /VAL_TABLE_ (?<name>[a-zA-Z0-9_]+) (?<definition>.*);/,
   },
   CM_: {
-    name: 'description',
+    name: 'comment',
     dataFormat: /CM_ "(?<comment>.*)"/,
   },
   'CM_ SG_': {
-    name: 'description',
+    name: 'signalComment',
     dataFormat: /CM_ SG_ (?<id>.*) (?<name>.*) "(?<comment>.*)"/,
   },
   'CM_ BU_': {
-    name: 'description',
+    name: 'nodeComment',
     dataFormat: /CM_ BU_ (?<node>.*) "(?<comment>.*)"/,
   },
   'CM_ BO_': {
-    name: 'description',
+    name: 'messageComment',
     dataFormat: /CM_ BO_ (?<id>.*) "(?<comment>.*)"/,
   },
 };
