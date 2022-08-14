@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { Message, Signal, DbcData } from './types';
+import { Message, Signal, DbcData, CanFrame } from './types';
 import Parser from './parser';
-import { MessageDoesNotExist } from './errors';
+import { MessageDoesNotExist, InvalidPayloadLength } from './errors';
 
 class Dbc extends Parser {
   data: DbcData;
@@ -51,6 +51,8 @@ class Dbc extends Parser {
 
   addMessage(message: Message) {
     this.data.messages.set(message.name, message);
+    // TODO Validate that message ID does not conflict 
+    // with other IDs. If it does, throw error
   }
 
   createSignal(name: string, startBit: number, type: string) {
@@ -62,7 +64,7 @@ class Dbc extends Parser {
     message?.signals.set(signal.name, signal);
   }
 
-  getMessageById(id: number) {
+  getMessageById(id: number) : Message {
     const messages = this.data.messages;
     for (const [name, message] of messages) {
       if (message.id === id) {
@@ -81,7 +83,15 @@ class Dbc extends Parser {
     }
   }
 
-  async load(file: string) {
+  getAllMessages() {
+    // TODO
+  }
+
+  getAllSignals() {
+    // TODO
+  }
+
+  async load(file: string) : Promise<DbcData> {
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -111,12 +121,27 @@ class Dbc extends Parser {
     return data;
   }
 
-  decode(message: Message) {
+  decode(frame: CanFrame) {
     // TODO
   }
 
   encode(message: Message) {
     // TODO
+  }
+
+  createCanFrame(id: number, extended: boolean, payload: Uint8Array) : CanFrame {
+    if (payload.length > 8) {
+      throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`)
+    } else if (payload.length === 0) {
+      throw new InvalidPayloadLength(`Payload is either empty or undefined: ${payload}`)
+    }
+    const frame = {
+      id: id,
+      dlc: payload.length,
+      extended: extended,
+      payload: payload
+    }
+    return frame
   }
 }
 

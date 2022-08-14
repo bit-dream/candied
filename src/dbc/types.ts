@@ -3,7 +3,7 @@
  * Global/generic types for library
  */
 
-export interface Signal {
+export type Signal = {
   name: string;
   multiplex: string;
   startBit: number;
@@ -20,7 +20,7 @@ export interface Signal {
   valueTable: ValueTable | null;
 }
 
-export interface Message {
+export type Message = {
   name: string;
   id: number;
   dlc: number;
@@ -38,7 +38,7 @@ export type Token = {
   dataFormat: RegExp;
 };
 
-export interface DbcData {
+export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
   description: string | null;
@@ -87,3 +87,10 @@ export type CanNodesRegex = {
 export type DefinitionRegex = {
   definition: string;
 };
+
+export type CanFrame = {
+  id: number;
+  dlc: number;
+  extended: boolean;
+  payload: Uint8Array;
+}

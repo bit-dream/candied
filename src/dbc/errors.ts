@@ -35,3 +35,11 @@ export class TokenError extends Error {
     Object.setPrototypeOf(this, MessageDoesNotExist.prototype);
   }
 }
+
+export class InvalidPayloadLength extends Error {
+  __proto__ = Error;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, MessageDoesNotExist.prototype);
+  }
+}
