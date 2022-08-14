@@ -17,6 +17,7 @@ import {
   CanNodesRegex,
   DbcData,
   DefinitionRegex,
+  ValueTable,
 } from './types';
 import tokens from './tokens';
 
@@ -126,7 +127,7 @@ class Parser {
         case 'CM_ SG_':
           msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
-            const signal = this.getSignalByNameFromData(msg, groups.name);
+            const signal = this.getSignalByNameFromMsg(msg, groups.name);
             if (signal) {
               signal.description = groups.comment;
             }
@@ -140,10 +141,7 @@ class Parser {
           const definition = this.extractDefinition(groups);
           msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
-            const signal = this.getSignalByNameFromData(msg, groups.name);
-            if (signal) {
-              signal.valueTable = definition;
-            }
+            this.assignToSigValTable(msg, groups.name, definition)
           }
           break;
 
@@ -154,13 +152,20 @@ class Parser {
     return data;
   }
 
-  getSignalByNameFromData(msg: Message, name: string) {
+  protected assignToSigValTable(msg: Message, signalName: string, value: ValueTable) {
+    const signal = this.getSignalByNameFromMsg(msg, signalName);
+    if (signal) {
+      signal.valueTable = value;
+    }
+  }
+
+  protected getSignalByNameFromMsg(msg: Message, name: string) {
     const signals = msg.signals;
     const signal = signals.get(name);
     return signal;
   }
 
-  getMessageByIdFromData(data: DbcData, id: number) {
+  protected getMessageByIdFromData(data: DbcData, id: number) {
     const messages = data.messages;
     for (const [name, message] of messages) {
       if (message.id === id) {
