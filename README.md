@@ -21,7 +21,20 @@ As of the time of writing, only 1 and 5 are supported with the aimed goal of ach
 ## Usage
 
 ### Loading a dbc
+can-dbc loads dbc files asynchonously as to not bottleneck applications and as a result
+the actual loading of the file will need to be wrapped in an async/await function or 
+use `.then()` to catch the resulting data upon completion.
 
+```js
+const filePath = 'path\to\my\dbc\my_file.dbc'
+
+dbc = Dbc();
+
+dbc.load(filePath)
+.then(data => {
+    console.log(data);
+})
+```
 
 ## Contributing
 
