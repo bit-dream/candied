@@ -42,10 +42,10 @@ export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
   description: string | null;
-  namespace: string[];
   busConfiguration: number | null;
   canNodes: string[];
   valueTables: Map<string, ValueTable> | null;
+  attributes: Attributes | null;
 }
 
 export type ValueTable = Map<number, string>;
@@ -93,4 +93,18 @@ export type CanFrame = {
   dlc: number;
   extended: boolean;
   payload: Uint8Array;
+}
+
+export type Attributes = {
+  file: (Attribute)[] | null;
+  signals: (Attribute)[] | null;
+  messages: (Attribute)[] | null;
+  nodes: (Attribute)[] | null;
+}
+
+export type Attribute = {
+  name: string;
+  dataType: string;
+  value: string;
+  options: (string)[];
 }

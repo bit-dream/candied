@@ -14,10 +14,10 @@ class Dbc extends Parser {
       version: null,
       messages: new Map(),
       description: null,
-      namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
       valueTables: null,
+      attributes: null
     };
   }
 
@@ -106,10 +106,10 @@ class Dbc extends Parser {
       version: null,
       messages: new Map(),
       description: null,
-      namespace: new Array(),
       busConfiguration: null,
       canNodes: new Array(),
       valueTables: new Map(),
+      attributes: null
     };
     for await (const line of rl) {
       lineInfo = this.parseLine(line);

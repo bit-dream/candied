@@ -25,9 +25,6 @@ class Parser {
   tokens: Tokens;
 
   constructor() {
-    /* Sort tokens by string length on
-    init so that we make the right matches when parsing,
-    i.e. VAL_ vs VAL_DEF_ */
     this.tokens = tokens;
   }
 
@@ -111,8 +108,10 @@ class Parser {
           break;
         case 'BU_':
           data.canNodes = this.parseCanNodes(groups);
+          break;
         case 'BS_':
           data.busConfiguration = this.parseCanConfiguration(groups);
+          break;
         case 'CM_':
           data.description = groups.comment;
           break;
