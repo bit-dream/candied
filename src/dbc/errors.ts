@@ -24,7 +24,7 @@ export class ParseError extends Error {
   __proto__ = Error;
   constructor(message: string) {
     super(message);
-    Object.setPrototypeOf(this, MessageDoesNotExist.prototype);
+    Object.setPrototypeOf(this, ParseError.prototype);
   }
 }
 
@@ -32,7 +32,7 @@ export class TokenError extends Error {
   __proto__ = Error;
   constructor(message: string) {
     super(message);
-    Object.setPrototypeOf(this, MessageDoesNotExist.prototype);
+    Object.setPrototypeOf(this, TokenError.prototype);
   }
 }
 
@@ -40,6 +40,14 @@ export class InvalidPayloadLength extends Error {
   __proto__ = Error;
   constructor(message: string) {
     super(message);
-    Object.setPrototypeOf(this, MessageDoesNotExist.prototype);
+    Object.setPrototypeOf(this, InvalidPayloadLength.prototype);
+  }
+}
+
+export class SignalDoesNotExist extends Error {
+  __proto__ = Error;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, SignalDoesNotExist.prototype);
   }
 }

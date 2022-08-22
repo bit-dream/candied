@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import { Message, Signal, DbcData, CanFrame } from './types';
 import Parser from './parser';
-import { MessageDoesNotExist, InvalidPayloadLength } from './errors';
+import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
 
 class Dbc extends Parser {
   data: DbcData;
@@ -74,6 +74,14 @@ class Dbc extends Parser {
     throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
   }
 
+  /**
+   * 
+   * Finds a specific message within the DBC file data by name
+   * 
+   * @param name string
+   * @returns Message
+   * @error MessageDoesNotExist
+   */
   getMessageByName(name: string) {
     try {
       const msg = this.data.messages.get(name);
@@ -83,14 +91,40 @@ class Dbc extends Parser {
     }
   }
 
-  getAllMessages() {
+  /**
+   * 
+   * Returns a signal object located in a specific CAN message by name
+   * 
+   * @param name string
+   * @param messageName string
+   * @returns Signal
+   * @error SignalDoesNotExist
+   */
+  getSignalByName(name: string, messageName: string) {
+    const msg = this.getMessageByName(messageName);
+    const signals = msg?.signals;
+    if (signals) {
+      for (let [signal, signalObj] of signals) {
+        if (signal === name) {
+          return signalObj;
+        }
+      }
+    } else {
+      throw new SignalDoesNotExist(`Signal could not be found in ${messageName}, because the
+      signal list for that message is empty.`)
+    }
+    throw new SignalDoesNotExist(`Could not find ${name} in signal list.`);
+  }
+
+  getSignalsByName(name: string) {
     // TODO
   }
 
-  getAllSignals() {
-    // TODO
-  }
-
+  /**
+   * 
+   * @param file string
+   * @returns Promise<DbcData> 
+   */
   async load(file: string) : Promise<DbcData> {
     const fileStream = fs.createReadStream(file);
 
@@ -121,15 +155,15 @@ class Dbc extends Parser {
     return data;
   }
 
-  decode(frame: CanFrame) {
+  private decode(frame: CanFrame) {
     // TODO
   }
 
-  encode(message: Message) {
+  private encode(message: Message) {
     // TODO
   }
 
-  createCanFrame(id: number, extended: boolean, payload: Uint8Array) : CanFrame {
+  private createCanFrame(id: number, extended: boolean, payload: Uint8Array) : CanFrame {
     if (payload.length > 8) {
       throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`)
     } else if (payload.length === 0) {
