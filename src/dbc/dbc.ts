@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import { Message, Signal, DbcData, CanFrame } from './types';
 import Parser from './parser';
+import Writer from './writer';
 import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
 
 class Dbc extends Parser {
@@ -154,6 +155,11 @@ class Dbc extends Parser {
     this.data = data;
     return data;
   }
+
+  write(filePath: string) {
+    const writer = new Writer(filePath);
+    writer.constructFile(this.data);
+  };
 
   private decode(frame: CanFrame) {
     // TODO

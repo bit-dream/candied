@@ -1,10 +1,3 @@
-/**
- *
- * Utility class that main the DBC class will extend from to provide
- * tokenization and parsing utility functions
- *
- */
-
 import {
   Token,
   Tokens,
@@ -49,12 +42,7 @@ class Parser {
     const foundTokens = new Map();
     let keys = new Array();
     baseTokens.forEach((token) => {
-      if (line.startsWith(token)) {
-        foundToken = token;
-        regexMatch = [line.match(this.tokens[token].dataFormat)];
-        foundTokens.set(token, regexMatch);
-        // Catch indented tokens
-      } else if (line.trimStart().startsWith(token)) {
+      if (line.trimStart().startsWith(token)) {
         foundToken = token;
         regexMatch = [line.match(this.tokens[token].dataFormat)];
         foundTokens.set(token, regexMatch);
