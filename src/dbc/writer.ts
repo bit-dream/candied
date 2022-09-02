@@ -80,8 +80,18 @@ class Writer {
         } else {
             sign = '-';
         }
+        let nodes: string;
+        if (signal.receivingNodes.length === 0) {
+            nodes = 'Vector___XXXX';
+        } else {
+            nodes = signal.receivingNodes.join(' ');
+        }
         // Format: SG_ Signal0 : 0|32@1- (1,0) [0|0] "" Node1
-        const lineContent = ` SG_ ${signal.name} : ${signal.startBit.toString()}|${signal.length.toString()}@${endian}${sign} (${signal.factor.toString()},${signal.offset.toString()}) [${signal.min.toString()}|${signal.max.toString()}] "${signal.unit}" Vector___XXXX`;
+        // TODO: Add support for multiplexors
+        const lineContent =
+        ` SG_ ` + `${signal.name} : ${signal.startBit.toString()}|${signal.length.toString()}@${endian}${sign}` +
+        `(${signal.factor.toString()},${signal.offset.toString()}) [${signal.min.toString()}|${signal.max.toString()}] ` +
+        `"${signal.unit}" ${nodes}`;
         this.writeLine(lineContent);
     };
 
