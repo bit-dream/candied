@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { DbcData, Message, Signal } from './types';
+import { DbcData, Message, Signal, ValueTable } from './types';
 
 class Writer {
     file: string;
@@ -26,6 +26,9 @@ class Writer {
         // Write all comments
         if (data.description) {this.writeBaseComment(data.description);};
         this.writeMessageAndSignalComments(data.messages);
+
+        if (data.valueTables) {this.writeValTable(data.valueTables)}
+        this.writeSignalTables(data.messages);
     };
 
     /**
@@ -148,6 +151,36 @@ class Writer {
                 }
             }
         }
+    }
+
+    private generateEnumTable(tableMembers: ValueTable) {
+        let members = ''
+        for (const [enumVal, enumName] of tableMembers) {
+            members = members + enumVal.toString() + ' ' + `"${enumName}"` + ' ';
+        }
+        return `${members}`
+    }
+
+    private writeValTable(valueTable: Map<string, ValueTable>) {
+        for (const [name, tableMembers] of valueTable) {
+            let members = this.generateEnumTable(tableMembers);
+            let lineContent = `VAL_TABLE_ ${name} ${members};`
+            this.writeLine(lineContent);
+        }
+        this.writeLine('');
+    }
+
+    private writeSignalTables(messages: Map<string,Message>) {
+        for (const [name, msg] of messages) {
+            for (const [name, signal] of msg.signals) {
+                if (signal.valueTable) {
+                    let members = this.generateEnumTable(signal.valueTable);
+                    let lineContent =  `VAL_ ${msg.id.toString()} ${signal.name} ${members} ;`;
+                    this.writeLine(lineContent);
+                }
+            }
+        }
+        this.writeLine('');
     }
 
 };
