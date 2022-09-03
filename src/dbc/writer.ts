@@ -19,6 +19,7 @@ class Writer {
         for (const [name, message] of data.messages) {
             this.writeMessage(message);
         }
+        if (data.description) {this.writeBaseComment(data.description);};
     };
     private writeVersion(version: string) {
         const lineContent = `VERSION "${version}"`
@@ -102,6 +103,14 @@ class Writer {
             { flag: 'a+' }
         );
     };
+
+    private writeBaseComment(comment: string) {
+        this.writeLine(`CM_ "${comment}" ;`)
+    }
+
+    private writeSignalComment(comment: string, message: string, signal: Signal) {
+        this.writeLine(`CM_ SG_ ${''} ${''} "${comment}" ;`)
+    }
 
 };
 
