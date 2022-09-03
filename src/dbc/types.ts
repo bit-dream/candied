@@ -5,7 +5,7 @@
 
 export type Signal = {
   name: string;
-  multiplex: string;
+  multiplex: string | null;
   startBit: number;
   length: number;
   endianness: string;

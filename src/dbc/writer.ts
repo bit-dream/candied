@@ -8,29 +8,49 @@ class Writer {
     }
 
     /**
-     * 
+     * Main constructor class that will organize and write all
+     * attributes of DbcData structure
      * @param data dbc data loaded or created using main DBC class
      */
     constructFile(data: DbcData) {
+
+        // Main file attributes
         this.writeVersion(data.version ? data.version : '');
         this.writeNamespace();
         this.writeBusSpeed(data.busConfiguration);
         this.writeNodes(data.canNodes);
+
+        // Both messages and signals
         for (const [name, message] of data.messages) {
             this.writeMessage(message);
         }
+
+        // Write all comments
         if (data.description) {this.writeBaseComment(data.description);};
+        this.writeMessageAndSignalComments(data.messages);
     };
+
+    /**
+     * 
+     * @param version Version of the dbc file
+     */
     private writeVersion(version: string) {
         const lineContent = `VERSION "${version}"`
         this.writeLine(lineContent, true);
     };
+
     private writeNamespace(ns: (string)[] | null = null) {
         // TODO: For now since name space technically doesn't need
         // to be complete for a valid DBC file, we will skip it's content
+        // and just render the main token
         const lineContent = `NS_:`;
         this.writeLine(lineContent, true);
     };
+
+    /**
+     * Speed of the CAN bus, typically expressed as 250, 500, etc
+     * @param busConfiguration Speed of the CAN bus
+     */
     private writeBusSpeed(busConfiguration: number | null) {
         let lineContent = '';
         if (busConfiguration === null) {
@@ -40,6 +60,11 @@ class Writer {
         }
         this.writeLine(lineContent, true);
     };
+
+    /**
+     * Generic list of nodes that exist for the CAN architecture
+     * @param nodes List of nodes that are attached to messages and signals
+     */
     private writeNodes(nodes: (string)[]) {
         let lineContent = '';
         if (nodes === null || nodes.length === 0) {
@@ -50,6 +75,11 @@ class Writer {
         }
         this.writeLine(lineContent, true);
     };
+
+    /**
+     * 
+     * @param message Individual message to be written to the file
+     */
     private writeMessage(message: Message) {
         let node;
         if (message.sendingNode) {
@@ -68,6 +98,10 @@ class Writer {
         this.writeLine('')
     };
 
+    /**
+     * 
+     * @param signal Signal to be writen to dbc file
+     */
     private writeSignal(signal: Signal) {
         let endian;
         if (signal.endianness === 'Motorola') {
@@ -75,23 +109,24 @@ class Writer {
         } else {
             endian = '1';
         }
-        let sign;
-        if (signal.signed) {
-            sign = '+';
-        } else {
-            sign = '-';
-        }
+        let sign = signal.signed ? '+' : '-';
         let nodes: string;
         if (signal.receivingNodes.length === 0) {
             nodes = 'Vector___XXXX';
         } else {
             nodes = signal.receivingNodes.join(' ');
         }
+        let name;
+        if (signal.multiplex) {
+            name = signal.name + ' ' + signal.multiplex;
+        } else {
+            name = signal.name;
+        }
+
         // Format: SG_ Signal0 : 0|32@1- (1,0) [0|0] "" Node1
-        // TODO: Add support for multiplexors
         const lineContent =
-        ` SG_ ` + `${signal.name} : ${signal.startBit.toString()}|${signal.length.toString()}@${endian}${sign}` +
-        `(${signal.factor.toString()},${signal.offset.toString()}) [${signal.min.toString()}|${signal.max.toString()}] ` +
+        ` SG_ ` + `${name} : ${signal.startBit.toString()}|${signal.length.toString()}@${endian}${sign}` +
+        ` (${signal.factor.toString()},${signal.offset.toString()}) [${signal.min.toString()}|${signal.max.toString()}] ` +
         `"${signal.unit}" ${nodes}`;
         this.writeLine(lineContent);
     };
@@ -108,8 +143,17 @@ class Writer {
         this.writeLine(`CM_ "${comment}" ;`)
     }
 
-    private writeSignalComment(comment: string, message: string, signal: Signal) {
-        this.writeLine(`CM_ SG_ ${''} ${''} "${comment}" ;`)
+    private writeMessageAndSignalComments(messages: Map<string,Message>) {
+        for (const [name, msg] of messages) {
+            if (msg.description) {
+                this.writeLine(`CM_ BO_ ${msg.id.toString()} "${msg.description}" ;`)
+            }
+            for (const [name, signal] of msg.signals) {
+                if (signal.description) {
+                    this.writeLine(`CM_ SG_ ${msg.id.toString()} ${name} "${signal.description}" ;`)
+                }
+            }
+        }
     }
 
 };
