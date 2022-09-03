@@ -21,9 +21,7 @@ class Writer {
         this.writeNodes(data.canNodes);
 
         // Both messages and signals
-        for (const [name, message] of data.messages) {
-            this.writeMessage(message);
-        }
+        this.writeMessagesAndSignals(data.messages);
 
         // Write all comments
         if (data.description) {this.writeBaseComment(data.description);};
@@ -80,22 +78,24 @@ class Writer {
      * 
      * @param message Individual message to be written to the file
      */
-    private writeMessage(message: Message) {
-        let node;
-        if (message.sendingNode) {
-            node = message.sendingNode
-        } else {
-            // Default that is typically generated from CANDB++ (from Vector)
-            node = 'Vector___XXX'
-        }
-        let lineContent = `BO_ ${message.id.toString()} ${message.name}: ${message.dlc.toString()} ${node}`;
-        this.writeLine(lineContent);
+    private writeMessagesAndSignals(messages: Map<string,Message>) {
+        for (const [name, message] of messages) {
+            let node;
+            if (message.sendingNode) {
+                node = message.sendingNode
+            } else {
+                // Default that is typically generated from CANDB++ (from Vector)
+                node = 'Vector___XXX'
+            }
+            let lineContent = `BO_ ${message.id.toString()} ${message.name}: ${message.dlc.toString()} ${node}`;
+            this.writeLine(lineContent);
 
-        // Extract signals and exand in file
-        for (const [name, signal] of message.signals) {
-            this.writeSignal(signal);
+            // Extract signals and exand in file
+            for (const [name, signal] of message.signals) {
+                this.writeSignal(signal);
+            }
+            this.writeLine('')
         }
-        this.writeLine('')
     };
 
     /**
@@ -103,25 +103,11 @@ class Writer {
      * @param signal Signal to be writen to dbc file
      */
     private writeSignal(signal: Signal) {
-        let endian;
-        if (signal.endianness === 'Motorola') {
-            endian = '0';
-        } else {
-            endian = '1';
-        }
+
+        let endian = (signal.endianness === 'Motorola') ? '0': '1';
         let sign = signal.signed ? '+' : '-';
-        let nodes: string;
-        if (signal.receivingNodes.length === 0) {
-            nodes = 'Vector___XXXX';
-        } else {
-            nodes = signal.receivingNodes.join(' ');
-        }
-        let name;
-        if (signal.multiplex) {
-            name = signal.name + ' ' + signal.multiplex;
-        } else {
-            name = signal.name;
-        }
+        let nodes = (signal.receivingNodes.length === 0) ? 'Vector___XXXX': signal.receivingNodes.join(' ');
+        let name = signal.multiplex ? signal.name + ' ' + signal.multiplex: signal.name;
 
         // Format: SG_ Signal0 : 0|32@1- (1,0) [0|0] "" Node1
         const lineContent =
@@ -131,6 +117,14 @@ class Writer {
         this.writeLine(lineContent);
     };
 
+    /**
+     * Main writer function for class. New line character will be added automatically
+     * to each line, so subsquent calls to this function
+     * will automatically start on the next line.
+     * 
+     * @param line Line content to write to file
+     * @param skipNextLine If next line should be a blank line
+     */
     private writeLine(line: string, skipNextLine: boolean = false) {
         fs.writeFileSync(
             this.file, 
