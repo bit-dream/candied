@@ -56,8 +56,24 @@ class Dbc extends Parser {
     // with other IDs. If it does, throw error
   }
 
-  createSignal(name: string, startBit: number, type: string) {
-    // TODO
+  createSignal(name: string, startBit: number, length: number) {
+    const signal: Signal = {
+      'name': name,
+      'multiplex': null,
+      'startBit': startBit,
+      'length': length,
+      'endianness': 'Intel',
+      'signed': false,
+      'factor': 1,
+      'offset': 0,
+      'min': 0,
+      'max': 0,
+      'unit': '',
+      'receivingNodes': new Array(),
+      'description': null,
+      'valueTable': null,
+    };
+    return signal;
   }
 
   addSignal(messageName: string, signal: Signal) {
