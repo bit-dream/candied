@@ -108,24 +108,40 @@ class Dbc extends Parser {
     this.data.messages.set(message.name, message);
     // TODO Validate that message ID does not conflict 
     // with other IDs. If it does, throw error
+    // TODO Allow for a list of messages
   }
 
-  createSignal(name: string, startBit: number, length: number) {
+  createSignal(
+    name: string, 
+    startBit: number, 
+    length: number,
+    multiplex = null,
+    endianness = 'Intel',
+    signed = false,
+    factor = 1,
+    offset = 0,
+    min = 0,
+    max = 0,
+    unit = '',
+    receivingNodes = new Array(),
+    description = null,
+    valueTable = null
+  ) {
     const signal: Signal = {
       'name': name,
-      'multiplex': null,
+      'multiplex': multiplex,
       'startBit': startBit,
       'length': length,
-      'endianness': 'Intel',
-      'signed': false,
-      'factor': 1,
-      'offset': 0,
-      'min': 0,
-      'max': 0,
-      'unit': '',
-      'receivingNodes': new Array(),
-      'description': null,
-      'valueTable': null,
+      'endianness': endianness,
+      'signed': signed,
+      'factor': factor,
+      'offset': offset,
+      'min': min,
+      'max': max,
+      'unit': unit,
+      'receivingNodes': receivingNodes,
+      'description': description,
+      'valueTable': valueTable,
     };
     return signal;
   }
@@ -140,6 +156,7 @@ class Dbc extends Parser {
   addSignal(messageName: string, signal: Signal) {
     const message = this.data.messages.get(messageName);
     message?.signals.set(signal.name, signal);
+    // TODO: Allow for list of signals
   }
 
   /**

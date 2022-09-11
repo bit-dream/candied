@@ -108,3 +108,8 @@ export type Attribute = {
   value: string;
   options: (string)[];
 }
+
+export interface Config {
+  defaultEndianness: string;
+  overwriteFile: boolean;
+}
