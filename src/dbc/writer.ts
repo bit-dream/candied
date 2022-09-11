@@ -37,7 +37,8 @@ class Writer {
      */
     private writeVersion(version: string) {
         const lineContent = `VERSION "${version}"`
-        this.writeLine(lineContent, true);
+        this.writeLine(lineContent);
+        this.writeLine('');
     };
 
     private writeNamespace(ns: (string)[] | null = null) {
@@ -45,7 +46,8 @@ class Writer {
         // to be complete for a valid DBC file, we will skip it's content
         // and just render the main token
         const lineContent = `NS_:`;
-        this.writeLine(lineContent, true);
+        this.writeLine(lineContent);
+        this.writeLine('');
     };
 
     /**
@@ -59,7 +61,8 @@ class Writer {
         } else {
             lineContent = `BS_: ${busConfiguration}`;
         }
-        this.writeLine(lineContent, true);
+        this.writeLine(lineContent);
+        this.writeLine('');
     };
 
     /**
@@ -74,7 +77,8 @@ class Writer {
             // TODO: Actually enumerate list out
             lineContent = `BU_:`;
         }
-        this.writeLine(lineContent, true);
+        this.writeLine(lineContent);
+        this.writeLine('');
     };
 
     /**
@@ -128,10 +132,10 @@ class Writer {
      * @param line Line content to write to file
      * @param skipNextLine If next line should be a blank line
      */
-    private writeLine(line: string, skipNextLine: boolean = false) {
+    private writeLine(line: string) {
         fs.writeFileSync(
             this.file, 
-            skipNextLine ? `${line}\n\n` : `${line}\n`, 
+            `${line}\n`, 
             { flag: 'a+' }
         );
     };
@@ -175,7 +179,7 @@ class Writer {
             for (const [name, signal] of msg.signals) {
                 if (signal.valueTable) {
                     let members = this.generateEnumTable(signal.valueTable);
-                    let lineContent =  `VAL_ ${msg.id.toString()} ${signal.name} ${members} ;`;
+                    let lineContent =  `VAL_ ${msg.id.toString()} ${signal.name} ${members};`;
                     this.writeLine(lineContent);
                 }
             }
