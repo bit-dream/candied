@@ -36,6 +36,80 @@ dbc.load(filePath)
 })
 ```
 
+### Creating and Adding Messages
+You can create new messages and add them to the existing dataset. This works
+whether you are creating a DBC from scratch or appending to existing DBC data.
+
+```js
+
+dbc = Dbc();
+
+// Create message expects at minimum a name, ID, and DLC.
+const msg1 = dbc.createMessage('MyMessageName', 100, 8);
+
+// You can optionally define a message comment and define a node for the message
+const msg2 = dbc.createMessage(
+    'MyMessageName', // name
+    103, // id
+    8, // dlc
+    'MyNode', // node
+    'This is just a test comment' // comment
+);
+
+// To add the messages to the class data, you can simply call addMessage() with the Message object
+dbc.addMessage(msg1);
+dbc.addMessage(msg2);
+
+```
+
+### Creating signals
+You can create new signals with calls to createSignal().
+
+By default createSignal() assumes a few things if the optional parameters are not passed
+to the function:
+
+Endianness -> Intel
+
+Multiplex -> None
+
+Signed -> False
+
+Factor -> 1
+
+Offset -> 0
+
+Min, Max -> 0
+
+Unit -> None
+
+Receiving Nodes -> None
+
+Description -> None
+
+Value Table -> None
+
+At minimum name, start bit, and length need to be supplied
+
+```js
+
+dbc = Dbc();
+
+// Create message expects at minimum a name, ID, and DLC.
+const signal = dbc.createSignal(
+    'MySignalName', // signal name
+    3, // start bit
+    8 // signal length
+  )
+
+const msg1 = dbc.createMessage('MyMessageName', 100, 8);
+dbc.addMessage(msg1);
+
+// To add the signal to the class data, you can simply call addSignal() with the Message name that the signal
+// will be appended to in addition to the Signal object
+dbc.addSignal('MyMessageName', signal);
+
+```
+
 ## Contributing
 
 
