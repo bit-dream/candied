@@ -18,7 +18,7 @@ export type Signal = {
   receivingNodes: string[];
   description: string | null;
   valueTable: ValueTable | null;
-}
+};
 
 export type Message = {
   name: string;
@@ -27,7 +27,7 @@ export type Message = {
   sendingNode: string | null;
   signals: Map<string, Signal>;
   description: string | null;
-}
+};
 
 export type Tokens = {
   [key: string]: Token;
@@ -46,7 +46,7 @@ export type DbcData = {
   canNodes: string[];
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes | null;
-}
+};
 
 export type ValueTable = Map<number, string>;
 
@@ -93,21 +93,21 @@ export type CanFrame = {
   dlc: number;
   extended: boolean;
   payload: Uint8Array;
-}
+};
 
 export type Attributes = {
-  file: (Attribute)[] | null;
-  signals: (Attribute)[] | null;
-  messages: (Attribute)[] | null;
-  nodes: (Attribute)[] | null;
-}
+  file: Attribute[] | null;
+  signals: Attribute[] | null;
+  messages: Attribute[] | null;
+  nodes: Attribute[] | null;
+};
 
 export type Attribute = {
   name: string;
   dataType: string;
   value: string;
-  options: (string)[];
-}
+  options: string[];
+};
 
 export interface Config {
   defaultEndianness: string;

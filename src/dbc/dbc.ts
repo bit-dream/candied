@@ -8,25 +8,25 @@ import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from '.
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
  * or write data to a new DBC file.
- * 
+ *
  * If loading data from an existing file, simply call:
  * const dbc = new Dbc();
  * dbc.load('path/to/my/dbcFile.dbc')
- * 
+ *
  * load() loads the dbc data async., so to pull the data from the class instance
  * you will either need to wrap the call in an async function or call .then(data)
  * ex. dbc.load('path/to/my/dbcFile.dbc').then( data => DO SOMETHING WITH DATA HERE )
- * 
+ *
  * By default when a new Dbc() instance is created, the encapulsated data will be empty.
  * If you are wanting to create fresh data you can call createMessage or createSignal to
  * create messages and signals, respectively.
  * Calls to createMessage and createSignal do not by default add the messages to the data,
  * you will need to make subsequent calls to addMessage or addSignal to add the data
  * to the class.
- * 
+ *
  * To write data to a dbc file, you can call write() function.
  * write() expects a path to the dbc file
- * 
+ *
  */
 class Dbc extends Parser {
   data: DbcData;
@@ -41,7 +41,7 @@ class Dbc extends Parser {
       busConfiguration: null,
       canNodes: new Array(),
       valueTables: null,
-      attributes: null
+      attributes: null,
     };
   }
 
@@ -64,7 +64,7 @@ class Dbc extends Parser {
   /**
    * Adds a list of CAN nodes that exist for the network topology
    */
-  set canNodes(nodes: (string)[]) {
+  set canNodes(nodes: string[]) {
     this.data.canNodes = nodes;
   }
 
@@ -76,9 +76,9 @@ class Dbc extends Parser {
   }
 
   /**
-   * 
+   *
    * Creates a Message instance that can later be added using addMessage()
-   * 
+   *
    * @param name Name of CAN message
    * @param id ID of CAN message
    * @param dlc Data Length Code (data length) of CAN message
@@ -88,32 +88,32 @@ class Dbc extends Parser {
    */
   createMessage(name: string, id: number, dlc: number, sendingNode = null, description = null) {
     const message: Message = {
-      'name': name,
-      'id': id,
-      'dlc': dlc,
-      'sendingNode': sendingNode,
-      'signals': new Map(),
-      'description': description,
+      name,
+      id,
+      dlc,
+      sendingNode,
+      signals: new Map(),
+      description,
     };
     return message;
   }
 
   /**
-   * 
+   *
    * Adds/appends message to existing message list
-   * 
+   *
    * @param message Message object to be added
    */
   addMessage(message: Message) {
     this.data.messages.set(message.name, message);
-    // TODO Validate that message ID does not conflict 
+    // TODO Validate that message ID does not conflict
     // with other IDs. If it does, throw error
     // TODO Allow for a list of messages
   }
 
   createSignal(
-    name: string, 
-    startBit: number, 
+    name: string,
+    startBit: number,
     length: number,
     signed = false,
     endianness = 'Intel',
@@ -125,31 +125,31 @@ class Dbc extends Parser {
     description = null,
     multiplex = null,
     receivingNodes = new Array(),
-    valueTable = null
+    valueTable = null,
   ) {
     const signal: Signal = {
-      'name': name,
-      'multiplex': multiplex,
-      'startBit': startBit,
-      'length': length,
-      'endianness': endianness,
-      'signed': signed,
-      'factor': factor,
-      'offset': offset,
-      'min': min,
-      'max': max,
-      'unit': unit,
-      'receivingNodes': receivingNodes,
-      'description': description,
-      'valueTable': valueTable,
+      name,
+      multiplex,
+      startBit,
+      length,
+      endianness,
+      signed,
+      factor,
+      offset,
+      min,
+      max,
+      unit,
+      receivingNodes,
+      description,
+      valueTable,
     };
     return signal;
   }
 
   /**
-   * 
+   *
    * Adds a Signal object to a specified Message
-   * 
+   *
    * @param messageName Name of the message the signal will be added to
    * @param signal Signal object to be added to the specified message
    */
@@ -160,15 +160,15 @@ class Dbc extends Parser {
   }
 
   /**
-   * 
+   *
    * Returns a message with the corresponding CAN ID. If message does not exist
    * a MessageDoesNotExist error will be thrown.
-   * 
+   *
    * @param id The CAN ID of the message wanting to be found
    * @returns Message
    * @throws MessageDoesNotExist
    */
-  getMessageById(id: number) : Message {
+  getMessageById(id: number): Message {
     const messages = this.data.messages;
     for (const [name, message] of messages) {
       if (message.id === id) {
@@ -179,9 +179,9 @@ class Dbc extends Parser {
   }
 
   /**
-   * 
+   *
    * Finds a specific message within the DBC file data by name
-   * 
+   *
    * @param name string
    * @returns Message
    * @error MessageDoesNotExist
@@ -196,9 +196,9 @@ class Dbc extends Parser {
   }
 
   /**
-   * 
+   *
    * Returns a signal object located in a specific CAN message by name
-   * 
+   *
    * @param name string
    * @param messageName string
    * @returns Signal
@@ -208,24 +208,24 @@ class Dbc extends Parser {
     const msg = this.getMessageByName(messageName);
     const signals = msg?.signals;
     if (signals) {
-      for (let [signal, signalObj] of signals) {
+      for (const [signal, signalObj] of signals) {
         if (signal === name) {
           return signalObj;
         }
       }
     } else {
       throw new SignalDoesNotExist(`Signal could not be found in ${messageName}, because the
-      signal list for that message is empty.`)
+      signal list for that message is empty.`);
     }
     throw new SignalDoesNotExist(`Could not find ${name} in signal list.`);
   }
 
   /**
-   * 
+   *
    * @param file string
-   * @returns Promise<DbcData> 
+   * @returns Promise<DbcData>
    */
-  async load(file: string) : Promise<DbcData> {
+  async load(file: string): Promise<DbcData> {
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -243,7 +243,7 @@ class Dbc extends Parser {
       busConfiguration: null,
       canNodes: new Array(),
       valueTables: new Map(),
-      attributes: null
+      attributes: null,
     };
     for await (const line of rl) {
       lineInfo = this.parseLine(line);
@@ -256,16 +256,16 @@ class Dbc extends Parser {
   }
 
   /**
-   * 
+   *
    * Writes the encapsulated data of a Dbc class instance to a dbc file
-   * 
+   *
    * @param filePath Path to the file/dbc to be written to. If it does not exist at the path, the file
    * will automatically be created.
    */
   write(filePath: string) {
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
-  };
+  }
 
   private decode(frame: CanFrame) {
     // TODO
@@ -276,19 +276,19 @@ class Dbc extends Parser {
   }
 
   // TODO
-  private createCanFrame(id: number, extended: boolean, payload: Uint8Array) : CanFrame {
+  private createCanFrame(id: number, extended: boolean, payload: Uint8Array): CanFrame {
     if (payload.length > 8) {
-      throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`)
+      throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
     } else if (payload.length === 0) {
-      throw new InvalidPayloadLength(`Payload is either empty or undefined: ${payload}`)
+      throw new InvalidPayloadLength(`Payload is either empty or undefined: ${payload}`);
     }
     const frame = {
-      id: id,
+      id,
       dlc: payload.length,
-      extended: extended,
-      payload: payload
-    }
-    return frame
+      extended,
+      payload,
+    };
+    return frame;
   }
 }
 

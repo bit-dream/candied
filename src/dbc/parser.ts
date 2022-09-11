@@ -26,14 +26,10 @@ class Parser {
   }
 
   /**
-     * 
-     * @param line Raw line from dbc file
-     * @returns {
-          line: line,
-          baseToken: foundToken,
-          regexMatch: regexMatch,
-        }
-     */
+   * 
+   * @param line Raw line from dbc file
+   * @returns Object
+   */
   protected parseLine(line: string) {
     const baseTokens = Object.keys(this.tokens);
 
@@ -54,9 +50,9 @@ class Parser {
     keys = keys.sort((a, b) => b.length - a.length);
 
     return {
-      'line': line,
-      'baseToken': keys[0],
-      'regexMatch': foundTokens.get(keys[0]),
+      line,
+      baseToken: keys[0],
+      regexMatch: foundTokens.get(keys[0]),
     };
   }
 
@@ -128,7 +124,7 @@ class Parser {
           const definition = this.extractDefinition(groups);
           msg = this.getMessageByIdFromData(data, parseInt(groups.id, 10));
           if (msg) {
-            this.assignToSigValTable(msg, groups.name, definition)
+            this.assignToSigValTable(msg, groups.name, definition);
           }
           break;
 
@@ -192,7 +188,7 @@ class Parser {
       multiplex: obj.plex,
       startBit: parseInt(obj.startBit, 10),
       length: parseInt(obj.length, 10),
-      endianness: parseInt(obj.endian,10) === 1 ? 'Intel': 'Motorola',
+      endianness: parseInt(obj.endian, 10) === 1 ? 'Intel' : 'Motorola',
       signed: obj.signed === '+' ? true : false,
       factor: parseInt(obj.factor, 10),
       offset: parseInt(obj.offset, 10),
@@ -212,7 +208,7 @@ class Parser {
   }
 
   protected parseCanNodes(obj: CanNodesRegex) {
-    const canNodes: (string)[] = obj.nodes.trim().split(' ');
+    const canNodes: string[] = obj.nodes.trim().split(' ');
     return canNodes;
   }
 

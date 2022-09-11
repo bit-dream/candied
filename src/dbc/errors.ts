@@ -4,6 +4,9 @@
  *
  */
 
+/* tslint:disable:max-classes-per-file */
+/* tslint:disable:variable-name */
+
 export class LineDoesNotContainToken extends Error {
   __proto__ = Error;
   constructor(message: string) {
