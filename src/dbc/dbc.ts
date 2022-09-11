@@ -115,16 +115,16 @@ class Dbc extends Parser {
     name: string, 
     startBit: number, 
     length: number,
-    multiplex = null,
-    endianness = 'Intel',
     signed = false,
-    factor = 1,
-    offset = 0,
+    endianness = 'Intel',
     min = 0,
     max = 0,
+    factor = 1,
+    offset = 0,
     unit = '',
-    receivingNodes = new Array(),
     description = null,
+    multiplex = null,
+    receivingNodes = new Array(),
     valueTable = null
   ) {
     const signal: Signal = {
