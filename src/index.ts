@@ -1,9 +1,3 @@
-import Dbc from './dbc/dbc';
-import { MessageDoesNotExist } from '../src/dbc/errors';
-
-/* Take a look at signal table parsing for DBC_template.dbc. doesn't
-seem to be pulling out correctly, but does for the tesla dbc file */
-const dbc = new Dbc();
-dbc.load('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/tesla_can.dbc').then((data) => {
-  dbc.write('hello.dbc');
-});
+/*
+  This file is intentially left empty
+*/
