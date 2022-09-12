@@ -1,5 +1,5 @@
 {
-  "name": "dbc",
+  "name": "dbc-can",
   "version": "0.1.0",
   "description": "A CAN DBC parsing library for javascript/typescript",
   "main": "lib/index.js",
