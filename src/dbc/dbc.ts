@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { Message, Signal, DbcData, CanFrame } from './types';
+import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
 import Parser from './parser';
 import Writer from './writer';
 import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
@@ -86,7 +86,7 @@ class Dbc extends Parser {
    * @param description Short description of what the message is/does
    * @returns Message
    */
-  createMessage(name: string, id: number, dlc: number, sendingNode = null, description = null) {
+  createMessage(name: string, id: number, dlc: number, sendingNode: null | string = null, description: null | string = null) {
     const message: Message = {
       name,
       id,
@@ -104,29 +104,39 @@ class Dbc extends Parser {
    *
    * @param message Message object to be added
    */
-  addMessage(message: Message) {
-    this.data.messages.set(message.name, message);
+  addMessage(message: Message | (Message)[]) {
+    if (Array.isArray(message)) {
+      message.forEach(msg => {
+        this.data.messages.set(msg.name, msg)
+      })
+    } else {
+      this.data.messages.set(message.name, message);
+    }
     // TODO Validate that message ID does not conflict
     // with other IDs. If it does, throw error
-    // TODO Allow for a list of messages
+  }
+
+  removeMessage(messageName: string) {
+    this.data.messages.delete(messageName);
   }
 
   createSignal(
     name: string,
     startBit: number,
     length: number,
-    signed = false,
-    endianness = 'Intel',
-    min = 0,
-    max = 0,
-    factor = 1,
-    offset = 0,
-    unit = '',
-    description = null,
-    multiplex = null,
-    receivingNodes = new Array(),
-    valueTable = null,
+    signed: boolean = false,
+    endianness: EndianType = 'Intel',
+    min: number = 0,
+    max: number = 0,
+    factor: number = 1,
+    offset: number = 0,
+    unit: string | null = null,
+    description: string | null = null,
+    multiplex: string | null = null,
+    receivingNodes: (string)[] = new Array(),
+    valueTable: ValueTable | null = null,
   ) {
+    if (!unit) { unit = '' };
     const signal: Signal = {
       name,
       multiplex,
@@ -146,6 +156,11 @@ class Dbc extends Parser {
     return signal;
   }
 
+  removeSignal(signalName: string, messageName: string) {
+    const msg = this.getMessageByName(messageName);
+    msg?.signals.delete(signalName);
+  }
+
   /**
    *
    * Adds a Signal object to a specified Message
@@ -153,10 +168,19 @@ class Dbc extends Parser {
    * @param messageName Name of the message the signal will be added to
    * @param signal Signal object to be added to the specified message
    */
-  addSignal(messageName: string, signal: Signal) {
+  addSignal(messageName: string, signal: Signal | (Signal)[]) {
     const message = this.data.messages.get(messageName);
-    message?.signals.set(signal.name, signal);
-    // TODO: Allow for list of signals
+    if (message) {
+      if (Array.isArray(signal)) {
+        signal.forEach(sig => {
+          message.signals.set(sig.name, sig);
+        })
+      } else {
+        message.signals.set(signal.name, signal);
+      }
+    } else {
+      throw new MessageDoesNotExist(`No message with name ${messageName} exists in the database.`);
+    }
   }
 
   /**
