@@ -20,6 +20,58 @@ As of the time of writing, only 1 and 5 are supported with the aimed goal of ach
 
 ## Usage
 
+### DBC Data structure
+When you create an fresh instance of the Dbc class using `new Dbc()`, a new data
+structure is created to encapsulate all of the components that make up a dbc file.
+
+After creating messages/signals or loading directly from a dbc file, you can see
+the contents of the data by using the `.` operator on that specific class instance and calling the data variable,
+e.g. `const dbc = new Dbc(); dbc.data;`
+
+The structure of the data is as follows:
+- Data
+    - version: string | null -> Version of the DBC file
+    - messages: Map<string, Message> -> A container of all available CAN messages
+    - description: string | null; -> Short description of the DBC file
+    - busConfiguration: number | null; -> Expected CAN bus speed
+    - canNodes: string[]; -> List of nodes as they exist for the network topology
+    - valueTables: Map<string, ValueTable> | null; -> Value Tables/Enumerations
+    - attributes: Attributes | null; -> Any and all top level attributes
+
+Invidiual messages can be pulled out by key (since the data structure is a Map) or by using the 
+builtin uility function `getMessageById()` or `getMessageByName()`.
+Each individual message contains a substructure with the following items:
+
+- Message
+    - name: string -> Name of the message
+    - id: number -> CAN ID of the message
+    - dlc: number -> Data Length Code (DLC) of the message
+    - sendingNode: string | null -> Any node that sends this message
+    - signals: Map<string, Signal> -> Map of all available signals attached to this message
+    - description: string | null -> Short description of this message
+
+Messages typically contain a list of signals. Signals can be access access in a similar way to that
+of messages, since each message contains a Map data structure for its signals. CAN-DBC has built
+in utility functions to make the process a little bit easier, namely `getSignalByName` and `getSignalsByName`.
+
+The structure of an individual signal is:
+
+- Signal
+    - name: string
+    - multiplex: string | null
+    - startBit: number
+    - length: number
+    - endianness: string
+    - signed: boolean
+    - factor: number
+    - offset: number
+    - min: number
+    - max: number
+    - unit: string
+    - receivingNodes: string[]
+    - description: string | null
+    - valueTable: ValueTable | null
+
 ### Loading a dbc
 can-dbc loads dbc files asynchonously as to not bottleneck applications and as a result
 the actual loading of the file will need to be wrapped in an async/await function or 
@@ -68,25 +120,16 @@ You can create new signals with calls to createSignal().
 By default createSignal() assumes a few things if the optional parameters are not passed
 to the function:
 
-Endianness -> Intel
-
-Multiplex -> None
-
-Signed -> False
-
-Factor -> 1
-
-Offset -> 0
-
-Min, Max -> 0
-
-Unit -> None
-
-Receiving Nodes -> None
-
-Description -> None
-
-Value Table -> None
+- Endianness -> Intel
+- Multiplex -> None
+- Signed -> False
+- Factor -> 1
+- Offset -> 0
+- Min, Max -> 0
+- Unit -> None
+- Receiving Nodes -> None
+- Description -> None
+- Value Table -> None
 
 At minimum name, start bit, and length need to be supplied
 
