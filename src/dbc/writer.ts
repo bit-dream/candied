@@ -150,7 +150,7 @@ class Writer {
       }
       for (const [signalName, signal] of msg.signals) {
         if (signal.description) {
-          this.writeLine(`CM_ SG_ ${msg.id.toString()} ${name} "${signal.description}" ;`);
+          this.writeLine(`CM_ SG_ ${msg.id.toString()} ${signalName} "${signal.description}" ;`);
         }
       }
     }

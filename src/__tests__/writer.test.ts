@@ -92,8 +92,8 @@ test('DBC_template.dbc: Correct Signals Tables Written to File', (done) => {
           const writerSignals = writerData.messages.get(name)?.signals;
           const dataSignals = data.messages.get(name)?.signals;
           if (dataSignals) {
-            for (const [name, signal] of dataSignals) {
-              expect(signal.valueTable).toEqual(writerSignals?.get(name)?.valueTable);
+            for (const [signalName, signal] of dataSignals) {
+              expect(signal.valueTable).toEqual(writerSignals?.get(signalName)?.valueTable);
             }
           } else {
             fail('No signals in test dbc file.');
