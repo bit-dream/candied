@@ -1,8 +1,8 @@
 {
   "name": "dbc-can",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A CAN DBC parsing library for javascript/typescript",
-  "main": "lib/dbc/dbc.js",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
