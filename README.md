@@ -16,8 +16,6 @@ You should be able to do the following with this library:
 4. Encode to a raw CAN frame from a DBC message
 5. Use utility functions to help analyize DBC files.
 
-As of the time of writing, only 1 and 5 are supported with the aimed goal of acheiving all 5 (and more).
-
 ## Usage
 
 ### DBC Data structure
@@ -112,6 +110,9 @@ const msg2 = dbc.createMessage(
 dbc.addMessage(msg1);
 dbc.addMessage(msg2);
 
+// Alternatively, you can pass addMessage() an array of messages for easier adding
+dbc.addMessage([msg1,msg2]);
+
 ```
 
 ### Creating signals
@@ -142,7 +143,7 @@ const signal = dbc.createSignal(
     'MySignalName', // signal name
     3, // start bit
     8 // signal length
-  )
+)
 
 const msg1 = dbc.createMessage('MyMessageName', 100, 8);
 dbc.addMessage(msg1);
@@ -151,10 +152,34 @@ dbc.addMessage(msg1);
 // will be appended to in addition to the Signal object
 dbc.addSignal('MyMessageName', signal);
 
+// Just like addMessage(), addSignal() can optionally take an array of signals
+const signal2 = dbc.createSignal(
+    'MySignalName2', // signal name
+    16, // start bit
+    8 // signal length
+);
+
+dbc.addSignal([signal,signal2]);
+
 ```
+
+
+## Missing Functionality
+Not all functionality stated in the motivation section is currently implemented in CAN-DBC. However,
+this library is to be actively maintained and as such, all functionality is eventually intended to be implemented.
+
+As of writing, there is no/limited support for: 
+1. CAN message encoding/decoding.
+2. When parsing DBC files, not all attributes are pulled out, specifically: BA_DEF_, BA_DEF_DEF_, BA_, BO_TX_BU_, SIG_GROUP_ (Reference DBC_Specification.md to understand more of what these tokens represent). These fields will be the main target of the next release.
+3. NS_ and BU_ are not filled out when generating the dbc file. These fields are not technically needed for a valid DBC file. But will be added in a future release.
+4. More general configurability of parsing, writing, and creation of DBC files
+5. Continue to develop addToken() uility function that will allow a user to manually add parsing tokens. This will help in allowing the dbc parser to be more configurable and allow users greater control so that if this library falls behind a DBC standard update.
 
 ## Contributing
 
+Contributing is highly encourage and if wishing to contribute the Missing Functionality section is a great place to start. We are also open to any and all fresh ideas.
+
+We ask that the formatter and linter is ran before submitting a pull request.
 
 ## NPM Publishing
 package.json includes four utility functions that will be run before publishing to NPM
