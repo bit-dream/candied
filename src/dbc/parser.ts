@@ -21,7 +21,7 @@ class Parser {
     this.tokens = tokens;
   }
 
-  addToken(tokenName: string, tokenData: Token) {
+  private addToken(tokenName: string, tokenData: Token) {
     this.tokens[tokenName] = tokenData;
   }
 

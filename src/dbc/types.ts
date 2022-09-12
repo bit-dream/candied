@@ -112,4 +112,9 @@ export type Attribute = {
 export interface Config {
   defaultEndianness: string;
   overwriteFile: boolean;
+  newFileOnWrite: boolean;
+  overwriteMessages: boolean;
+  overwriteSignals: boolean;
 }
+
+export type EndianType = 'Intel'|'Motorola';
