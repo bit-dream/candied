@@ -26,7 +26,7 @@ class Parser {
   }
 
   /**
-   * 
+   *
    * @param line Raw line from dbc file
    * @returns Object
    */

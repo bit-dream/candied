@@ -86,7 +86,13 @@ class Dbc extends Parser {
    * @param description Short description of what the message is/does
    * @returns Message
    */
-  createMessage(name: string, id: number, dlc: number, sendingNode: null | string = null, description: null | string = null) {
+  createMessage(
+    name: string,
+    id: number,
+    dlc: number,
+    sendingNode: null | string = null,
+    description: null | string = null,
+  ) {
     const message: Message = {
       name,
       id,
@@ -104,11 +110,11 @@ class Dbc extends Parser {
    *
    * @param message Message object to be added
    */
-  addMessage(message: Message | (Message)[]) {
+  addMessage(message: Message | Message[]) {
     if (Array.isArray(message)) {
-      message.forEach(msg => {
-        this.data.messages.set(msg.name, msg)
-      })
+      message.forEach((msg) => {
+        this.data.messages.set(msg.name, msg);
+      });
     } else {
       this.data.messages.set(message.name, message);
     }
@@ -133,10 +139,12 @@ class Dbc extends Parser {
     unit: string | null = null,
     description: string | null = null,
     multiplex: string | null = null,
-    receivingNodes: (string)[] = new Array(),
+    receivingNodes: string[] = new Array(),
     valueTable: ValueTable | null = null,
   ) {
-    if (!unit) { unit = '' };
+    if (!unit) {
+      unit = '';
+    }
     const signal: Signal = {
       name,
       multiplex,
@@ -168,13 +176,13 @@ class Dbc extends Parser {
    * @param messageName Name of the message the signal will be added to
    * @param signal Signal object to be added to the specified message
    */
-  addSignal(messageName: string, signal: Signal | (Signal)[]) {
+  addSignal(messageName: string, signal: Signal | Signal[]) {
     const message = this.data.messages.get(messageName);
     if (message) {
       if (Array.isArray(signal)) {
-        signal.forEach(sig => {
+        signal.forEach((sig) => {
           message.signals.set(sig.name, sig);
-        })
+        });
       } else {
         message.signals.set(signal.name, signal);
       }

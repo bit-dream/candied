@@ -117,4 +117,4 @@ export interface Config {
   overwriteSignals: boolean;
 }
 
-export type EndianType = 'Intel'|'Motorola';
+export type EndianType = 'Intel' | 'Motorola';
