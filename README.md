@@ -70,6 +70,20 @@ The structure of an individual signal is:
     - description: string | null
     - valueTable: ValueTable | null
 
+### Importing the package
+
+```js
+import Dbc from 'dbc-can';
+const dbc = new Dbc();
+
+```
+
+```js
+var Dbc = require('dbc-can');
+const dbc = new Dbc();
+
+```
+
 ### Loading a dbc
 can-dbc loads dbc files asynchonously as to not bottleneck applications and as a result
 the actual loading of the file will need to be wrapped in an async/await function or 
@@ -162,7 +176,25 @@ const signal2 = dbc.createSignal(
 dbc.addSignal([signal,signal2]);
 
 ```
+### Writing DBC Files
+Writing to a DBC file is relatively easy using the builtin write function.
 
+```js
+import Dbc from 'dbc-can';
+
+const dbc = new Dbc();
+
+const msg = dbc.createMessage('TestMessage', 10, 8);
+const signal = dbc.createSignal('TestSignal', 0, 4);
+
+dbc.addMessage(msg);
+dbc.addSignal('TestMessage', signal);
+
+// Put in the path to the file, making sure to include the .dbc extension
+// The data that is written to the file is the data that is encapsulated within the class instance
+dbc.write('path/to/file.dbc');
+
+```
 
 ## Missing Functionality
 Not all functionality stated in the motivation section is currently implemented in CAN-DBC. However,
