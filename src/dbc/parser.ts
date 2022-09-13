@@ -158,7 +158,7 @@ class Parser {
   }
 
   protected extractDefinition(obj: DefinitionRegex) {
-    const regEx = /(?<value>[0-9-]+) "(?<description>[a-zA-Z_]+)"/gi;
+    const regEx = /(?<value>[0-9-]+) "(?<description>(?:[^"\\]|\\.)*)"/gi;
     const matches = obj.definition.matchAll(regEx);
     const definitions = new Map();
 
