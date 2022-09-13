@@ -189,7 +189,7 @@ class Parser {
       startBit: parseInt(obj.startBit, 10),
       length: parseInt(obj.length, 10),
       endianness: parseInt(obj.endian, 10) === 1 ? 'Intel' : 'Motorola',
-      signed: obj.signed === '+' ? true : false,
+      signed: obj.signed === '-' ? true : false,
       factor: parseInt(obj.factor, 10),
       offset: parseInt(obj.offset, 10),
       min: parseInt(obj.min, 10),
