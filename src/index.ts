@@ -6,6 +6,6 @@ import Dbc from './dbc/dbc';
 
 export default Dbc;
 
-if (typeof module === "object" && typeof module.exports === "object") {
+if (typeof module === 'object' && typeof module.exports === 'object') {
   module.exports = Object.assign(module.exports.default, module.exports);
 }
