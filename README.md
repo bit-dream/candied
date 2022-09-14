@@ -1,4 +1,4 @@
-# CAN-DBC
+# DBC-CAN
 ### A zero dependency, lightly weight parser, written in pure Javascript/Typescript
 
 ## Motivation
@@ -7,7 +7,7 @@ The DBC file is an ASCII based translation file used to apply identifying names,
 
 Simply put, it helps decode raw CAN (Controller Area Network) frames into something that is human readable.
 
-### What are the goals of CAN-DBC
+### What are the goals of DBC-CAN
 To develop and deploy a very simple, lightweight library that doesn't relay on external dependecies.
 You should be able to do the following with this library:
 1. Load and parse a .dbc file so that its contents can be analysed (messages, signals, etc.)
@@ -17,6 +17,17 @@ You should be able to do the following with this library:
 5. Use utility functions to help analyize DBC files.
 
 ## Usage
+
+### Installing the Library
+
+dbc-can is freely available on NPM and can be installed directly using the command `npm install dbc-can`
+
+### Importing the Library
+```js
+    import Dbc from 'dbc-can';
+```
+Note that if you are using Node, you may need to include:
+`"type": "module"` in your parent package.json file so that the package can be imported correctly.
 
 ### DBC Data structure
 When you create an fresh instance of the Dbc class using `new Dbc()`, a new data
@@ -49,7 +60,7 @@ Each individual message contains a substructure with the following items:
     - description: string | null -> Short description of this message
 
 Messages typically contain a list of signals. Signals can be access access in a similar way to that
-of messages, since each message contains a Map data structure for its signals. CAN-DBC has built
+of messages, since each message contains a Map data structure for its signals. DBC-CAN has built
 in utility functions to make the process a little bit easier, namely `getSignalByName` and `getSignalsByName`.
 
 The structure of an individual signal is:
@@ -70,22 +81,8 @@ The structure of an individual signal is:
     - description: string | null
     - valueTable: ValueTable | null
 
-### Importing the package
-
-```js
-import Dbc from 'dbc-can';
-const dbc = new Dbc();
-
-```
-
-```js
-var Dbc = require('dbc-can');
-const dbc = new Dbc();
-
-```
-
 ### Loading a dbc
-can-dbc loads dbc files asynchonously as to not bottleneck applications and as a result
+DBC-CAN loads dbc files asynchonously as to not bottleneck applications and as a result
 the actual loading of the file will need to be wrapped in an async/await function or 
 use `.then()` to catch the resulting data upon completion.
 
@@ -98,6 +95,21 @@ dbc.load(filePath)
 .then(data => {
     console.log(data);
 })
+```
+
+### Modifing Top Level Properties
+
+As outlined in the Dbc Data Structure section, there a few top level properties that can be modified
+to suit your individual needs. dbc-can has built in setters for the class that allow you to directly modify them.
+
+```js
+import Dbc from 'dbc-can';
+
+const dbc = new Dbc();
+dbc.version = '1.0'; // Internal DBC file version number
+dbc.busConfiguration = 500 // CAN bus speed
+dbc.canNodes = ['Node1', 'Node2'] // Top level nodes that exist on the CAN bus
+
 ```
 
 ### Creating and Adding Messages
@@ -126,6 +138,14 @@ dbc.addMessage(msg2);
 
 // Alternatively, you can pass addMessage() an array of messages for easier adding
 dbc.addMessage([msg1,msg2]);
+
+/* Note that when creating a message that what is being returned is a simple object.
+ * If you don't want to pass the additional arguments to createMessage() you can
+ * access the properties directly
+*/
+msg1.sendingNode = 'MyNode';
+msg1.description = 'This is a description for this message';
+dbc.addMessage(msg1);
 
 ```
 
@@ -173,7 +193,16 @@ const signal2 = dbc.createSignal(
     8 // signal length
 );
 
-dbc.addSignal([signal,signal2]);
+dbc.addSignal('MyMessageName', [signal,signal2]);
+
+/* Note that when creating a signal that what is being returned is a simple object.
+ * If you don't want to pass the additional arguments to createSignal() you can
+ * access the properties directly. This may be preferential so you don't have to pass
+ * all of the additional arguments if you are only intending to modify a few of them.
+*/
+signal.signed = true
+signal.endianness = 'Motorola'
+dbc.addSignal('MyMessageName',signal);
 
 ```
 ### Writing DBC Files
@@ -197,7 +226,7 @@ dbc.write('path/to/file.dbc');
 ```
 
 ## Missing Functionality
-Not all functionality stated in the motivation section is currently implemented in CAN-DBC. However,
+Not all functionality stated in the motivation section is currently implemented in DBC-CAN. However,
 this library is to be actively maintained and as such, all functionality is eventually intended to be implemented.
 
 As of writing, there is no/limited support for: 
@@ -206,6 +235,13 @@ As of writing, there is no/limited support for:
 3. NS_ and BU_ are not filled out when generating the dbc file. These fields are not technically needed for a valid DBC file. But will be added in a future release.
 4. More general configurability of parsing, writing, and creation of DBC files
 5. Continue to develop addToken() uility function that will allow a user to manually add parsing tokens. This will help in allowing the dbc parser to be more configurable and allow users greater control so that if this library falls behind a DBC standard update.
+6. Input and output validation:
+    a. Disallow adding of messages with the same name
+    b. Disallow adding of signals that overlap due to start bits and length
+    c. Validate entire data structure before writing to a dbc file. The Writer() class that generates the dbc file
+    will generate a DBC file that can be parsed by popular tools like CANDB++, but that does not guarentee that
+    the everything is completely correct. For example, older DBC files do not support Message/Signal names that are greater
+    than 32 characters long.
 
 ## Contributing
 

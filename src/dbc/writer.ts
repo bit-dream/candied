@@ -13,6 +13,8 @@ class Writer {
    * @param data dbc data loaded or created using main DBC class
    */
   constructFile(data: DbcData) {
+    // This will clear out the file before writing to it
+    fs.writeFileSync(this.file, '', { flag: 'w+' });
     // Main file attributes
     this.writeVersion(data.version ? data.version : '');
     this.writeNamespace();
