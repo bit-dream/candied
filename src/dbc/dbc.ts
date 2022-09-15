@@ -299,29 +299,6 @@ class Dbc extends Parser {
     writer.constructFile(this.data);
   }
 
-  private decode(frame: CanFrame) {
-    // TODO
-  }
-
-  private encode(message: Message) {
-    // TODO
-  }
-
-  // TODO
-  private createCanFrame(id: number, extended: boolean, payload: Uint8Array): CanFrame {
-    if (payload.length > 8) {
-      throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
-    } else if (payload.length === 0) {
-      throw new InvalidPayloadLength(`Payload is either empty or undefined: ${payload}`);
-    }
-    const frame = {
-      id,
-      dlc: payload.length,
-      extended,
-      payload,
-    };
-    return frame;
-  }
 }
 
 export default Dbc;
