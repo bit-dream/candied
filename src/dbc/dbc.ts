@@ -299,7 +299,6 @@ class Dbc extends Parser {
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
-
 }
 
 export default Dbc;

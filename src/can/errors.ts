@@ -14,4 +14,3 @@ export class InvalidPayloadLength extends Error {
     Object.setPrototypeOf(this, InvalidPayloadLength.prototype);
   }
 }
-
