@@ -4,6 +4,7 @@ import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './ty
 import Parser from './parser';
 import Writer from './writer';
 import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
+import Can from '../can/can';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file

@@ -8,7 +8,7 @@ export type Signal = {
   multiplex: string | null;
   startBit: number;
   length: number;
-  endianness: string;
+  endianness: EndianType;
   signed: boolean;
   factor: number;
   offset: number;

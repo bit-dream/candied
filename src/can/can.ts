@@ -1,14 +1,20 @@
 import Dbc from '../dbc/dbc';
 import { MessageDoesNotExist } from '../dbc/errors';
-import { DbcData, EndianType, Message } from '../dbc/types';
-import { Frame, BoundMessage, BoundSignal} from './canTypes';
+import { DbcData, EndianType, Message, Signal } from '../dbc/types';
+import { Frame, BoundMessage, BoundSignal, Payload} from './types';
 import { InvalidPayloadLength } from './errors';
 
 class Can {
 
-  constructor() {
+  #dbc: DbcData
+  constructor(dbc: DbcData) {
+    this.#dbc = dbc;
   }
   
+   set dbc(dbc: DbcData) {
+    this.#dbc = dbc;
+   }
+   
    createFrame(id: number, payload: (number)[], hex=false): Frame {
     if (payload.length > 8) {
       throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
@@ -28,26 +34,29 @@ class Can {
     return canFrame;
   }
 
-  /*
-  decode(frame: Frame) {
-    // Convert 
-    const bin = this.decArr2bin(frame.payload);
+
+  decode(frame: Frame): BoundMessage | undefined {
+
     const msg = this.getMessageById(frame.id);
+
+    if (msg.dlc !== frame.dlc) {
+        return undefined
+    }
 
     let signals = new Map();
     for (const [name, signal] of msg.signals) {
+        const bndSig = this.decodeSignal(frame.payload, signal);
+        signals.set(name, bndSig);
     }
     
-    let boundMessage: BoundMessage = {
+    let boundMessage = {
         name: msg.name,
         id: msg.id,
         signals
     }
     return boundMessage
   }
-  */
 
-  /*
   private getMessageById(id: number): Message {
     const messages = this.#dbc.messages;
     for (const [name, message] of messages) {
@@ -57,52 +66,52 @@ class Can {
     }
     throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
   }
-  */
 
-  extractBits(data: (string)[], startBit: number, length: number, endian: EndianType) {
-    
-    let bin: string;
-    switch (endian) {
-        case 'Intel':
-            // Rearrange byte order to 8 -> 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1
-            bin = data.reduceRight((previousVal,currentVal) => previousVal + currentVal);
-            bin = bin.slice((length - startBit) - startBit + 1, length - startBit);
-            break;
-        case 'Motorola':
-            bin = data.join('');
-            bin = bin.slice((length - startBit) - startBit + 1, length - startBit);
-            break;
-    }
-
-    return bin;
-  }
-
-  private requiredBits(bitLen: number) {
-    
-    let minNumBits = 8;
-    if (bitLen > 8 && bitLen <= 16) {
-        minNumBits = 16;
-    } else if (bitLen > 16 && bitLen <= 32) {
-        minNumBits = 32;
-    } else if (bitLen >= 32 && bitLen <= 64) {
-        minNumBits = 64;
-    } else if (bitLen > 64) {
-        throw Error(`Length of bits exceeds the length a CAN frame can store: ${bitLen} `)
-    }
-
-    return minNumBits
-  }
-
-  bitGet(num: number, idx: number) {
+  private bitGet(num: number, idx: number) {
 
     let bitField = this.dec2bin(num).split('');
     // Assumes least significant bit starts at the end of the array
     return bitField[idx]
   }
 
-  bitSet(num: (number)[], idx: number, val: number) {
+  private bitSet(num: (number)[], idx: number, val: number) {
     num[num.length - idx - 1] = val; 
     return num; 
+  }
+
+  decodeSignal(payload: Payload, signal: Signal): BoundSignal {
+
+    let rawValue = this.getValue(payload, signal.startBit, signal.length, signal.endianness, signal.signed);
+    
+    // Apply scaling and offset
+    let prcValue = (rawValue * signal.factor) + signal.offset;
+    // Determine if we need to enforce min/maxs on the value
+    if (signal.min === 0 && signal.max === 0) {
+        prcValue = prcValue;
+    } else if (prcValue < signal.min) {
+        prcValue = signal.min;
+    } else if (prcValue > signal.max) {
+        prcValue = signal.max;
+    }
+
+    // If we have an enumeration, return enumeration member for physical value, otherwise return with units
+    let physValue: string;
+    if (signal.valueTable) {
+        let enumMem = signal.valueTable.get(prcValue);
+        if (enumMem) {
+            physValue = enumMem;
+        } else {
+            physValue = prcValue.toString() + (signal.unit ? ' ' + signal.unit : '');
+        }
+    } else {
+        physValue = prcValue.toString() + (signal.unit ? ' ' + signal.unit : '');
+    }
+
+    return {
+        value: prcValue,
+        rawValue,
+        physValue
+    }
   }
 
   getValue(data: (number)[], startBit: number, signalLength: number, endian: EndianType, signed: boolean) {
@@ -141,7 +150,7 @@ class Can {
     return prcValue;
   }
 
-  bin2decSigned(bits: string) {
+  private bin2decSigned(bits: string) {
     let negative = (bits[0] === '1');
     if (negative) {
         let inverse = '';
@@ -154,19 +163,11 @@ class Can {
     }
 }
 
-  bin2dec(bin: string) {
+  private bin2dec(bin: string) {
     return parseInt(bin, 2);
   }
 
-  decArr2bin(bytes: (number)[]) {
-    let binArr = bytes.map((num) => this.dec2bin(num))
-    
-    //const binStrArr = bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, '0'), '').split('');
-    //return binStrArr.map((b)=>parseInt(b,10));
-    return binArr
-  }
-
-  dec2bin(dec: number): string {
+  private dec2bin(dec: number): string {
     const paddedBin =  ("000000000" + (dec >>> 0).toString(2))
     return paddedBin.substring(paddedBin.length - 8);
   }

@@ -2,7 +2,7 @@ export type Frame = {
     id: number;
     dlc: number;
     isExtended: boolean;
-    payload: (number)[];
+    payload: Payload;
 };
 
 export type BoundMessage = {
@@ -16,3 +16,5 @@ export type BoundSignal = {
     rawValue: number;
     physValue: string;
 };
+
+export type Payload = (number)[];
