@@ -4,6 +4,7 @@ import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './ty
 import Parser from './parser';
 import Writer from './writer';
 import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
+import Can from '../can/can';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -299,28 +300,31 @@ class Dbc extends Parser {
     writer.constructFile(this.data);
   }
 
-  private decode(frame: CanFrame) {
-    // TODO
-  }
-
-  private encode(message: Message) {
-    // TODO
-  }
-
-  // TODO
-  private createCanFrame(id: number, extended: boolean, payload: Uint8Array): CanFrame {
-    if (payload.length > 8) {
-      throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
-    } else if (payload.length === 0) {
-      throw new InvalidPayloadLength(`Payload is either empty or undefined: ${payload}`);
-    }
-    const frame = {
-      id,
-      dlc: payload.length,
-      extended,
-      payload,
+  /**
+   *
+   * Transforms the internal DBC data from class instance into a JSON object/string
+   *
+   * @param pretty Determines if JSON output should be formatted. Defaults to true.
+   * @returns JSON representation of loaded DBC data
+   */
+  toJson(pretty = true) {
+    const replacer = (key: any, value: any) => {
+      if (value instanceof Map) {
+        if (key === 'valueTable' || key === 'valueTables') {
+          return Object.fromEntries(value.entries());
+        }
+        return Array.from(value.values()); // or with spread: value: [...value]
+      } else {
+        return value;
+      }
     };
-    return frame;
+
+    let indent = 0;
+    if (pretty) {
+      indent = 2;
+    }
+    const json = JSON.stringify(this.data, replacer, indent);
+    return json;
   }
 }
 
