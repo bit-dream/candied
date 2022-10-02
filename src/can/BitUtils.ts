@@ -1,6 +1,6 @@
 class BitUtils {
   protected bitGet(num: number, idx: number) {
-    let bitField = this.dec2bin(num).split('');
+    const bitField = this.dec2bin(num).split('');
     // Assumes least significant bit starts at the end of the array
     return bitField[idx];
   }
@@ -11,7 +11,7 @@ class BitUtils {
   }
 
   protected bin2decSigned(bits: string) {
-    let negative = bits[0] === '1';
+    const negative = bits[0] === '1';
     if (negative) {
       let inverse = '';
       for (let i = 0; i < bits.length; i++) {

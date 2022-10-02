@@ -42,13 +42,13 @@ class Can extends BitUtils {
       return undefined;
     }
 
-    let signals = new Map();
+    const signals = new Map();
     for (const [name, signal] of msg.signals) {
       const bndSig = this.decodeSignal(frame.payload, signal);
       signals.set(name, bndSig);
     }
 
-    let boundMessage = {
+    const boundMessage = {
       name: msg.name,
       id: msg.id,
       signals,
@@ -67,7 +67,7 @@ class Can extends BitUtils {
   }
 
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
-    let rawValue = this.getValue(payload, signal.startBit, signal.length, signal.endianness, signal.signed);
+    const rawValue = this.getValue(payload, signal.startBit, signal.length, signal.endianness, signal.signed);
 
     // Apply scaling and offset
     let prcValue = rawValue * signal.factor + signal.offset;
@@ -83,7 +83,7 @@ class Can extends BitUtils {
     // If we have an enumeration, return enumeration member for physical value, otherwise return with units
     let physValue: string;
     if (signal.valueTable) {
-      let enumMem = signal.valueTable.get(prcValue);
+      const enumMem = signal.valueTable.get(prcValue);
       if (enumMem) {
         physValue = enumMem;
       } else {
@@ -106,11 +106,11 @@ class Can extends BitUtils {
     let targetBit = startBit;
 
     for (let i = 0; i < signalLength; ++i) {
-      let targetByteIndex = Math.ceil((targetBit + 1) / 8);
+      const targetByteIndex = Math.ceil((targetBit + 1) / 8);
 
       // Need to handle bit field correctly since LSB starts at end of array
-      let targetBitIdx = 7 - (targetBit - (targetByteIndex - 1) * 8);
-      let val = this.bitGet(data[targetByteIndex - 1], targetBitIdx);
+      const targetBitIdx = 7 - (targetBit - (targetByteIndex - 1) * 8);
+      const val = this.bitGet(data[targetByteIndex - 1], targetBitIdx);
 
       if (val) {
         signalData = this.bitSet(signalData, i, Number(val));
