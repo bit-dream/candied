@@ -299,6 +299,34 @@ class Dbc extends Parser {
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
+
+  /**
+   * 
+   * Transforms the internal DBC data from class instance into a JSON object/string
+   * 
+   * @param pretty Determines if JSON output should be formatted. Defaults to true.
+   * @returns JSON representation of loaded DBC data
+   */
+  toJson(pretty = true) {
+
+    const replacer = (key: any, value: any) => {
+      if(value instanceof Map) {
+        if (key === 'valueTable' || key === 'valueTables') {
+          return Object.fromEntries(value.entries())
+        }
+        return Array.from(value.values()) // or with spread: value: [...value]
+      } else {
+        return value;
+      }
+    }
+
+    let indent = 0;
+    if (pretty) {
+      indent = 2;
+    }
+    let json = JSON.stringify(this.data, replacer, indent);
+    return json
+  }
 }
 
 export default Dbc;
