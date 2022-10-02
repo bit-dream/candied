@@ -16,7 +16,7 @@ class Can extends BitUtils {
     this.#dbc = dbc;
   }
 
-  createFrame(id: number, payload: number[], hex = false): Frame {
+  createFrame(id: number, payload: number[]): Frame {
     if (payload.length > 8) {
       throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
     } else if (payload.length === 0) {

@@ -225,17 +225,225 @@ dbc.write('path/to/file.dbc');
 
 ```
 
+### Decoding CAN Messages
+DBC-CAN has the ability to decode CAN frames to its real world values.
+
+```js
+import Dbc from 'dbc-can';
+import { CAN } from 'dbc-can';
+
+const dbc = new Dbc();
+
+// createFrame will automatically determine DLC from the payload size as well as extended vs standard for the ID
+// Payload assumes decimal. Payload values are clamped if values entered are above 255 or below 0.
+// i.e. 300 = 255, -1 = 0
+dbc.load('tesla_can.dbc').then(data=>{
+
+    // Can() class allows for creation of CAN frames as well as message decoding
+    const can = new Can(data);
+    const canFrame = can.createFrame(264, [40, 200, 100, 140, 23, 255, 66, 12]);
+    // decode takes in type Frame. Returns a bound message type
+    /*
+        name: string;
+        id: number;
+        signals: Map<string, BoundSignal>;
+    */
+    let boundMsg = can.decode(canFrame);
+    /* Bound signals contain: 
+        Physical value - Conditioned value that has any units applied, as well as any scaling, factors, and min/max values
+        if any enumerations are attached the signal, the enumeration member will automatically be returned
+        Value - Conditioned value that has scaling, factor, and min/max values applied
+        Raw Value - Raw value as extracted according to the DBC file
+    */
+    let boundSignals = boundMsg?.signals;
+    console.log(boundSignals);
+});
+
+```
+
+Returns
+```js
+Map(7) {
+  'DI_torqueDriver' => { value: 522, rawValue: 2088, physValue: '522 Nm' },
+  'DI_torque1Counter' => { value: 6, rawValue: 6, physValue: '6' },
+  'DI_torqueMotor' => { value: 750, rawValue: 3172, physValue: '750 Nm' },
+  'DI_soptState' => { value: 4, rawValue: 4, physValue: 'SOPT_TEST_NOT_RUN' },
+  'DI_motorRPM' => { value: -233, rawValue: -233, physValue: '-233 RPM' },
+  'DI_pedalPos' => {
+    value: 26.400000000000002,
+    rawValue: 66,
+    physValue: '26.400000000000002 %'
+  },
+  'DI_torque1Checksum' => { value: 12, rawValue: 12, physValue: '12' }
+}
+```
+
+### Exporting to JSON
+DBC-CAN allows you to export loaded or created DBC data directly from the class instance
+
+```js
+import Dbc from 'dbc-can';
+
+const dbc = new Dbc();
+dbc.load('DBC_template.dbc').then(data=>{
+    // You can optionally past a value of false to toJson so no formatting is applied to the output
+    // ie. .toJson(false)
+    let json = dbc.toJson();
+    console.log(json);
+})
+
+```
+
+Returns
+```json
+{
+  "version": "1.0",
+  "messages": [
+    {
+      "name": "CANMessage",
+      "id": 1234,
+      "dlc": 8,
+      "sendingNode": "Node0",
+      "signals": [
+        {
+          "name": "Signal0",
+          "multiplex": "",
+          "startBit": 0,
+          "length": 32,
+          "endianness": "Intel",
+          "signed": true,
+          "factor": 1,
+          "offset": 0,
+          "min": 0,
+          "max": 0,
+          "unit": "",
+          "receivingNodes": [
+            "Node1",
+            "Node2"
+          ],
+          "description": "First signal in this message",
+          "valueTable": null
+        },
+        {
+          "name": "Signal1",
+          "multiplex": "",
+          "startBit": 32,
+          "length": 32,
+          "endianness": "Intel",
+          "signed": false,
+          "factor": 100,
+          "offset": 0,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "receivingNodes": [
+            "Node1",
+            "Node2"
+          ],
+          "description": null,
+          "valueTable": null
+        }
+      ],
+      "description": null
+    },
+    {
+      "name": "CANMultiplexed",
+      "id": 4321,
+      "dlc": 2,
+      "sendingNode": "Node0",
+      "signals": [
+        {
+          "name": "Multiplexer",
+          "multiplex": "M",
+          "startBit": 0,
+          "length": 8,
+          "endianness": "Intel",
+          "signed": false,
+          "factor": 1,
+          "offset": 0,
+          "min": 0,
+          "max": 0,
+          "unit": "",
+          "receivingNodes": [
+            "Node1"
+          ],
+          "description": null,
+          "valueTable": null
+        },
+        {
+          "name": "Value0",
+          "multiplex": "m0",
+          "startBit": 8,
+          "length": 8,
+          "endianness": "Intel",
+          "signed": false,
+          "factor": 1,
+          "offset": 0,
+          "min": 0,
+          "max": 0,
+          "unit": "",
+          "receivingNodes": [
+            "Node1"
+          ],
+          "description": null,
+          "valueTable": {
+            "0": "Value0",
+            "1": "Value1",
+            "2": "Value2"
+          }
+        },
+        {
+          "name": "Value1",
+          "multiplex": "m1",
+          "startBit": 8,
+          "length": 8,
+          "endianness": "Intel",
+          "signed": false,
+          "factor": 1,
+          "offset": 0,
+          "min": 0,
+          "max": 0,
+          "unit": "",
+          "receivingNodes": [
+            "Node1"
+          ],
+          "description": null,
+          "valueTable": {}
+        }
+      ],
+      "description": "Multiplexed CAN-Message"
+    }
+  ],
+  "description": "DBC Template with multiline description",
+  "busConfiguration": 500,
+  "canNodes": [
+    "Node0",
+    "Node1",
+    "Node2"
+  ],
+  "valueTables": {
+    "Numbers": [
+      "Three",
+      "Two",
+      "One",
+      "Zero"
+    ]
+  },
+  "attributes": null
+}
+```
+
+
 ## Missing Functionality
 Not all functionality stated in the motivation section is currently implemented in DBC-CAN. However,
 this library is to be actively maintained and as such, all functionality is eventually intended to be implemented.
 
 As of writing, there is no/limited support for: 
-1. CAN message encoding/decoding.
-2. When parsing DBC files, not all attributes are pulled out, specifically: BA_DEF_, BA_DEF_DEF_, BA_, BO_TX_BU_, SIG_GROUP_ (Reference DBC_Specification.md to understand more of what these tokens represent). These fields will be the main target of the next release.
-3. NS_ and BU_ are not filled out when generating the dbc file. These fields are not technically needed for a valid DBC file. But will be added in a future release.
-4. More general configurability of parsing, writing, and creation of DBC files
-5. Continue to develop addToken() uility function that will allow a user to manually add parsing tokens. This will help in allowing the dbc parser to be more configurable and allow users greater control so that if this library falls behind a DBC standard update.
-6. Input and output validation:
+1. When parsing DBC files, not all attributes are pulled out, specifically: BA_DEF_, BA_DEF_DEF_, BA_, BO_TX_BU_, SIG_GROUP_ (Reference DBC_Specification.md to understand more of what these tokens represent). These fields will be the main target of the next release.
+2. NS_ and BU_ are not filled out when generating the dbc file. These fields are not technically needed for a valid DBC file. But will be added in a future release.
+3. More general configurability of parsing, writing, and creation of DBC files
+4. Continue to develop addToken() uility function that will allow a user to manually add parsing tokens. This will help in allowing the dbc parser to be more configurable and allow users greater control so that if this library falls behind a DBC standard update.
+5. Input and output validation:
     a. Disallow adding of messages with the same name
     b. Disallow adding of signals that overlap due to start bits and length
     c. Validate entire data structure before writing to a dbc file. The Writer() class that generates the dbc file
