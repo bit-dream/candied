@@ -7,13 +7,25 @@ import BitUtils from './BitUtils';
 
 class Can extends BitUtils {
   #dbc: DbcData;
+  #idMap: Map<number, Message>;
+
   constructor(dbc: DbcData) {
     super();
     this.#dbc = dbc;
+    this.#idMap = this.messageMapTransform(this.#dbc.messages);
   }
 
   set dbc(dbc: DbcData) {
     this.#dbc = dbc;
+    this.#idMap = this.messageMapTransform(this.#dbc.messages);
+  }
+
+  private messageMapTransform(messages: Map<string, Message>): Map<number, Message> {
+    const idMap = new Map();
+    for (const [key, value] of messages) {
+      idMap.set(value.id, value);
+    }
+    return idMap;
   }
 
   createFrame(id: number, payload: number[]): Frame {
@@ -57,13 +69,12 @@ class Can extends BitUtils {
   }
 
   private getMessageById(id: number): Message {
-    const messages = this.#dbc.messages;
-    for (const [name, message] of messages) {
-      if (message.id === id) {
-        return message;
-      }
+    let message: Message | undefined;
+    message = this.#idMap.get(id);
+    if (message === undefined) {
+      throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
     }
-    throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
+    return message;
   }
 
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
