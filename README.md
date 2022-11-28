@@ -225,6 +225,35 @@ dbc.write('path/to/file.dbc');
 
 ```
 
+### Example DBC File Creation
+Below is an example of how you can create a fairly large DBC file with relative ease. For this particular
+example, we will create a DBC file that contains over 700 individual CAN messages and a few signals contained
+in each message.
+```js
+let dbc = new Dbc();
+
+// Create a blank array with over 700 elements
+// We'll use this to create our number range 0-699
+let range = new Array(700);
+for (const key of range.keys()) {
+
+    // Give each message a unique name by appending the iteration number
+    const msgName = 'Message' + (key + 1).toString();
+
+    // Create and add the message to the class data
+    let msg = dbc.createMessage(msgName, key + 1, 8);
+    dbc.addMessage(msg);
+
+    // Create and add the signals to the newly created message
+    let signal1 = dbc.createSignal('Signal1', 0, 16);
+    let signal2 = dbc.createSignal('Signal2', 28, 16);
+    dbc.addSignal(msgName,[signal1,signal2]);
+}
+
+// Write the data to a file
+dbc.write('/Users/Documents/Large.dbc')
+```
+
 ### Decoding CAN Messages
 DBC-CAN has the ability to decode CAN frames to its real world values.
 
