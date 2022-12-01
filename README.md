@@ -20,14 +20,20 @@ You should be able to do the following with this library:
 
 ### Installing the Library
 
-dbc-can is freely available on NPM and can be installed directly using the command `npm install dbc-can`
+dbc-can is freely available on NPM and can be installed directly using the command 
+
+
+`npm install dbc-can`
+
 
 ### Importing the Library
 ```js
     import Dbc from 'dbc-can';
+    // OR
+    const Dbc = require('dbc-can');
 ```
 Note that if you are using Node, you may need to include:
-`"type": "module"` in your parent package.json file so that the package can be imported correctly.
+`"type": "module"` in your parent package.json file so that the package can be imported correctly if using ```import```.
 
 ### DBC Data structure
 When you create an fresh instance of the Dbc class using `new Dbc()`, a new data
@@ -82,19 +88,34 @@ The structure of an individual signal is:
     - valueTable: ValueTable | null
 
 ### Loading a dbc
-DBC-CAN loads dbc files asynchonously as to not bottleneck applications and as a result
-the actual loading of the file will need to be wrapped in an async/await function or 
+
+#### Aysnc/Non-block Loading
+You can load files asynchonously as to not bottleneck applications.
+The actual loading of the file will need to be wrapped in an async/await function or 
 use `.then()` to catch the resulting data upon completion.
 
 ```js
 const filePath = 'path\to\my\dbc\my_file.dbc'
 
-dbc = Dbc();
+const dbc = new Dbc();
 
 dbc.load(filePath)
 .then(data => {
     console.log(data);
 })
+```
+
+#### Synchronous Loading
+Alteratively to the ```.load()``` method, you can load data from a DBC file in a blocking/synchronous way
+by calling the ```.loadSync()``` method.
+
+```js
+const filePath = 'path\to\my\dbc\my_file.dbc'
+
+const dbc = new Dbc();
+const data = dbc.loadSync(filePath);
+console.log(data);
+
 ```
 
 ### Modifing Top Level Properties
@@ -118,7 +139,7 @@ whether you are creating a DBC from scratch or appending to existing DBC data.
 
 ```js
 
-dbc = Dbc();
+const dbc = new Dbc();
 
 // Create message expects at minimum a name, ID, and DLC.
 const msg1 = dbc.createMessage('MyMessageName', 100, 8);
@@ -170,7 +191,7 @@ At minimum name, start bit, and length need to be supplied
 
 ```js
 
-dbc = Dbc();
+const dbc = new Dbc();
 
 // Create message expects at minimum a name, ID, and DLC.
 const signal = dbc.createSignal(
@@ -230,7 +251,7 @@ Below is an example of how you can create a fairly large DBC file with relative 
 example, we will create a DBC file that contains over 700 individual CAN messages and a few signals contained
 in each message.
 ```js
-let dbc = new Dbc();
+const dbc = new Dbc();
 
 // Create a blank array with over 700 elements
 // We'll use this to create our number range 0-699
