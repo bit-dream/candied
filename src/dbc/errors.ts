@@ -54,3 +54,11 @@ export class SignalDoesNotExist extends Error {
     Object.setPrototypeOf(this, SignalDoesNotExist.prototype);
   }
 }
+
+export class IncorrectFileExtension extends Error {
+  __proto__ = Error;
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, IncorrectFileExtension.prototype);
+  }
+}

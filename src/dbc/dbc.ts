@@ -1,10 +1,10 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as readline from 'readline';
 import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
 import Parser from './parser';
 import Writer from './writer';
-import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist } from './errors';
-import Can from '../can/can';
+import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -259,6 +259,7 @@ class Dbc extends Parser {
    * @returns Promise<DbcData>
    */
   async load(file: string): Promise<DbcData> {
+    this.validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -289,6 +290,52 @@ class Dbc extends Parser {
   }
 
   /**
+   * Loads a DBC file syncrhonously, as opposed to the default method 'load', which is
+   * a non-blocking/async call whos promise must be caught for the return data to be used.
+   *
+   * @param file Full file path to the dbc file, including extension
+   * @returns DbcData Data contained in the dbc file
+   */
+  loadSync(file: string): DbcData {
+    this.validateFileExtension(file, '.dbc');
+    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
+
+    const lines = fileContents.split('\n');
+    let lineInfo = null;
+    let data: DbcData = {
+      version: null,
+      messages: new Map(),
+      description: null,
+      busConfiguration: null,
+      canNodes: new Array(),
+      valueTables: new Map(),
+      attributes: null,
+    };
+
+    lines.forEach((line) => {
+      lineInfo = this.parseLine(line);
+      data = this.parseLineFromBaseToken(lineInfo, data);
+    });
+
+    // Add table data to class instance for future referencing
+    this.data = data;
+    return data;
+  }
+
+  /**
+   * Determines if the containing filepath has the correct extension
+   *
+   * @param file Filepath
+   * @param ext File extension to check against
+   */
+  private validateFileExtension(file: string, ext: string): void {
+    const fileExt = path.extname(file);
+    if (fileExt !== ext) {
+      throw new IncorrectFileExtension(`Function expected a file extension of '.dbc', got ${fileExt}`);
+    }
+  }
+
+  /**
    *
    * Writes the encapsulated data of a Dbc class instance to a dbc file
    *
@@ -296,6 +343,7 @@ class Dbc extends Parser {
    * will automatically be created.
    */
   write(filePath: string) {
+    this.validateFileExtension(filePath, '.dbc');
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
