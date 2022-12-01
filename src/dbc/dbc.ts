@@ -4,8 +4,7 @@ import * as readline from 'readline';
 import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
 import Parser from './parser';
 import Writer from './writer';
-import { MessageDoesNotExist, InvalidPayloadLength, SignalDoesNotExist, IncorrectFileExtension } from './errors';
-import Can from '../can/can';
+import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -344,6 +343,7 @@ class Dbc extends Parser {
    * will automatically be created.
    */
   write(filePath: string) {
+    this.validateFileExtension(filePath,'.dbc');
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
