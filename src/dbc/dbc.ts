@@ -259,7 +259,7 @@ class Dbc extends Parser {
    * @returns Promise<DbcData>
    */
   async load(file: string): Promise<DbcData> {
-    this.validateFileExtension(file,'.dbc');
+    this.validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -292,13 +292,13 @@ class Dbc extends Parser {
   /**
    * Loads a DBC file syncrhonously, as opposed to the default method 'load', which is
    * a non-blocking/async call whos promise must be caught for the return data to be used.
-   * 
+   *
    * @param file Full file path to the dbc file, including extension
    * @returns DbcData Data contained in the dbc file
    */
-  loadSync(file: string) : DbcData {
-    this.validateFileExtension(file,'.dbc');
-    const fileContents = fs.readFileSync(file, {'encoding': 'ascii'});
+  loadSync(file: string): DbcData {
+    this.validateFileExtension(file, '.dbc');
+    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
     const lines = fileContents.split('\n');
     let lineInfo = null;
@@ -312,10 +312,10 @@ class Dbc extends Parser {
       attributes: null,
     };
 
-    lines.forEach((line)=>{
+    lines.forEach((line) => {
       lineInfo = this.parseLine(line);
       data = this.parseLineFromBaseToken(lineInfo, data);
-    })
+    });
 
     // Add table data to class instance for future referencing
     this.data = data;
@@ -324,7 +324,7 @@ class Dbc extends Parser {
 
   /**
    * Determines if the containing filepath has the correct extension
-   * 
+   *
    * @param file Filepath
    * @param ext File extension to check against
    */
@@ -343,7 +343,7 @@ class Dbc extends Parser {
    * will automatically be created.
    */
   write(filePath: string) {
-    this.validateFileExtension(filePath,'.dbc');
+    this.validateFileExtension(filePath, '.dbc');
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
