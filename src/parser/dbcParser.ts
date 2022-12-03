@@ -1,4 +1,4 @@
-import { DbcData, Message, Signal, EndianType } from '../dbc/types';
+import { DbcData, Message, Signal, EndianType, ValueTable } from '../dbc/types';
 import { ASTKinds, ASTNodeIntf,Parser, ParseResult, CanMessage, CanSignal, Version, NewSymbolValue,
 Val, ValTable, AttributeValue, AttributeDefault, GlobalAttribute, MessageAttribute, SignalAttribute,
 NodeAttribute, Node } from '../parser/parser';
@@ -22,14 +22,16 @@ export default class DbcParser extends Parser {
                     this.addSignal(data, this.parseResult.ast);
                     break;
                 case ASTKinds.Version:
-                    this.addVersion(data, this.parseResult.ast)
+                    this.addVersion(data, this.parseResult.ast);
                     break;
                 case ASTKinds.NewSymbolValue:
-                    this.addNewSymbolValue(data, this.parseResult.ast)
+                    this.addNewSymbolValue(data, this.parseResult.ast);
                     break;
                 case ASTKinds.Val:
+                    this.addVal(data, this.parseResult.ast);
                     break;
                 case ASTKinds.ValTable:
+                    this.addValTable(data, this.parseResult.ast);
                     break;
                 case ASTKinds.AttributeValue:
                     break;
@@ -81,7 +83,8 @@ export default class DbcParser extends Parser {
         signal.multiplex = data.multiplex;
         signal.receivingNodes = data.nodes;
         signal.unit = data.unit;
-        
+        signal.valueTable = null;
+        signal.description = null;
         /* Signals come directly after a message tag, so we can just append
             the current signal instance to the last message found in the array */
         const messageList = Array.from(dbc.messages.keys());
@@ -99,6 +102,28 @@ export default class DbcParser extends Parser {
 
     private addNewSymbolValue(dbc: DbcData, data: NewSymbolValue) {
         dbc.newSymbols.push(data.symbol);
+    }
+
+    private addVal(dbc: DbcData, data: Val) {
+        
+        let messageName: string | null = null;
+        for (const [key,value] of dbc.messages) {
+            const msg = dbc.messages.get(key);
+            if (msg && msg.id === data.id) {
+                const signals = msg.signals;
+                const signal = signals.get(data.name);
+                const table: ValueTable = data.enum;
+                if (signal) {
+                    signal.valueTable = table;
+                }
+                return;
+            }
+        }
+    }
+
+    private addValTable(dbc: DbcData, data: ValTable) {
+        const table: ValueTable = data.enum;
+        dbc.valueTables?.set(data.name,table);
     }
 
     protected hasKindProp(obj: unknown): obj is ASTNodeIntf {

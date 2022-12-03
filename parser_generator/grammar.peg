@@ -39,7 +39,8 @@ CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} 
 ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 
-Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+    .id = number {return parseInt(raw_id,10);}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 
 SignalComment := 'CM_ SG_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}

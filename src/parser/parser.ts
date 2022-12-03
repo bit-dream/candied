@@ -30,7 +30,8 @@
 *     .max = number {return parseFloat(raw_max);}
 * ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
-* Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+* Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+*     .id = number {return parseInt(raw_id,10);}
 *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 * SignalComment := 'CM_ SG_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
 *     .comment = string {return cleanComment(raw_comment);}
@@ -322,14 +323,18 @@ export type ValTable_$0 = string;
 export type ValTable_$1 = string;
 export class Val {
     public kind: ASTKinds.Val = ASTKinds.Val;
-    public id: Val_$0;
+    public raw_id: Val_$0;
     public name: Val_$1;
     public raw_table: Val_$2;
+    public id: number;
     public enum: Map<number,string>;
-    constructor(id: Val_$0, name: Val_$1, raw_table: Val_$2){
-        this.id = id;
+    constructor(raw_id: Val_$0, name: Val_$1, raw_table: Val_$2){
+        this.raw_id = raw_id;
         this.name = name;
         this.raw_table = raw_table;
+        this.id = ((): number => {
+        return parseInt(raw_id,10);
+        })();
         this.enum = ((): Map<number,string> => {
         return table2Enum(raw_table.replace(';',''));
         })();
@@ -770,19 +775,19 @@ export class Parser {
     public matchVal($$dpth: number, $$cr?: ErrorTracker): Nullable<Val> {
         return this.run<Val>($$dpth,
             () => {
-                let $scope$id: Nullable<Val_$0>;
+                let $scope$raw_id: Nullable<Val_$0>;
                 let $scope$name: Nullable<Val_$1>;
                 let $scope$raw_table: Nullable<Val_$2>;
                 let $$res: Nullable<Val> = null;
                 if (true
                     && this.regexAccept(String.raw`(?:VAL_\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$id = this.matchVal_$0($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_id = this.matchVal_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
                     && ($scope$name = this.matchVal_$1($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_table = this.matchVal_$2($$dpth + 1, $$cr)) !== null
                 ) {
-                    $$res = new Val($scope$id, $scope$name, $scope$raw_table);
+                    $$res = new Val($scope$raw_id, $scope$name, $scope$raw_table);
                 }
                 return $$res;
             });
