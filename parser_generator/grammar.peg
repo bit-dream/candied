@@ -1,8 +1,9 @@
 ---
-import { table2Enum, cleanComment } from "./parserHelpers";
+import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttrVal, extractAttrId } from "./parserHelpers";
 ---
 
-Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment
+Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue
 
 Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }
@@ -27,3 +28,20 @@ MessageComment := 'CM_ BO_\s' id={'[0-9]+'} '\s' raw_comment={'.*'}
 
 NodeComment := 'CM_ BU_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
     .comment = string {return cleanComment(raw_comment);}
+
+GlobalAttribute := 'BA_DEF_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s' raw_value={'.*'}
+
+MessageAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+
+NodeAttribute := 'BA_DEF_ BU_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+
+SignalAttribute := 'BA_DEF_ SG_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+
+AttributeDefault := 'BA_DEF_DEF_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' value={'.*'}
+
+AttributeValue := 'BA_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' raw={'.*'}
+    .type = string {return extractAttrType(raw);}
+    .node = string {return extractAttrNode(this.type,raw);}
+    .id = string {return extractAttrId(this.type,raw);}
+    .value = string {return extractAttrVal(this.type,raw);}
+
