@@ -2,7 +2,7 @@
 import { table2Enum } from "./parserHelpers";
 ---
 
-Choice := Node | Message | Signal | ValTable
+Choice := Node | Message | Signal | ValTable | Val
 
 Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }
@@ -13,5 +13,8 @@ Signal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s
     .unit = string {return Array.from(raw_unit).filter(l=> l !== '"').toString() ;}
     .nodes = string[] {return raw_node_str.split(' ');}
 
-ValTable := '\s*VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+    .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}

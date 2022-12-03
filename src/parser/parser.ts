@@ -3,14 +3,16 @@
 * ---
 * import { table2Enum } from "./parserHelpers";
 * ---
-* Choice := Node | Message | Signal | ValTable
+* Choice := Node | Message | Signal | ValTable | Val
 * Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
 *     .node_names = string[] { return raw_node_string.split(' '); }
 * Message := 'BO_\s' id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
 * Signal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' start_bit={'[0-9]+'} '\|' length={'[0-9]+'} '@' endian={'[1|0]'} signed={'[+|-]'} '\s\(' factor={'[0-9.]+'} ',' offset={'[0-9.]+'} '\)\s\[' min={'[0-9.]+'} '\|' max={'[0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
 *     .unit = string {return Array.from(raw_unit).filter(l=> l !== '"').toString() ;}
 *     .nodes = string[] {return raw_node_str.split(' ');}
-* ValTable := '\s*VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+* ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+*     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+* Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 */
 
@@ -26,6 +28,7 @@ export enum ASTKinds {
     Choice_2 = "Choice_2",
     Choice_3 = "Choice_3",
     Choice_4 = "Choice_4",
+    Choice_5 = "Choice_5",
     Node = "Node",
     Node_$0 = "Node_$0",
     Message = "Message",
@@ -49,12 +52,17 @@ export enum ASTKinds {
     ValTable = "ValTable",
     ValTable_$0 = "ValTable_$0",
     ValTable_$1 = "ValTable_$1",
+    Val = "Val",
+    Val_$0 = "Val_$0",
+    Val_$1 = "Val_$1",
+    Val_$2 = "Val_$2",
 }
-export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4;
+export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5;
 export type Choice_1 = Node;
 export type Choice_2 = Message;
 export type Choice_3 = Signal;
 export type Choice_4 = ValTable;
+export type Choice_5 = Val;
 export class Node {
     public kind: ASTKinds.Node = ASTKinds.Node;
     public raw_node_string: Node_$0;
@@ -142,6 +150,24 @@ export class ValTable {
 }
 export type ValTable_$0 = string;
 export type ValTable_$1 = string;
+export class Val {
+    public kind: ASTKinds.Val = ASTKinds.Val;
+    public id: Val_$0;
+    public name: Val_$1;
+    public raw_table: Val_$2;
+    public enum: Map<number,string>;
+    constructor(id: Val_$0, name: Val_$1, raw_table: Val_$2){
+        this.id = id;
+        this.name = name;
+        this.raw_table = raw_table;
+        this.enum = ((): Map<number,string> => {
+        return table2Enum(raw_table.replace(';',''));
+        })();
+    }
+}
+export type Val_$0 = string;
+export type Val_$1 = string;
+export type Val_$2 = string;
 export class Parser {
     private readonly input: string;
     private pos: PosInfo;
@@ -165,6 +191,7 @@ export class Parser {
             () => this.matchChoice_2($$dpth + 1, $$cr),
             () => this.matchChoice_3($$dpth + 1, $$cr),
             () => this.matchChoice_4($$dpth + 1, $$cr),
+            () => this.matchChoice_5($$dpth + 1, $$cr),
         ]);
     }
     public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -178,6 +205,9 @@ export class Parser {
     }
     public matchChoice_4($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_4> {
         return this.matchValTable($$dpth + 1, $$cr);
+    }
+    public matchChoice_5($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_5> {
+        return this.matchVal($$dpth + 1, $$cr);
     }
     public matchNode($$dpth: number, $$cr?: ErrorTracker): Nullable<Node> {
         return this.run<Node>($$dpth,
@@ -322,7 +352,7 @@ export class Parser {
                 let $scope$raw_table: Nullable<ValTable_$1>;
                 let $$res: Nullable<ValTable> = null;
                 if (true
-                    && this.regexAccept(String.raw`(?:\s*VAL_TABLE_\s)`, $$dpth + 1, $$cr) !== null
+                    && this.regexAccept(String.raw`(?:VAL_TABLE_\s)`, $$dpth + 1, $$cr) !== null
                     && ($scope$name = this.matchValTable_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_table = this.matchValTable_$1($$dpth + 1, $$cr)) !== null
@@ -336,6 +366,35 @@ export class Parser {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
     }
     public matchValTable_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<ValTable_$1> {
+        return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+    }
+    public matchVal($$dpth: number, $$cr?: ErrorTracker): Nullable<Val> {
+        return this.run<Val>($$dpth,
+            () => {
+                let $scope$id: Nullable<Val_$0>;
+                let $scope$name: Nullable<Val_$1>;
+                let $scope$raw_table: Nullable<Val_$2>;
+                let $$res: Nullable<Val> = null;
+                if (true
+                    && this.regexAccept(String.raw`(?:VAL_\s)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$id = this.matchVal_$0($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$name = this.matchVal_$1($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$raw_table = this.matchVal_$2($$dpth + 1, $$cr)) !== null
+                ) {
+                    $$res = new Val($scope$id, $scope$name, $scope$raw_table);
+                }
+                return $$res;
+            });
+    }
+    public matchVal_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Val_$0> {
+        return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+    }
+    public matchVal_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<Val_$1> {
+        return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+    }
+    public matchVal_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<Val_$2> {
         return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
     }
     public test(): boolean {
