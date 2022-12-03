@@ -3,7 +3,13 @@ import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttr
 ---
 
 Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment |
-GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue
+GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
+Version | NewSymbol
+
+Version := 'VERSION' '\s+' raw_version={'.*'}
+    .version = string {return cleanComment(raw_version);}
+
+NewSymbol := '\s+' symbol={'[a-zA-Z_]+_'} '$'
 
 Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }
