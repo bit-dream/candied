@@ -5,10 +5,13 @@
 * ---
 * Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
-* Version | NewSymbol
+* Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed
+* BlankLine := ''$
 * Version := 'VERSION' '\s+' raw_version={'.*'}
 *     .version = string {return cleanComment(raw_version);}
-* NewSymbol := '\s+' symbol={'[a-zA-Z_]+_'} '$'
+* NewSymbol := 'NS_:'
+* BusSpeed := 'BS_:'
+* NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
 * Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
 *     .node_names = string[] { return raw_node_string.split(' '); }
 * Message := 'BO_\s' id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
@@ -61,10 +64,16 @@ export enum ASTKinds {
     Choice_14 = "Choice_14",
     Choice_15 = "Choice_15",
     Choice_16 = "Choice_16",
+    Choice_17 = "Choice_17",
+    Choice_18 = "Choice_18",
+    Choice_19 = "Choice_19",
+    BlankLine = "BlankLine",
     Version = "Version",
     Version_$0 = "Version_$0",
     NewSymbol = "NewSymbol",
-    NewSymbol_$0 = "NewSymbol_$0",
+    BusSpeed = "BusSpeed",
+    NewSymbolValue = "NewSymbolValue",
+    NewSymbolValue_$0 = "NewSymbolValue_$0",
     Node = "Node",
     Node_$0 = "Node_$0",
     Message = "Message",
@@ -124,8 +133,9 @@ export enum ASTKinds {
     AttributeValue = "AttributeValue",
     AttributeValue_$0 = "AttributeValue_$0",
     AttributeValue_$1 = "AttributeValue_$1",
+    $EOF = "$EOF",
 }
-export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16;
+export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19;
 export type Choice_1 = Node;
 export type Choice_2 = Message;
 export type Choice_3 = Signal;
@@ -141,7 +151,13 @@ export type Choice_12 = NodeAttribute;
 export type Choice_13 = AttributeDefault;
 export type Choice_14 = AttributeValue;
 export type Choice_15 = Version;
-export type Choice_16 = NewSymbol;
+export type Choice_16 = NewSymbolValue;
+export type Choice_17 = BlankLine;
+export type Choice_18 = NewSymbol;
+export type Choice_19 = BusSpeed;
+export interface BlankLine {
+    kind: ASTKinds.BlankLine;
+}
 export class Version {
     public kind: ASTKinds.Version = ASTKinds.Version;
     public raw_version: Version_$0;
@@ -154,11 +170,13 @@ export class Version {
     }
 }
 export type Version_$0 = string;
-export interface NewSymbol {
-    kind: ASTKinds.NewSymbol;
-    symbol: NewSymbol_$0;
+export type NewSymbol = string;
+export type BusSpeed = string;
+export interface NewSymbolValue {
+    kind: ASTKinds.NewSymbolValue;
+    symbol: NewSymbolValue_$0;
 }
-export type NewSymbol_$0 = string;
+export type NewSymbolValue_$0 = string;
 export class Node {
     public kind: ASTKinds.Node = ASTKinds.Node;
     public raw_node_string: Node_$0;
@@ -417,6 +435,9 @@ export class Parser {
             () => this.matchChoice_14($$dpth + 1, $$cr),
             () => this.matchChoice_15($$dpth + 1, $$cr),
             () => this.matchChoice_16($$dpth + 1, $$cr),
+            () => this.matchChoice_17($$dpth + 1, $$cr),
+            () => this.matchChoice_18($$dpth + 1, $$cr),
+            () => this.matchChoice_19($$dpth + 1, $$cr),
         ]);
     }
     public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -465,7 +486,29 @@ export class Parser {
         return this.matchVersion($$dpth + 1, $$cr);
     }
     public matchChoice_16($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_16> {
+        return this.matchNewSymbolValue($$dpth + 1, $$cr);
+    }
+    public matchChoice_17($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_17> {
+        return this.matchBlankLine($$dpth + 1, $$cr);
+    }
+    public matchChoice_18($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_18> {
         return this.matchNewSymbol($$dpth + 1, $$cr);
+    }
+    public matchChoice_19($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_19> {
+        return this.matchBusSpeed($$dpth + 1, $$cr);
+    }
+    public matchBlankLine($$dpth: number, $$cr?: ErrorTracker): Nullable<BlankLine> {
+        return this.run<BlankLine>($$dpth,
+            () => {
+                let $$res: Nullable<BlankLine> = null;
+                if (true
+                    && this.regexAccept(String.raw`(?:)`, $$dpth + 1, $$cr) !== null
+                    && this.match$EOF($$cr) !== null
+                ) {
+                    $$res = {kind: ASTKinds.BlankLine, };
+                }
+                return $$res;
+            });
     }
     public matchVersion($$dpth: number, $$cr?: ErrorTracker): Nullable<Version> {
         return this.run<Version>($$dpth,
@@ -486,21 +529,27 @@ export class Parser {
         return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
     }
     public matchNewSymbol($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbol> {
-        return this.run<NewSymbol>($$dpth,
+        return this.regexAccept(String.raw`(?:NS_:)`, $$dpth + 1, $$cr);
+    }
+    public matchBusSpeed($$dpth: number, $$cr?: ErrorTracker): Nullable<BusSpeed> {
+        return this.regexAccept(String.raw`(?:BS_:)`, $$dpth + 1, $$cr);
+    }
+    public matchNewSymbolValue($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbolValue> {
+        return this.run<NewSymbolValue>($$dpth,
             () => {
-                let $scope$symbol: Nullable<NewSymbol_$0>;
-                let $$res: Nullable<NewSymbol> = null;
+                let $scope$symbol: Nullable<NewSymbolValue_$0>;
+                let $$res: Nullable<NewSymbolValue> = null;
                 if (true
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$symbol = this.matchNewSymbol_$0($$dpth + 1, $$cr)) !== null
+                    && ($scope$symbol = this.matchNewSymbolValue_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:$)`, $$dpth + 1, $$cr) !== null
                 ) {
-                    $$res = {kind: ASTKinds.NewSymbol, symbol: $scope$symbol};
+                    $$res = {kind: ASTKinds.NewSymbolValue, symbol: $scope$symbol};
                 }
                 return $$res;
             });
     }
-    public matchNewSymbol_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbol_$0> {
+    public matchNewSymbolValue_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbolValue_$0> {
         return this.regexAccept(String.raw`(?:[a-zA-Z_]+_)`, $$dpth + 1, $$cr);
     }
     public matchNode($$dpth: number, $$cr?: ErrorTracker): Nullable<Node> {
@@ -1060,6 +1109,12 @@ export class Parser {
         if(this.memoSafe)
         memo.set($scope$pos.overallPos, [$scope$result, this.mark()]);
         return $scope$result;
+    }
+    private match$EOF(et?: ErrorTracker): Nullable<{kind: ASTKinds.$EOF}> {
+        const res: {kind: ASTKinds.$EOF} | null = this.finished() ? { kind: ASTKinds.$EOF } : null;
+        if(et)
+            et.record(this.mark(), res, { kind: "EOF", negated: this.negating });
+        return res;
     }
 }
 export function parse(s: string): ParseResult {
