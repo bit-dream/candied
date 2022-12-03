@@ -22,8 +22,10 @@ export default class DbcParser extends Parser {
                     this.addSignal(data, this.parseResult.ast);
                     break;
                 case ASTKinds.Version:
+                    this.addVersion(data, this.parseResult.ast)
                     break;
                 case ASTKinds.NewSymbolValue:
+                    this.addNewSymbolValue(data, this.parseResult.ast)
                     break;
                 case ASTKinds.Val:
                     break;
@@ -89,6 +91,14 @@ export default class DbcParser extends Parser {
             msg = dbc.messages.get(lastKey);
             msg?.signals.set(signal.name,signal);
         }
+    }
+
+    private addVersion(dbc: DbcData, data: Version) {
+        dbc.version = data.version;
+    }
+
+    private addNewSymbolValue(dbc: DbcData, data: NewSymbolValue) {
+        dbc.newSymbols.push(data.symbol);
     }
 
     protected hasKindProp(obj: unknown): obj is ASTNodeIntf {

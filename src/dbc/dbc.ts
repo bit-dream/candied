@@ -41,6 +41,7 @@ class Dbc {
       canNodes: new Array(),
       valueTables: null,
       attributes: null,
+      newSymbols: new Array()
     };
   }
 
@@ -307,6 +308,7 @@ class Dbc {
       canNodes: new Array(),
       valueTables: new Map(),
       attributes: null,
+      newSymbols: new Array()
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });

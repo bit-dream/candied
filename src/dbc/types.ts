@@ -46,6 +46,7 @@ export type DbcData = {
   canNodes: string[];
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes | null;
+  newSymbols: string[];
 };
 
 export type ValueTable = Map<number, string>;
