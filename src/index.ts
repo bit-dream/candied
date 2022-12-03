@@ -20,4 +20,5 @@ const ret4 = parse("BU_:");
 const ret5 = parse('SG_ Multiplexer M : 0|8@1+ (1,0) [0|0] "%" Node1')
 const ret6 = parse('SG_ Multiplexer m2 : 0|8@1+ (1,0) [0|0] "" Node1')
 const ret7 = parse('SG_ Multiplexer : 0|8@1+ (1,0) [0|0] "" Node1 Node2')
-console.log(ret5,ret6,ret7);
+const ret8 = parse('VAL_TABLE_ DI_mode 2 "DI_MODE_DYNO" 1 "DI_MODE_DRIVE" 0 "DI_MODE_UNDEF" ;')
+console.log(ret5,ret6,ret7,ret8);
