@@ -1,0 +1,10 @@
+Choice := Node | Message | Signal
+
+Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
+    .node_names = string[] { return raw_node_string.split(' '); }
+
+Message := 'BO_\s' id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'} ';'?
+
+Signal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' start_bit={'[0-9]+'} '\|' length={'[0-9]+'} '@' endian={'[1|0]'} signed={'[+|-]'} '\s\(' factor={'[0-9.]+'} ',' offset={'[0-9.]+'} '\)\s\[' min={'[0-9.]+'} '\|' max={'[0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
+    .unit = string {return Array.from(raw_unit).filter(l=> l !== '"').toString() ;}
+    .nodes = string[] {return raw_node_str.split(' ');}
