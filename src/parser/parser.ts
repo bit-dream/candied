@@ -3,7 +3,7 @@
 * ---
 * import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttrVal, extractAttrId } from "./parserHelpers";
 * ---
-* Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+* Choice := Node | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed
 * BlankLine := ''$
@@ -14,10 +14,20 @@
 * NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
 * Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
 *     .node_names = string[] { return raw_node_string.split(' '); }
-* Message := 'BO_\s' id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
-* Signal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' start_bit={'[0-9]+'} '\|' length={'[0-9]+'} '@' endian={'[1|0]'} signed={'[+|-]'} '\s\(' factor={'[0-9.]+'} ',' offset={'[0-9.]+'} '\)\s\[' min={'[0-9.]+'} '\|' max={'[0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
+* CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
+*     .id = number {return parseInt(raw_id,10);}
+*     .dlc = number {return parseInt(raw_dlc,10);}
+* CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[0-9.]+'} ',' raw_offset={'[0-9.]+'} '\)\s\[' raw_min={'[0-9.]+'} '\|' raw_max={'[0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
 *     .unit = string {return Array.from(raw_unit).filter(l=> l !== '"').toString() ;}
 *     .nodes = string[] {return raw_node_str.split(' ');}
+*     .start_bit = number {return parseInt(raw_start_bit,10);}
+*     .length = number {return parseInt(raw_length,10);}
+*     .endian = string {return raw_endian === '1' ? 'Intel' : 'Motorola'}
+*     .signed = boolean {return raw_signed === '-' ? true : false;}
+*     .factor = number {return parseFloat(raw_factor);}
+*     .offset = number {return parseFloat(raw_offset);}
+*     .min = number {return parseFloat(raw_min);}
+*     .max = number {return parseFloat(raw_max);}
 * ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 * Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
@@ -76,24 +86,24 @@ export enum ASTKinds {
     NewSymbolValue_$0 = "NewSymbolValue_$0",
     Node = "Node",
     Node_$0 = "Node_$0",
-    Message = "Message",
-    Message_$0 = "Message_$0",
-    Message_$1 = "Message_$1",
-    Message_$2 = "Message_$2",
-    Message_$3 = "Message_$3",
-    Signal = "Signal",
-    Signal_$0 = "Signal_$0",
-    Signal_$1 = "Signal_$1",
-    Signal_$2 = "Signal_$2",
-    Signal_$3 = "Signal_$3",
-    Signal_$4 = "Signal_$4",
-    Signal_$5 = "Signal_$5",
-    Signal_$6 = "Signal_$6",
-    Signal_$7 = "Signal_$7",
-    Signal_$8 = "Signal_$8",
-    Signal_$9 = "Signal_$9",
-    Signal_$10 = "Signal_$10",
-    Signal_$11 = "Signal_$11",
+    CanMessage = "CanMessage",
+    CanMessage_$0 = "CanMessage_$0",
+    CanMessage_$1 = "CanMessage_$1",
+    CanMessage_$2 = "CanMessage_$2",
+    CanMessage_$3 = "CanMessage_$3",
+    CanSignal = "CanSignal",
+    CanSignal_$0 = "CanSignal_$0",
+    CanSignal_$1 = "CanSignal_$1",
+    CanSignal_$2 = "CanSignal_$2",
+    CanSignal_$3 = "CanSignal_$3",
+    CanSignal_$4 = "CanSignal_$4",
+    CanSignal_$5 = "CanSignal_$5",
+    CanSignal_$6 = "CanSignal_$6",
+    CanSignal_$7 = "CanSignal_$7",
+    CanSignal_$8 = "CanSignal_$8",
+    CanSignal_$9 = "CanSignal_$9",
+    CanSignal_$10 = "CanSignal_$10",
+    CanSignal_$11 = "CanSignal_$11",
     ValTable = "ValTable",
     ValTable_$0 = "ValTable_$0",
     ValTable_$1 = "ValTable_$1",
@@ -137,8 +147,8 @@ export enum ASTKinds {
 }
 export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19;
 export type Choice_1 = Node;
-export type Choice_2 = Message;
-export type Choice_3 = Signal;
+export type Choice_2 = CanMessage;
+export type Choice_3 = CanSignal;
 export type Choice_4 = ValTable;
 export type Choice_5 = Val;
 export type Choice_6 = SignalComment;
@@ -189,44 +199,66 @@ export class Node {
     }
 }
 export type Node_$0 = string;
-export interface Message {
-    kind: ASTKinds.Message;
-    id: Message_$0;
-    name: Message_$1;
-    dlc: Message_$2;
-    node: Message_$3;
+export class CanMessage {
+    public kind: ASTKinds.CanMessage = ASTKinds.CanMessage;
+    public raw_id: CanMessage_$0;
+    public name: CanMessage_$1;
+    public raw_dlc: CanMessage_$2;
+    public node: CanMessage_$3;
+    public id: number;
+    public dlc: number;
+    constructor(raw_id: CanMessage_$0, name: CanMessage_$1, raw_dlc: CanMessage_$2, node: CanMessage_$3){
+        this.raw_id = raw_id;
+        this.name = name;
+        this.raw_dlc = raw_dlc;
+        this.node = node;
+        this.id = ((): number => {
+        return parseInt(raw_id,10);
+        })();
+        this.dlc = ((): number => {
+        return parseInt(raw_dlc,10);
+        })();
+    }
 }
-export type Message_$0 = string;
-export type Message_$1 = string;
-export type Message_$2 = string;
-export type Message_$3 = string;
-export class Signal {
-    public kind: ASTKinds.Signal = ASTKinds.Signal;
-    public name: Signal_$0;
-    public multiplex: Signal_$1;
-    public start_bit: Signal_$2;
-    public length: Signal_$3;
-    public endian: Signal_$4;
-    public signed: Signal_$5;
-    public factor: Signal_$6;
-    public offset: Signal_$7;
-    public min: Signal_$8;
-    public max: Signal_$9;
-    public raw_unit: Signal_$10;
-    public raw_node_str: Signal_$11;
+export type CanMessage_$0 = string;
+export type CanMessage_$1 = string;
+export type CanMessage_$2 = string;
+export type CanMessage_$3 = string;
+export class CanSignal {
+    public kind: ASTKinds.CanSignal = ASTKinds.CanSignal;
+    public name: CanSignal_$0;
+    public multiplex: CanSignal_$1;
+    public raw_start_bit: CanSignal_$2;
+    public raw_length: CanSignal_$3;
+    public raw_endian: CanSignal_$4;
+    public raw_signed: CanSignal_$5;
+    public raw_factor: CanSignal_$6;
+    public raw_offset: CanSignal_$7;
+    public raw_min: CanSignal_$8;
+    public raw_max: CanSignal_$9;
+    public raw_unit: CanSignal_$10;
+    public raw_node_str: CanSignal_$11;
     public unit: string;
     public nodes: string[];
-    constructor(name: Signal_$0, multiplex: Signal_$1, start_bit: Signal_$2, length: Signal_$3, endian: Signal_$4, signed: Signal_$5, factor: Signal_$6, offset: Signal_$7, min: Signal_$8, max: Signal_$9, raw_unit: Signal_$10, raw_node_str: Signal_$11){
+    public start_bit: number;
+    public length: number;
+    public endian: string;
+    public signed: boolean;
+    public factor: number;
+    public offset: number;
+    public min: number;
+    public max: number;
+    constructor(name: CanSignal_$0, multiplex: CanSignal_$1, raw_start_bit: CanSignal_$2, raw_length: CanSignal_$3, raw_endian: CanSignal_$4, raw_signed: CanSignal_$5, raw_factor: CanSignal_$6, raw_offset: CanSignal_$7, raw_min: CanSignal_$8, raw_max: CanSignal_$9, raw_unit: CanSignal_$10, raw_node_str: CanSignal_$11){
         this.name = name;
         this.multiplex = multiplex;
-        this.start_bit = start_bit;
-        this.length = length;
-        this.endian = endian;
-        this.signed = signed;
-        this.factor = factor;
-        this.offset = offset;
-        this.min = min;
-        this.max = max;
+        this.raw_start_bit = raw_start_bit;
+        this.raw_length = raw_length;
+        this.raw_endian = raw_endian;
+        this.raw_signed = raw_signed;
+        this.raw_factor = raw_factor;
+        this.raw_offset = raw_offset;
+        this.raw_min = raw_min;
+        this.raw_max = raw_max;
         this.raw_unit = raw_unit;
         this.raw_node_str = raw_node_str;
         this.unit = ((): string => {
@@ -235,20 +267,44 @@ export class Signal {
         this.nodes = ((): string[] => {
         return raw_node_str.split(' ');
         })();
+        this.start_bit = ((): number => {
+        return parseInt(raw_start_bit,10);
+        })();
+        this.length = ((): number => {
+        return parseInt(raw_length,10);
+        })();
+        this.endian = ((): string => {
+        return raw_endian === '1' ? 'Intel' : 'Motorola'
+        })();
+        this.signed = ((): boolean => {
+        return raw_signed === '-' ? true : false;
+        })();
+        this.factor = ((): number => {
+        return parseFloat(raw_factor);
+        })();
+        this.offset = ((): number => {
+        return parseFloat(raw_offset);
+        })();
+        this.min = ((): number => {
+        return parseFloat(raw_min);
+        })();
+        this.max = ((): number => {
+        return parseFloat(raw_max);
+        })();
     }
 }
-export type Signal_$0 = string;
-export type Signal_$1 = string;
-export type Signal_$2 = string;
-export type Signal_$3 = string;
-export type Signal_$4 = string;
-export type Signal_$5 = string;
-export type Signal_$6 = string;
-export type Signal_$7 = string;
-export type Signal_$8 = string;
-export type Signal_$9 = string;
-export type Signal_$10 = string;
-export type Signal_$11 = string;
+export type CanSignal_$0 = string;
+export type CanSignal_$1 = string;
+export type CanSignal_$2 = string;
+export type CanSignal_$3 = string;
+export type CanSignal_$4 = string;
+export type CanSignal_$5 = string;
+export type CanSignal_$6 = string;
+export type CanSignal_$7 = string;
+export type CanSignal_$8 = string;
+export type CanSignal_$9 = string;
+export type CanSignal_$10 = string;
+export type CanSignal_$11 = string;
 export class ValTable {
     public kind: ASTKinds.ValTable = ASTKinds.ValTable;
     public name: ValTable_$0;
@@ -444,10 +500,10 @@ export class Parser {
         return this.matchNode($$dpth + 1, $$cr);
     }
     public matchChoice_2($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_2> {
-        return this.matchMessage($$dpth + 1, $$cr);
+        return this.matchCanMessage($$dpth + 1, $$cr);
     }
     public matchChoice_3($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_3> {
-        return this.matchSignal($$dpth + 1, $$cr);
+        return this.matchCanSignal($$dpth + 1, $$cr);
     }
     public matchChoice_4($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_4> {
         return this.matchValTable($$dpth + 1, $$cr);
@@ -571,121 +627,121 @@ export class Parser {
     public matchNode_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Node_$0> {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_\s]*)`, $$dpth + 1, $$cr);
     }
-    public matchMessage($$dpth: number, $$cr?: ErrorTracker): Nullable<Message> {
-        return this.run<Message>($$dpth,
+    public matchCanMessage($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage> {
+        return this.run<CanMessage>($$dpth,
             () => {
-                let $scope$id: Nullable<Message_$0>;
-                let $scope$name: Nullable<Message_$1>;
-                let $scope$dlc: Nullable<Message_$2>;
-                let $scope$node: Nullable<Message_$3>;
-                let $$res: Nullable<Message> = null;
+                let $scope$raw_id: Nullable<CanMessage_$0>;
+                let $scope$name: Nullable<CanMessage_$1>;
+                let $scope$raw_dlc: Nullable<CanMessage_$2>;
+                let $scope$node: Nullable<CanMessage_$3>;
+                let $$res: Nullable<CanMessage> = null;
                 if (true
                     && this.regexAccept(String.raw`(?:BO_\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$id = this.matchMessage_$0($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_id = this.matchCanMessage_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$name = this.matchMessage_$1($$dpth + 1, $$cr)) !== null
+                    && ($scope$name = this.matchCanMessage_$1($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?::\s*)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$dlc = this.matchMessage_$2($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_dlc = this.matchCanMessage_$2($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$node = this.matchMessage_$3($$dpth + 1, $$cr)) !== null
+                    && ($scope$node = this.matchCanMessage_$3($$dpth + 1, $$cr)) !== null
                 ) {
-                    $$res = {kind: ASTKinds.Message, id: $scope$id, name: $scope$name, dlc: $scope$dlc, node: $scope$node};
+                    $$res = new CanMessage($scope$raw_id, $scope$name, $scope$raw_dlc, $scope$node);
                 }
                 return $$res;
             });
     }
-    public matchMessage_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Message_$0> {
+    public matchCanMessage_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage_$0> {
         return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
     }
-    public matchMessage_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<Message_$1> {
+    public matchCanMessage_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage_$1> {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]*)`, $$dpth + 1, $$cr);
     }
-    public matchMessage_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<Message_$2> {
+    public matchCanMessage_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage_$2> {
         return this.regexAccept(String.raw`(?:[0-9])`, $$dpth + 1, $$cr);
     }
-    public matchMessage_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<Message_$3> {
+    public matchCanMessage_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage_$3> {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]*)`, $$dpth + 1, $$cr);
     }
-    public matchSignal($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal> {
-        return this.run<Signal>($$dpth,
+    public matchCanSignal($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal> {
+        return this.run<CanSignal>($$dpth,
             () => {
-                let $scope$name: Nullable<Signal_$0>;
-                let $scope$multiplex: Nullable<Signal_$1>;
-                let $scope$start_bit: Nullable<Signal_$2>;
-                let $scope$length: Nullable<Signal_$3>;
-                let $scope$endian: Nullable<Signal_$4>;
-                let $scope$signed: Nullable<Signal_$5>;
-                let $scope$factor: Nullable<Signal_$6>;
-                let $scope$offset: Nullable<Signal_$7>;
-                let $scope$min: Nullable<Signal_$8>;
-                let $scope$max: Nullable<Signal_$9>;
-                let $scope$raw_unit: Nullable<Signal_$10>;
-                let $scope$raw_node_str: Nullable<Signal_$11>;
-                let $$res: Nullable<Signal> = null;
+                let $scope$name: Nullable<CanSignal_$0>;
+                let $scope$multiplex: Nullable<CanSignal_$1>;
+                let $scope$raw_start_bit: Nullable<CanSignal_$2>;
+                let $scope$raw_length: Nullable<CanSignal_$3>;
+                let $scope$raw_endian: Nullable<CanSignal_$4>;
+                let $scope$raw_signed: Nullable<CanSignal_$5>;
+                let $scope$raw_factor: Nullable<CanSignal_$6>;
+                let $scope$raw_offset: Nullable<CanSignal_$7>;
+                let $scope$raw_min: Nullable<CanSignal_$8>;
+                let $scope$raw_max: Nullable<CanSignal_$9>;
+                let $scope$raw_unit: Nullable<CanSignal_$10>;
+                let $scope$raw_node_str: Nullable<CanSignal_$11>;
+                let $$res: Nullable<CanSignal> = null;
                 if (true
                     && this.regexAccept(String.raw`(?:\s*SG_\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$name = this.matchSignal_$0($$dpth + 1, $$cr)) !== null
+                    && ($scope$name = this.matchCanSignal_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$multiplex = this.matchSignal_$1($$dpth + 1, $$cr)) !== null
+                    && ($scope$multiplex = this.matchCanSignal_$1($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*:\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$start_bit = this.matchSignal_$2($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_start_bit = this.matchCanSignal_$2($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\|)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$length = this.matchSignal_$3($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_length = this.matchCanSignal_$3($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:@)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$endian = this.matchSignal_$4($$dpth + 1, $$cr)) !== null
-                    && ($scope$signed = this.matchSignal_$5($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_endian = this.matchCanSignal_$4($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_signed = this.matchCanSignal_$5($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s\()`, $$dpth + 1, $$cr) !== null
-                    && ($scope$factor = this.matchSignal_$6($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_factor = this.matchCanSignal_$6($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:,)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$offset = this.matchSignal_$7($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_offset = this.matchCanSignal_$7($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\)\s\[)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$min = this.matchSignal_$8($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_min = this.matchCanSignal_$8($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\|)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$max = this.matchSignal_$9($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_max = this.matchCanSignal_$9($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\]\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$raw_unit = this.matchSignal_$10($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_unit = this.matchCanSignal_$10($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$raw_node_str = this.matchSignal_$11($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_node_str = this.matchCanSignal_$11($$dpth + 1, $$cr)) !== null
                 ) {
-                    $$res = new Signal($scope$name, $scope$multiplex, $scope$start_bit, $scope$length, $scope$endian, $scope$signed, $scope$factor, $scope$offset, $scope$min, $scope$max, $scope$raw_unit, $scope$raw_node_str);
+                    $$res = new CanSignal($scope$name, $scope$multiplex, $scope$raw_start_bit, $scope$raw_length, $scope$raw_endian, $scope$raw_signed, $scope$raw_factor, $scope$raw_offset, $scope$raw_min, $scope$raw_max, $scope$raw_unit, $scope$raw_node_str);
                 }
                 return $$res;
             });
     }
-    public matchSignal_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$0> {
+    public matchCanSignal_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$0> {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$1> {
+    public matchCanSignal_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$1> {
         return this.regexAccept(String.raw`(?:M|[m0-9]*|\s)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$2> {
+    public matchCanSignal_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$2> {
         return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$3> {
+    public matchCanSignal_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$3> {
         return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$4($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$4> {
+    public matchCanSignal_$4($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$4> {
         return this.regexAccept(String.raw`(?:[1|0])`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$5($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$5> {
+    public matchCanSignal_$5($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$5> {
         return this.regexAccept(String.raw`(?:[+|-])`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$6($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$6> {
+    public matchCanSignal_$6($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$6> {
         return this.regexAccept(String.raw`(?:[0-9.]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$7($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$7> {
+    public matchCanSignal_$7($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$7> {
         return this.regexAccept(String.raw`(?:[0-9.]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$8($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$8> {
+    public matchCanSignal_$8($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$8> {
         return this.regexAccept(String.raw`(?:[0-9.]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$9($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$9> {
+    public matchCanSignal_$9($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$9> {
         return this.regexAccept(String.raw`(?:[0-9.]+)`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$10($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$10> {
+    public matchCanSignal_$10($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$10> {
         return this.regexAccept(String.raw`(?:".*")`, $$dpth + 1, $$cr);
     }
-    public matchSignal_$11($$dpth: number, $$cr?: ErrorTracker): Nullable<Signal_$11> {
+    public matchCanSignal_$11($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignal_$11> {
         return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
     }
     public matchValTable($$dpth: number, $$cr?: ErrorTracker): Nullable<ValTable> {

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import DbcParser from '../parser/dbcParser';
 import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
-import Parser from './parser';
 import Writer from './writer';
 import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
@@ -29,12 +29,10 @@ import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from 
  * write() expects a path to the dbc file
  *
  */
-class Dbc extends Parser {
+class Dbc {
   data: DbcData;
 
   constructor() {
-    super();
-
     this.data = {
       version: null,
       messages: new Map(),
@@ -258,6 +256,7 @@ class Dbc extends Parser {
    * @param file string
    * @returns Promise<DbcData>
    */
+  /*
   async load(file: string): Promise<DbcData> {
     this.validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
@@ -288,6 +287,7 @@ class Dbc extends Parser {
     this.data = data;
     return data;
   }
+  */
 
   /**
    * Loads a DBC file syncrhonously, as opposed to the default method 'load', which is
@@ -298,10 +298,7 @@ class Dbc extends Parser {
    */
   loadSync(file: string): DbcData {
     this.validateFileExtension(file, '.dbc');
-    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
-    const lines = fileContents.split('\n');
-    let lineInfo = null;
     let data: DbcData = {
       version: null,
       messages: new Map(),
@@ -312,15 +309,33 @@ class Dbc extends Parser {
       attributes: null,
     };
 
+    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
+
+    let lineNum = 1;
+    let errMap = new Map();
+
+    const lines = fileContents.split('\n');
     lines.forEach((line) => {
-      lineInfo = this.parseLine(line);
-      data = this.parseLineFromBaseToken(lineInfo, data);
+      const parser = new DbcParser(line);
+      data = parser.updateData(data);
+      /*
+      // Log parser errors with line number
+      if (parseResult.errs.length !== 0) {
+        errMap.set(lineNum, parseResult.errs);
+        lineNum++;
+        return
+      }
+
+      lineNum++;
+      */
     });
 
     // Add table data to class instance for future referencing
     this.data = data;
     return data;
   }
+
+
 
   /**
    * Determines if the containing filepath has the correct extension

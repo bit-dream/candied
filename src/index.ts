@@ -4,7 +4,7 @@
  */
 import Dbc from './dbc/dbc';
 import Can from './can/can';
-import { parse } from './parser/parser'
+import { parse, Choice } from './parser/parser'
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -17,9 +17,6 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 }
 export { Can };
 
-const fileContents = fs.readFileSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc', { encoding: 'ascii' });
-const lines = fileContents.split('\n');
-lines.forEach((line) => {
-  let ret = parse(line);
-  console.log(ret)
-});
+const dbc = new Dbc();
+const data = dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc');
+console.log(data)
