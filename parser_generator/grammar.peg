@@ -1,5 +1,5 @@
 ---
-import { tableSpread } from "./parserHelpers";
+import { table2Enum } from "./parserHelpers";
 ---
 
 Choice := Node | Message | Signal | ValTable
@@ -14,4 +14,4 @@ Signal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s
     .nodes = string[] {return raw_node_str.split(' ');}
 
 ValTable := '\s*VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
-    .enum = Map<number,string> {return tableSpread(raw_table.replace(';',''));}
+    .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}

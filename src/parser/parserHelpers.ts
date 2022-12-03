@@ -1,4 +1,4 @@
-export function tableSpread(table: any) {
+export function table2Enum(table: string): Map<number,string> {
     const regEx = /(?<value>[0-9-]+) "(?<description>(?:[^"\\]|\\.)*)"/gi;
     const matches = table.matchAll(regEx);
     const definitions = new Map();
