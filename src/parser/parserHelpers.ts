@@ -10,3 +10,9 @@ export function table2Enum(table: string): Map<number,string> {
     }
     return definitions;
   }
+
+export function cleanComment(comment: string): string {
+  let noSemiColon = comment.replace(';','');
+  let final = noSemiColon.replace(/"/gi,'');
+  return final;
+}

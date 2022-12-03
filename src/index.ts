@@ -25,4 +25,7 @@ const ret9 = parse('VAL_TABLE_ DI_limpReason 24 "DI_LIMP_NUMREASONS" 23 "DI_LIMP
 const ret10 = parse('VAL_TABLE_ StW_AnglHP_Spd 16383 "SNA" ;')
 const ret11 = parse('VAL_ 3 StW_Angl 16383 "SNA" ;');
 const ret12 = parse('VAL_ 3 StW_AnglSens_Id 2 "MUST" 0 "PSBL" 1 "SELF" ;');
-console.log(ret8,ret9,ret10,ret11,ret12);
+const ret13 = parse('CM_ SG_ 1234 Signal0 "First signal in this message";');
+const ret14 = parse('CM_ BU_ Node0 "The 0th Node";');
+const ret15 = parse('CM_ BO_ 4321 "Multiplexed CAN-Message";');
+console.log(ret13,ret14,ret15);

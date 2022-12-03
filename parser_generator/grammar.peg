@@ -1,8 +1,8 @@
 ---
-import { table2Enum } from "./parserHelpers";
+import { table2Enum, cleanComment } from "./parserHelpers";
 ---
 
-Choice := Node | Message | Signal | ValTable | Val
+Choice := Node | Message | Signal | ValTable | Val | SignalComment | MessageComment | NodeComment
 
 Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }
@@ -18,3 +18,12 @@ ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 
 Val := 'VAL_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+SignalComment := 'CM_ SG_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+
+MessageComment := 'CM_ BO_\s' id={'[0-9]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+
+NodeComment := 'CM_ BU_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
