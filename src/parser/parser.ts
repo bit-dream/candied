@@ -5,7 +5,7 @@
 * ---
 * Choice := Node | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
-* Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed
+* Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
 * BlankLine := ''$
 * Version := 'VERSION' '\s+' raw_version={'.*'}
 *     .version = string {return cleanComment(raw_version);}
@@ -33,6 +33,8 @@
 * Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 *     .id = number {return parseInt(raw_id,10);}
 *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+* Comment := 'CM_\s' !'[SG_|BO_|BU_]' raw_comment={'.*'}
+*     .comment = string {return cleanComment(raw_comment);}
 * SignalComment := 'CM_ SG_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
 *     .comment = string {return cleanComment(raw_comment);}
 * MessageComment := 'CM_ BO_\s' id={'[0-9]+'} '\s' raw_comment={'.*'}
@@ -78,6 +80,7 @@ export enum ASTKinds {
     Choice_17 = "Choice_17",
     Choice_18 = "Choice_18",
     Choice_19 = "Choice_19",
+    Choice_20 = "Choice_20",
     BlankLine = "BlankLine",
     Version = "Version",
     Version_$0 = "Version_$0",
@@ -112,6 +115,8 @@ export enum ASTKinds {
     Val_$0 = "Val_$0",
     Val_$1 = "Val_$1",
     Val_$2 = "Val_$2",
+    Comment = "Comment",
+    Comment_$0 = "Comment_$0",
     SignalComment = "SignalComment",
     SignalComment_$0 = "SignalComment_$0",
     SignalComment_$1 = "SignalComment_$1",
@@ -146,7 +151,7 @@ export enum ASTKinds {
     AttributeValue_$1 = "AttributeValue_$1",
     $EOF = "$EOF",
 }
-export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19;
+export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19 | Choice_20;
 export type Choice_1 = Node;
 export type Choice_2 = CanMessage;
 export type Choice_3 = CanSignal;
@@ -166,6 +171,7 @@ export type Choice_16 = NewSymbolValue;
 export type Choice_17 = BlankLine;
 export type Choice_18 = NewSymbol;
 export type Choice_19 = BusSpeed;
+export type Choice_20 = Comment;
 export interface BlankLine {
     kind: ASTKinds.BlankLine;
 }
@@ -343,6 +349,18 @@ export class Val {
 export type Val_$0 = string;
 export type Val_$1 = string;
 export type Val_$2 = string;
+export class Comment {
+    public kind: ASTKinds.Comment = ASTKinds.Comment;
+    public raw_comment: Comment_$0;
+    public comment: string;
+    constructor(raw_comment: Comment_$0){
+        this.raw_comment = raw_comment;
+        this.comment = ((): string => {
+        return cleanComment(raw_comment);
+        })();
+    }
+}
+export type Comment_$0 = string;
 export class SignalComment {
     public kind: ASTKinds.SignalComment = ASTKinds.SignalComment;
     public id: SignalComment_$0;
@@ -499,6 +517,7 @@ export class Parser {
             () => this.matchChoice_17($$dpth + 1, $$cr),
             () => this.matchChoice_18($$dpth + 1, $$cr),
             () => this.matchChoice_19($$dpth + 1, $$cr),
+            () => this.matchChoice_20($$dpth + 1, $$cr),
         ]);
     }
     public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -557,6 +576,9 @@ export class Parser {
     }
     public matchChoice_19($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_19> {
         return this.matchBusSpeed($$dpth + 1, $$cr);
+    }
+    public matchChoice_20($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_20> {
+        return this.matchComment($$dpth + 1, $$cr);
     }
     public matchBlankLine($$dpth: number, $$cr?: ErrorTracker): Nullable<BlankLine> {
         return this.run<BlankLine>($$dpth,
@@ -799,6 +821,24 @@ export class Parser {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
     }
     public matchVal_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<Val_$2> {
+        return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+    }
+    public matchComment($$dpth: number, $$cr?: ErrorTracker): Nullable<Comment> {
+        return this.run<Comment>($$dpth,
+            () => {
+                let $scope$raw_comment: Nullable<Comment_$0>;
+                let $$res: Nullable<Comment> = null;
+                if (true
+                    && this.regexAccept(String.raw`(?:CM_\s)`, $$dpth + 1, $$cr) !== null
+                    && this.negate(() => this.regexAccept(String.raw`(?:[SG_|BO_|BU_])`, $$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_comment = this.matchComment_$0($$dpth + 1, $$cr)) !== null
+                ) {
+                    $$res = new Comment($scope$raw_comment);
+                }
+                return $$res;
+            });
+    }
+    public matchComment_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Comment_$0> {
         return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
     }
     public matchSignalComment($$dpth: number, $$cr?: ErrorTracker): Nullable<SignalComment> {

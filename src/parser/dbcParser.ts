@@ -1,7 +1,7 @@
 import { DbcData, Message, Signal, EndianType, ValueTable } from '../dbc/types';
 import { ASTKinds, ASTNodeIntf,Parser, ParseResult, CanMessage, CanSignal, Version, NewSymbolValue,
 Val, ValTable, AttributeValue, AttributeDefault, GlobalAttribute, MessageAttribute, SignalAttribute,
-NodeAttribute, Node } from '../parser/parser';
+NodeAttribute, Node, Comment, SignalComment } from '../parser/parser';
 
 export default class DbcParser extends Parser {
     parseResult: ParseResult;
@@ -48,16 +48,26 @@ export default class DbcParser extends Parser {
                 case ASTKinds.Node:
                     break;
                 case ASTKinds.SignalComment:
+                    console.log(this.parseResult.ast);
                     break;
                 case ASTKinds.MessageComment:
+                    console.log(this.parseResult.ast);
                     break;
                 case ASTKinds.NodeComment:
+                    console.log(this.parseResult.ast);
+                    break;
+                case ASTKinds.Comment:
+                    this.addComment(data, this.parseResult.ast);
                     break;
             }
-        } else {
-            
         }
         return data;
+    }
+
+    /* START OF HELPER FUNCTIONS FOR UPDATEDATA CALLBACK */
+
+    private addComment(dbc: DbcData, data: Comment) {
+        dbc.description = data.comment;
     }
 
     private addMessage(dbc: DbcData, data: CanMessage) {
@@ -68,7 +78,7 @@ export default class DbcParser extends Parser {
         message.sendingNode = data.node;
         message.signals = new Map();
         dbc.messages.set(message.name,message);
-      }
+    }
 
     private addSignal(dbc: DbcData, data: CanSignal) {
         const signal = {} as Signal;
@@ -96,6 +106,10 @@ export default class DbcParser extends Parser {
         }
     }
 
+    private addSignalComment(dbc: DbcData, data: SignalComment) {
+        
+    }
+
     private addVersion(dbc: DbcData, data: Version) {
         dbc.version = data.version;
     }
@@ -106,6 +120,7 @@ export default class DbcParser extends Parser {
 
     private addVal(dbc: DbcData, data: Val) {
         
+        // Need to find specific signal in dataset to append signal table to
         let messageName: string | null = null;
         for (const [key,value] of dbc.messages) {
             const msg = dbc.messages.get(key);
@@ -126,7 +141,7 @@ export default class DbcParser extends Parser {
         dbc.valueTables?.set(data.name,table);
     }
 
-    protected hasKindProp(obj: unknown): obj is ASTNodeIntf {
+    private hasKindProp(obj: unknown): obj is ASTNodeIntf {
         return (
             typeof obj === 'object' && obj !== null && 'kind' in obj
         );

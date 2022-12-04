@@ -18,5 +18,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 export { Can };
 
 const dbc = new Dbc();
-const data = dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc');
+const [data, err] = dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc',
+false);
 console.log(data)
+console.log(err)

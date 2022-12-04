@@ -297,7 +297,7 @@ class Dbc {
    * @param file Full file path to the dbc file, including extension
    * @returns DbcData Data contained in the dbc file
    */
-  loadSync(file: string): DbcData {
+  loadSync(file: string, throwOnError: boolean = false): [DbcData, Map<string,SyntaxError[]>] {
     this.validateFileExtension(file, '.dbc');
 
     let data: DbcData = {
@@ -319,22 +319,21 @@ class Dbc {
     const lines = fileContents.split('\n');
     lines.forEach((line) => {
       const parser = new DbcParser(line);
-      data = parser.updateData(data);
-      /*
-      // Log parser errors with line number
-      if (parseResult.errs.length !== 0) {
-        errMap.set(lineNum, parseResult.errs);
-        lineNum++;
-        return
+      const parseErrors = parser.parseResult.errs;
+      if (parseErrors.length === 0) {
+        data = parser.updateData(data);
+      } else {
+        if (throwOnError) {
+          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`)
+        }
+        errMap.set(lineNum,parseErrors)
       }
-
       lineNum++;
-      */
     });
 
     // Add table data to class instance for future referencing
     this.data = data;
-    return data;
+    return [data, errMap];
   }
 
 

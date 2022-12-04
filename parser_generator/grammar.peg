@@ -4,7 +4,7 @@ import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttr
 
 Choice := Node | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
-Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed
+Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
 
 BlankLine := ''$
 
@@ -42,6 +42,9 @@ ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
 Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
     .id = number {return parseInt(raw_id,10);}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+Comment := 'CM_\s' !'[SG_|BO_|BU_]' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
 
 SignalComment := 'CM_ SG_\s' id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
     .comment = string {return cleanComment(raw_comment);}
