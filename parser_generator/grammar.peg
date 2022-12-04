@@ -2,7 +2,7 @@
 import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttrVal, extractAttrId } from "./parserHelpers";
 ---
 
-Choice := Node | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
 
@@ -17,7 +17,7 @@ BusSpeed := 'BS_:'
 
 NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
 
-Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
+CanNode := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }
 
 CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}

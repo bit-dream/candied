@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
-import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
+import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable, Node } from './types';
 import Writer from './writer';
 import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
@@ -37,8 +37,8 @@ class Dbc {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: null,
       attributes: null,
       newSymbols: new Array()
@@ -58,14 +58,7 @@ class Dbc {
   set busConfiguration(speed: number) {
     // TODO: Might need to do some input validation to ensure we are not writing bad
     // data to a dbc file
-    this.data.busConfiguration = speed;
-  }
-
-  /**
-   * Adds a list of CAN nodes that exist for the network topology
-   */
-  set canNodes(nodes: string[]) {
-    this.data.canNodes = nodes;
+    this.data.busSpeed = speed;
   }
 
   /**
@@ -100,6 +93,7 @@ class Dbc {
       sendingNode,
       signals: new Map(),
       description,
+      attributes: null
     };
     return message;
   }
@@ -160,6 +154,7 @@ class Dbc {
       receivingNodes,
       description,
       valueTable,
+      attributes: null
     };
     return signal;
   }
@@ -304,8 +299,8 @@ class Dbc {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: new Map(),
       attributes: null,
       newSymbols: new Array()

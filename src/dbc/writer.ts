@@ -18,8 +18,8 @@ class Writer {
     // Main file attributes
     this.writeVersion(data.version ? data.version : '');
     this.writeNamespace();
-    this.writeBusSpeed(data.busConfiguration);
-    this.writeNodes(data.canNodes);
+    this.writeBusSpeed(data.busSpeed);
+    this.writeNodes(Array.from(data.nodes.keys()));
 
     // Both messages and signals
     this.writeMessagesAndSignals(data.messages);

@@ -3,7 +3,7 @@
 * ---
 * import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttrVal, extractAttrId } from "./parserHelpers";
 * ---
-* Choice := Node | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+* Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
 * BlankLine := ''$
@@ -12,7 +12,7 @@
 * NewSymbol := 'NS_:'
 * BusSpeed := 'BS_:'
 * NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
-* Node := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
+* CanNode := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
 *     .node_names = string[] { return raw_node_string.split(' '); }
 * CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
 *     .id = number {return parseInt(raw_id,10);}
@@ -88,8 +88,8 @@ export enum ASTKinds {
     BusSpeed = "BusSpeed",
     NewSymbolValue = "NewSymbolValue",
     NewSymbolValue_$0 = "NewSymbolValue_$0",
-    Node = "Node",
-    Node_$0 = "Node_$0",
+    CanNode = "CanNode",
+    CanNode_$0 = "CanNode_$0",
     CanMessage = "CanMessage",
     CanMessage_$0 = "CanMessage_$0",
     CanMessage_$1 = "CanMessage_$1",
@@ -152,7 +152,7 @@ export enum ASTKinds {
     $EOF = "$EOF",
 }
 export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19 | Choice_20;
-export type Choice_1 = Node;
+export type Choice_1 = CanNode;
 export type Choice_2 = CanMessage;
 export type Choice_3 = CanSignal;
 export type Choice_4 = ValTable;
@@ -194,18 +194,18 @@ export interface NewSymbolValue {
     symbol: NewSymbolValue_$0;
 }
 export type NewSymbolValue_$0 = string;
-export class Node {
-    public kind: ASTKinds.Node = ASTKinds.Node;
-    public raw_node_string: Node_$0;
+export class CanNode {
+    public kind: ASTKinds.CanNode = ASTKinds.CanNode;
+    public raw_node_string: CanNode_$0;
     public node_names: string[];
-    constructor(raw_node_string: Node_$0){
+    constructor(raw_node_string: CanNode_$0){
         this.raw_node_string = raw_node_string;
         this.node_names = ((): string[] => {
         return raw_node_string.split(' ');
         })();
     }
 }
-export type Node_$0 = string;
+export type CanNode_$0 = string;
 export class CanMessage {
     public kind: ASTKinds.CanMessage = ASTKinds.CanMessage;
     public raw_id: CanMessage_$0;
@@ -521,7 +521,7 @@ export class Parser {
         ]);
     }
     public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
-        return this.matchNode($$dpth + 1, $$cr);
+        return this.matchCanNode($$dpth + 1, $$cr);
     }
     public matchChoice_2($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_2> {
         return this.matchCanMessage($$dpth + 1, $$cr);
@@ -635,23 +635,23 @@ export class Parser {
     public matchNewSymbolValue_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbolValue_$0> {
         return this.regexAccept(String.raw`(?:[a-zA-Z_]+_)`, $$dpth + 1, $$cr);
     }
-    public matchNode($$dpth: number, $$cr?: ErrorTracker): Nullable<Node> {
-        return this.run<Node>($$dpth,
+    public matchCanNode($$dpth: number, $$cr?: ErrorTracker): Nullable<CanNode> {
+        return this.run<CanNode>($$dpth,
             () => {
-                let $scope$raw_node_string: Nullable<Node_$0>;
-                let $$res: Nullable<Node> = null;
+                let $scope$raw_node_string: Nullable<CanNode_$0>;
+                let $$res: Nullable<CanNode> = null;
                 if (true
                     && this.regexAccept(String.raw`(?:BU_:\s*)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$raw_node_string = this.matchNode_$0($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_node_string = this.matchCanNode_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
                     && ((this.regexAccept(String.raw`(?:;)`, $$dpth + 1, $$cr)) || true)
                 ) {
-                    $$res = new Node($scope$raw_node_string);
+                    $$res = new CanNode($scope$raw_node_string);
                 }
                 return $$res;
             });
     }
-    public matchNode_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<Node_$0> {
+    public matchCanNode_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanNode_$0> {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_\s]*)`, $$dpth + 1, $$cr);
     }
     public matchCanMessage($$dpth: number, $$cr?: ErrorTracker): Nullable<CanMessage> {

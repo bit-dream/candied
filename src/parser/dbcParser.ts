@@ -1,7 +1,7 @@
-import { DbcData, Message, Signal, EndianType, ValueTable } from '../dbc/types';
+import { DbcData, Message, Signal, EndianType, ValueTable, Node } from '../dbc/types';
 import { ASTKinds, ASTNodeIntf,Parser, ParseResult, CanMessage, CanSignal, Version, NewSymbolValue,
 Val, ValTable, AttributeValue, AttributeDefault, GlobalAttribute, MessageAttribute, SignalAttribute,
-NodeAttribute, Node, Comment, SignalComment } from '../parser/parser';
+NodeAttribute, CanNode, Comment, SignalComment, MessageComment, NodeComment } from '../parser/parser';
 
 export default class DbcParser extends Parser {
     parseResult: ParseResult;
@@ -45,7 +45,8 @@ export default class DbcParser extends Parser {
                     break;
                 case ASTKinds.NodeAttribute:
                     break;
-                case ASTKinds.Node:
+                case ASTKinds.CanNode:
+                    this.addNode(data, this.parseResult.ast);
                     break;
                 case ASTKinds.SignalComment:
                     console.log(this.parseResult.ast);
@@ -54,7 +55,7 @@ export default class DbcParser extends Parser {
                     console.log(this.parseResult.ast);
                     break;
                 case ASTKinds.NodeComment:
-                    console.log(this.parseResult.ast);
+                    this.addNodeComment(data, this.parseResult.ast);
                     break;
                 case ASTKinds.Comment:
                     this.addComment(data, this.parseResult.ast);
@@ -68,6 +69,16 @@ export default class DbcParser extends Parser {
 
     private addComment(dbc: DbcData, data: Comment) {
         dbc.description = data.comment;
+    }
+
+    private addNode(dbc: DbcData, data: CanNode) {
+        data.node_names.forEach((nodeName: string)=>{
+            const node = {} as Node;
+            node.name = nodeName;
+            node.description = null;
+            node.attributes = null;
+            dbc.nodes.set(nodeName,node);
+        })
     }
 
     private addMessage(dbc: DbcData, data: CanMessage) {
@@ -110,6 +121,17 @@ export default class DbcParser extends Parser {
         
     }
 
+    private addMessageComment(dbc: DbcData, data: MessageComment) {
+        
+    }
+
+    private addNodeComment(dbc: DbcData, data: NodeComment) {
+        const node = dbc.nodes.get(data.name);
+        if (node) {
+            node.description = data.comment;
+        }
+    }
+
     private addVersion(dbc: DbcData, data: Version) {
         dbc.version = data.version;
     }
@@ -132,6 +154,15 @@ export default class DbcParser extends Parser {
                     signal.valueTable = table;
                 }
                 return;
+            }
+        }
+    }
+
+    private modMessagePropById(messages: Map<string,Message>, id: number, prop: string, propData: any) {
+        for (const [key,value] of messages) {
+            const msg = messages.get(key);
+            if (msg && msg.id === id) {
+                return msg;
             }
         }
     }

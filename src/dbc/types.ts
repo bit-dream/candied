@@ -18,6 +18,7 @@ export type Signal = {
   receivingNodes: string[];
   description: string | null;
   valueTable: ValueTable | null;
+  attributes: Attributes | null;
 };
 
 export type Message = {
@@ -27,7 +28,14 @@ export type Message = {
   sendingNode: string | null;
   signals: Map<string, Signal>;
   description: string | null;
+  attributes: Attributes | null;
 };
+
+export type Node = {
+  name: string;
+  description: string | null;
+  attributes: Attributes | null;
+}
 
 export type Tokens = {
   [key: string]: Token;
@@ -42,8 +50,8 @@ export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
   description: string | null;
-  busConfiguration: number | null;
-  canNodes: string[];
+  busSpeed: number | null;
+  nodes: Map<string,Node>;
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes | null;
   newSymbols: string[];
@@ -96,12 +104,7 @@ export type CanFrame = {
   payload: Uint8Array;
 };
 
-export type Attributes = {
-  file: Attribute[] | null;
-  signals: Attribute[] | null;
-  messages: Attribute[] | null;
-  nodes: Attribute[] | null;
-};
+export type Attributes = Map<string,Attribute>;
 
 export type Attribute = {
   name: string;
