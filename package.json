@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "coverage": "jest --config jestconfig.json --coverage",
-    "build": "tsc",
+    "build": "npm run buildparser && tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
@@ -15,7 +15,7 @@
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
-    "go": "tsc && node lib/index.js",
+    "go": "npm run build && node lib/index.js",
     "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts"
   },
   "files": [
