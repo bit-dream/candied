@@ -35,8 +35,8 @@ class Writer {
     }
     this.writeSignalTables(data.messages);
     this.writeAttributeDefinitions(data);
-
-
+    this.writeAttributeDefaults(data);
+    this.writeAttributeValues(data);
   }
 
   /**
@@ -209,7 +209,7 @@ class Writer {
       },'');
   }
 
-  private createWriteStrFromDataType(value: Attribute, type: 'BU_'|'BO_'|'SG_'|null): string {
+  private createAttributeDefinitionStr(value: Attribute, type: 'BU_'|'BO_'|'SG_'|null): string {
     let lineContent: string;
     if (type) {
       lineContent = `BA_DEF_ ${type} "${value.name}" ${value.dataType}`;
@@ -235,13 +235,13 @@ class Writer {
   writeAttributeDefinitions(data: DbcData) {
     // Write global attributes
     data.attributes.forEach((value: Attribute, key: string) => {
-      this.writeLine(this.createWriteStrFromDataType(value,null));
+      this.writeLine(this.createAttributeDefinitionStr(value,null));
     })
 
     // Write node attributes
     data.nodes.forEach(node=>{
       node.attributes.forEach((value: Attribute, key: string) =>{
-        this.writeLine(this.createWriteStrFromDataType(value,'BU_'));
+        this.writeLine(this.createAttributeDefinitionStr(value,'BU_'));
       })
     })
 
@@ -249,7 +249,7 @@ class Writer {
     const messages = data.messages;
     messages.forEach(message => {
       message.attributes.forEach((value: Attribute, key: string) => {
-        this.writeLine(this.createWriteStrFromDataType(value,'BO_'));
+        this.writeLine(this.createAttributeDefinitionStr(value,'BO_'));
       })
     })
 
@@ -259,7 +259,161 @@ class Writer {
       if (signals) {
         signals.forEach((signal: Signal, key: string)=>{
           signal.attributes.forEach((value: Attribute, key: string)=>{
-            this.writeLine(this.createWriteStrFromDataType(value,'SG_'));
+            this.writeLine(this.createAttributeDefinitionStr(value,'SG_'));
+          })
+        })  
+      }
+    })
+    this.writeLine('')
+  }
+
+  createAttributeDefaultString(value: Attribute): string {
+    let lineContent: string = `BA_DEF_DEF_ "${value.name}"`;
+    switch (value.dataType) {
+      case 'STRING':
+        lineContent = lineContent + ` "${value.defaultValue}";`;
+        break;
+      default:
+        lineContent = lineContent + ` ${value.defaultValue};`;
+        break;
+    }
+    return lineContent;
+  }
+
+  writeAttributeDefaults(data: DbcData) {
+    // Write global attributes
+    data.attributes.forEach((value: Attribute, key: string) => {
+      this.writeLine(this.createAttributeDefaultString(value));
+    })
+
+    // Write node attributes
+    data.nodes.forEach(node=>{
+      node.attributes.forEach((value: Attribute, key: string) =>{
+        this.writeLine(this.createAttributeDefaultString(value));
+      })
+    })
+
+    // Write message attributes
+    const messages = data.messages;
+    messages.forEach(message => {
+      message.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeDefaultString(value));
+      })
+    })
+
+    // Write signal attributes
+    messages.forEach(message => {
+      const signals = message.signals;
+      if (signals) {
+        signals.forEach((signal: Signal, key: string)=>{
+          signal.attributes.forEach((value: Attribute, key: string)=>{
+            this.writeLine(this.createAttributeDefaultString(value));
+          })
+        })  
+      }
+    })
+    this.writeLine('')
+  }
+
+  createAttributeValueString(
+    value: Attribute, 
+    type: 'BU_'|'BO_'|'SG_'|null, 
+    id: number | null, 
+    node: string | null, 
+    signal: string | null
+  ): string {
+
+    let lineContent: string = `BA_ "${value.name}"`;
+    if (!type) {
+      if (value.dataType === 'STRING') {
+        lineContent = lineContent + ` "${value.value}";`;
+      } else {
+        lineContent = lineContent + ` ${value.value};`;
+      }
+      return lineContent;
+    }
+
+    //BA_ "BUIntAttribute" BU_ Node0 100;
+    //BA_ "BOStringAttribute" BO_ 1234 "MessageAttribute";
+    //BA_ "SGEnumAttribute" SG_ 1234 Signal0 2;
+    switch (type) {
+      case 'BU_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${node} "${value.defaultValue}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${node} ${value.defaultValue};`;
+        }
+        break;
+      case 'BO_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${id} "${value.defaultValue}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${id} ${value.defaultValue};`;
+        }
+        break;
+      case 'SG_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${id} ${signal} "${value.defaultValue}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${id} ${signal} ${value.defaultValue};`;
+        }
+        break;
+    }
+    return lineContent;
+  }
+
+  writeAttributeValues(data: DbcData) {
+    // Write global attributes
+    data.attributes.forEach((value: Attribute, key: string) => {
+      this.writeLine(this.createAttributeValueString(
+        value,
+        null,
+        null,
+        null,
+        null
+      ));
+    })
+
+    // Write node attributes
+    data.nodes.forEach(node=>{
+      node.attributes.forEach((value: Attribute, key: string) =>{
+        this.writeLine(this.createAttributeValueString(
+          value,
+          'BU_',
+          null,
+          key,
+          null
+        ));
+      })
+    })
+
+    // Write message attributes
+    const messages = data.messages;
+    messages.forEach(message => {
+      message.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeValueString(
+          value,
+          'BO_',
+          message.id,
+          null,
+          null
+        ));
+      })
+    })
+
+    // Write signal attributes
+    messages.forEach(message => {
+      const signals = message.signals;
+      if (signals) {
+        signals.forEach((signal: Signal, key: string)=>{
+          signal.attributes.forEach((value: Attribute, key: string)=>{
+            this.writeLine(this.createAttributeValueString(
+              value,
+              'SG_',
+              message.id,
+              null,
+              key
+            ));
           })
         })  
       }
