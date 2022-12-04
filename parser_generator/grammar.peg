@@ -1,5 +1,7 @@
 ---
-import { table2Enum, cleanComment, extractAttrType, extractAttrNode, extractAttrVal, extractAttrId, extractMinVal, extractMaxVal, extractOptions } from "./parserHelpers";
+import { table2Enum, cleanComment, extractAttrType, 
+extractAttrNode, extractAttrVal, extractAttrId, extractMinVal, 
+extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 ---
 
 Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
@@ -84,5 +86,6 @@ AttributeValue := 'BA_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' raw={'.*'}
     .type = string {return extractAttrType(raw);}
     .node = string {return extractAttrNode(this.type,raw);}
     .id = number {return parseInt(extractAttrId(this.type,raw),10);}
+    .signal = string {return extractAttrSignalName(this.type,raw);}
     .value = string {return extractAttrVal(this.type,raw);}
 

@@ -135,6 +135,7 @@ export default class DbcParser extends Parser {
     signal.unit = data.unit;
     signal.valueTable = null;
     signal.description = null;
+    signal.attributes = new Map();
     /* Signals come directly after a message tag, so we can just append
             the current signal instance to the last message found in the array */
     const messageList = Array.from(dbc.messages.keys());
@@ -304,9 +305,10 @@ export default class DbcParser extends Parser {
           if (msgName) {
             const msg = dbc.messages.get(msgName);
             if (msg) {
-              const signal = msg.signals.get(data.name);
+              const signal = msg.signals.get(data.signal);
               if (signal) {
                 signal.attributes.set(attr.name, attr);
+                dbc.attributes.delete(attr.name);
               }
             }
           }
@@ -316,6 +318,7 @@ export default class DbcParser extends Parser {
             const msg = dbc.messages.get(msgName);
             if (msg) {
               msg.attributes.set(attr.name, attr);
+              dbc.attributes.delete(attr.name);
             }
           }
           break;
@@ -323,6 +326,7 @@ export default class DbcParser extends Parser {
           const node = dbc.nodes.get(data.node);
           if (node) {
             node.attributes.set(attr.name, attr);
+            dbc.attributes.delete(attr.name);
           }
           break;
         case 'Global':

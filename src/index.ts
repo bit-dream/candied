@@ -19,9 +19,9 @@ export { Can };
 
 // TODO: Clear out starting and ending spaces for attribute option parsing
 // TODO: when parsed node list is empty, it's generating a map with a key of '' in the data
-// TODO: strip starting and ending white spaces from parsed comments
+// TODO: Perform cleanup after parse to remove non-global attributes from main attributes map
 const dbc = new Dbc();
-const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/tesla_can.dbc';
+const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc';
 dbc.load(file).then((data) => {
   console.log(data);
 });

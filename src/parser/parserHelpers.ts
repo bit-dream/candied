@@ -94,6 +94,30 @@ export function extractAttrVal(type: string, str: string): string {
   }
 }
 
+export function extractAttrSignalName(type: string, str: string): string {
+  let matches: RegExpMatchArray | null;
+  let signalName = ''
+  switch (type) {
+    case 'Message':
+      break;
+    case 'Signal':
+      matches = str.match(/SG_\s(?<id>[0-9]+)\s(?<signalName>[a-zA-Z0-9_]+)\s(?<value>.*);/);
+      if (matches) {
+        if (matches.groups) {
+          signalName = matches.groups.signalName;
+        }
+      }
+      break;
+    case 'Node':
+      break;
+    case 'Global':
+      break;
+    default:
+      break;
+  }
+  return signalName;
+}
+
 export function extractAttrId(type: string, str: string): string {
   let matches: RegExpMatchArray | null;
   switch (type) {
