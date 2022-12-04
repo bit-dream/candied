@@ -40,8 +40,8 @@ class Dbc {
       busSpeed: null,
       nodes: new Map(),
       valueTables: null,
-      attributes: null,
-      newSymbols: new Array()
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
   }
 
@@ -93,7 +93,7 @@ class Dbc {
       sendingNode,
       signals: new Map(),
       description,
-      attributes: null
+      attributes: new Map(),
     };
     return message;
   }
@@ -154,7 +154,7 @@ class Dbc {
       receivingNodes,
       description,
       valueTable,
-      attributes: null
+      attributes: new Map(),
     };
     return signal;
   }
@@ -252,8 +252,7 @@ class Dbc {
    * @param file string
    * @returns Promise<DbcData>
    */
-  /*
-  async load(file: string): Promise<DbcData> {
+  async load(file: string, throwOnError: boolean = false): Promise<DbcData> {
     this.validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
 
@@ -264,26 +263,38 @@ class Dbc {
       crlfDelay: Infinity,
     });
 
-    let lineInfo = null;
     let data: DbcData = {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: new Map(),
-      attributes: null,
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
+
+    let lineNum = 1;
+    const errMap = new Map();
+
     for await (const line of rl) {
-      lineInfo = this.parseLine(line);
-      data = this.parseLineFromBaseToken(lineInfo, data);
+      const parser = new DbcParser(line);
+      const parseErrors = parser.parseResult.errs;
+      if (parseErrors.length === 0) {
+        data = parser.updateData(data);
+      } else {
+        if (throwOnError) {
+          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
+        }
+        errMap.set(lineNum, parseErrors);
+      }
+      lineNum++;
     }
 
     // Add table data to class instance for future referencing
     this.data = data;
     return data;
   }
-  */
 
   /**
    * Loads a DBC file syncrhonously, as opposed to the default method 'load', which is
@@ -292,7 +303,7 @@ class Dbc {
    * @param file Full file path to the dbc file, including extension
    * @returns DbcData Data contained in the dbc file
    */
-  loadSync(file: string, throwOnError: boolean = false): [DbcData, Map<string,SyntaxError[]>] {
+  loadSync(file: string, throwOnError: boolean = false): DbcData {
     this.validateFileExtension(file, '.dbc');
 
     let data: DbcData = {
@@ -302,14 +313,14 @@ class Dbc {
       busSpeed: null,
       nodes: new Map(),
       valueTables: new Map(),
-      attributes: null,
-      newSymbols: new Array()
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
     let lineNum = 1;
-    let errMap = new Map();
+    const errMap = new Map();
 
     const lines = fileContents.split('\n');
     lines.forEach((line) => {
@@ -319,19 +330,17 @@ class Dbc {
         data = parser.updateData(data);
       } else {
         if (throwOnError) {
-          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`)
+          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
         }
-        errMap.set(lineNum,parseErrors)
+        errMap.set(lineNum, parseErrors);
       }
       lineNum++;
     });
 
     // Add table data to class instance for future referencing
     this.data = data;
-    return [data, errMap];
+    return data;
   }
-
-
 
   /**
    * Determines if the containing filepath has the correct extension

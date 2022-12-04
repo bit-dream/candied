@@ -4,7 +4,7 @@
  */
 import Dbc from './dbc/dbc';
 import Can from './can/can';
-import { parse, Choice } from './parser/parser'
+import { parse, Choice } from './parser/parser';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -17,8 +17,11 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 }
 export { Can };
 
+// TODO: Clear out starting and ending spaces for attribute option parsing
+// TODO: when parsed node list is empty, it's generating a map with a key of '' in the data
+// TODO: strip starting and ending white spaces from parsed comments
 const dbc = new Dbc();
-const [data, err] = dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc',
-false);
-console.log(data)
-console.log(err)
+const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/tesla_can.dbc';
+dbc.load(file).then((data) => {
+  console.log(data);
+});

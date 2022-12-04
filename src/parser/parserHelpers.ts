@@ -1,24 +1,26 @@
-export function table2Enum(table: string): Map<number,string> {
-    const regEx = /(?<value>[0-9-]+) "(?<description>(?:[^"\\]|\\.)*)"/gi;
-    const matches = table.matchAll(regEx);
-    const definitions = new Map();
+import { AttributeType } from '../dbc/types';
 
-    for (const match of matches) {
-      if (match.groups) {
-        definitions.set(parseInt(match.groups.value, 10), match.groups.description);
-      }
+export function table2Enum(table: string): Map<number, string> {
+  const regEx = /(?<value>[0-9-]+) "(?<description>(?:[^"\\]|\\.)*)"/gi;
+  const matches = table.matchAll(regEx);
+  const definitions = new Map();
+
+  for (const match of matches) {
+    if (match.groups) {
+      definitions.set(parseInt(match.groups.value, 10), match.groups.description);
     }
-    return definitions;
   }
-
-export function cleanComment(comment: string): string {
-  let noSemiColon = comment.replace(';','');
-  let final = noSemiColon.replace(/"/gi,'');
-  return final;
+  return definitions;
 }
 
-export function extractAttrType(str: string): string {
-  const match = str.match(/BO_|BU_|SG_/)
+export function cleanComment(comment: string): string {
+  const noSemiColon = comment.replace(';', '');
+  const final = noSemiColon.replace(/"/gi, '');
+  return final.trim();
+}
+
+export function extractAttrType(str: string): AttributeType {
+  const match = str.match(/BO_|BU_|SG_/);
   if (match) {
     switch (match?.toString()) {
       case 'BO_':
@@ -31,7 +33,7 @@ export function extractAttrType(str: string): string {
         return 'Global';
     }
   } else {
-    return 'Global'
+    return 'Global';
   }
 }
 
@@ -39,9 +41,9 @@ export function extractAttrNode(type: string, str: string): string {
   let matches: RegExpMatchArray | null;
   switch (type) {
     case 'Message':
-      return ''
+      return '';
     case 'Signal':
-      return ''
+      return '';
     case 'Node':
       matches = str.match(/BU_\s(?<node>[a-zA-Z0-9_]+)\s(?<value>.*)\s*;/);
       if (matches) {
@@ -50,9 +52,9 @@ export function extractAttrNode(type: string, str: string): string {
         }
       }
     case 'Global':
-      return ''
+      return '';
     default:
-      return ''
+      return '';
   }
 }
 
@@ -88,7 +90,7 @@ export function extractAttrVal(type: string, str: string): string {
         }
       }
     default:
-      return ''
+      return '';
   }
 }
 
@@ -110,10 +112,76 @@ export function extractAttrId(type: string, str: string): string {
         }
       }
     case 'Node':
-      return ''
+      return '';
     case 'Global':
-      return ''
+      return '';
     default:
-      return ''
+      return '';
   }
+}
+
+export function extractMinVal(type: string, str: string): number {
+  let min = 0;
+  switch (type) {
+    case 'FLOAT':
+      const floatMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (floatMatches && floatMatches.groups) {
+        min = parseFloat(floatMatches.groups.min);
+      }
+      break;
+    case 'STRING':
+      break;
+    case 'HEX':
+      break;
+    case 'ENUM':
+      break;
+    case 'INT':
+      const intMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (intMatches && intMatches.groups) {
+        min = parseFloat(intMatches.groups.min);
+      }
+      break;
+    default:
+      break;
+  }
+  return min;
+}
+
+export function extractMaxVal(type: string, str: string): number {
+  let max = 0;
+  switch (type) {
+    case 'FLOAT':
+      const floatMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (floatMatches && floatMatches.groups) {
+        max = parseFloat(floatMatches.groups.max);
+      }
+      break;
+    case 'STRING':
+      break;
+    case 'HEX':
+      break;
+    case 'ENUM':
+      break;
+    case 'INT':
+      const intMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (intMatches && intMatches.groups) {
+        max = parseFloat(intMatches.groups.max);
+      }
+      break;
+    default:
+      break;
+  }
+  return max;
+}
+
+export function extractOptions(type: string, str: string): string[] {
+  if (type !== 'ENUM') {
+    return [];
+  }
+  const newStr = str.replace(';', '');
+  const strArr = newStr.split(',');
+  const final = strArr.map((s: string) => {
+    return s.replace(/"/gi, '');
+  });
+  return final;
 }
