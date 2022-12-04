@@ -24,4 +24,5 @@ const dbc = new Dbc();
 const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc';
 dbc.load(file).then((data) => {
   console.log(data);
+  dbc.write('/Users/headquarters/Documents/Code/can-dbc/test.dbc');
 });
