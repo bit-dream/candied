@@ -3,5 +3,10 @@
     "rules": {
         "no-bitwise": false,
         "prefer-for-of": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "src/parser/parser.ts"
+        ]
     }
 }

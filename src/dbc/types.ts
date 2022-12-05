@@ -18,6 +18,7 @@ export type Signal = {
   receivingNodes: string[];
   description: string | null;
   valueTable: ValueTable | null;
+  attributes: Attributes;
 };
 
 export type Message = {
@@ -27,6 +28,13 @@ export type Message = {
   sendingNode: string | null;
   signals: Map<string, Signal>;
   description: string | null;
+  attributes: Attributes;
+};
+
+export type Node = {
+  name: string;
+  description: string | null;
+  attributes: Attributes;
 };
 
 export type Tokens = {
@@ -42,51 +50,14 @@ export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
   description: string | null;
-  busConfiguration: number | null;
-  canNodes: string[];
+  busSpeed: number | null;
+  nodes: Map<string, Node>;
   valueTables: Map<string, ValueTable> | null;
-  attributes: Attributes | null;
+  attributes: Attributes;
+  newSymbols: string[];
 };
 
 export type ValueTable = Map<number, string>;
-
-export type MessageRegex = {
-  messageName: string;
-  id: string;
-  dlc: string;
-  sendingNode: string;
-};
-
-export type SignalRegex = {
-  name: string;
-  plex: string;
-  startBit: string;
-  length: string;
-  endian: string;
-  signed: string;
-  factor: string;
-  offset: string;
-  min: string;
-  max: string;
-  unit: string;
-  receivingNodes: string;
-};
-
-export type VersionRegex = {
-  version: string;
-};
-
-export type CanConfigRegex = {
-  speed: string;
-};
-
-export type CanNodesRegex = {
-  nodes: string;
-};
-
-export type DefinitionRegex = {
-  definition: string;
-};
 
 export type CanFrame = {
   id: number;
@@ -95,18 +66,18 @@ export type CanFrame = {
   payload: Uint8Array;
 };
 
-export type Attributes = {
-  file: Attribute[] | null;
-  signals: Attribute[] | null;
-  messages: Attribute[] | null;
-  nodes: Attribute[] | null;
-};
-
+export type Attributes = Map<string, Attribute>;
+export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node';
+export type AttributeDataType = 'FLOAT' | 'STRING' | 'ENUM' | 'INT' | 'HEX';
 export type Attribute = {
   name: string;
-  dataType: string;
-  value: string;
-  options: string[];
+  type: AttributeType;
+  dataType: AttributeDataType;
+  value: string | null;
+  defaultValue: string | null;
+  options: string[] | null;
+  min: number | null;
+  max: number | null;
 };
 
 export interface Config {

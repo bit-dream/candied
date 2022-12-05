@@ -5,10 +5,11 @@ const dummyData: DbcData = {
   version: null,
   messages: new Map(),
   description: null,
-  busConfiguration: null,
-  canNodes: new Array(),
+  busSpeed: null,
+  nodes: new Map(),
   valueTables: null,
-  attributes: null,
+  attributes: new Map(),
+  newSymbols: new Array(),
 };
 
 test('Can Frame Creation', () => {

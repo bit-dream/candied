@@ -7,15 +7,17 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "coverage": "jest --config jestconfig.json --coverage",
-    "build": "tsc",
+    "build": "npm run buildparser && tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "prepare" : "npm run build",
-    "npm" : "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags",
-    "go": "tsc && node lib/index.js"
+    "prepare": "npm run build",
+    "npm": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags",
+    "go": "npm run build && node lib/index.js",
+    "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts",
+    "test:debug": "jest --runInBand"
   },
   "files": [
     "lib/**/*"
@@ -24,7 +26,13 @@
     "type": "git",
     "url": "git+https://github.com/bit-dream/can-dbc.git"
   },
-  "keywords": ["dbc","can","can-dbc","parser","vector"],
+  "keywords": [
+    "dbc",
+    "can",
+    "can-dbc",
+    "parser",
+    "vector"
+  ],
   "author": "Derek Black",
   "license": "ISC",
   "bugs": {
@@ -38,6 +46,7 @@
     "ts-jest": "^28.0.7",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
+    "tspeg": "^3.2.1",
     "typescript": "^4.7.4"
   }
 }

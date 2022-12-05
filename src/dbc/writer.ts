@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { DbcData, Message, Signal, ValueTable } from './types';
+import { Attribute, AttributeDataType, DbcData, Message, Signal, ValueTable } from './types';
 
 class Writer {
   file: string;
@@ -17,9 +17,9 @@ class Writer {
     fs.writeFileSync(this.file, '', { flag: 'w+' });
     // Main file attributes
     this.writeVersion(data.version ? data.version : '');
-    this.writeNamespace();
-    this.writeBusSpeed(data.busConfiguration);
-    this.writeNodes(data.canNodes);
+    this.writeNamespace(data.newSymbols);
+    this.writeBusSpeed(data.busSpeed);
+    this.writeNodes(Array.from(data.nodes.keys()));
 
     // Both messages and signals
     this.writeMessagesAndSignals(data.messages);
@@ -34,24 +34,29 @@ class Writer {
       this.writeValTable(data.valueTables);
     }
     this.writeSignalTables(data.messages);
+    this.writeAttributeDefinitions(data);
+    this.writeAttributeDefaults(data);
+    this.writeAttributeValues(data);
   }
 
   /**
    *
    * @param version Version of the dbc file
    */
-  private writeVersion(version: string) {
+  writeVersion(version: string) {
     const lineContent = `VERSION "${version}"`;
     this.writeLine(lineContent);
     this.writeLine('');
   }
 
-  private writeNamespace(ns: string[] | null = null) {
-    // TODO: For now since name space technically doesn't need
-    // to be complete for a valid DBC file, we will skip it's content
-    // and just render the main token
+  writeNamespace(ns: string[] | null = null) {
     const lineContent = `NS_:`;
     this.writeLine(lineContent);
+    if (ns) {
+      ns.forEach((newSymbol) => {
+        this.writeLine(`    ${newSymbol}`);
+      });
+    }
     this.writeLine('');
   }
 
@@ -59,7 +64,7 @@ class Writer {
    * Speed of the CAN bus, typically expressed as 250, 500, etc
    * @param busConfiguration Speed of the CAN bus
    */
-  private writeBusSpeed(busConfiguration: number | null) {
+  writeBusSpeed(busConfiguration: number | null) {
     let lineContent = '';
     if (busConfiguration === null) {
       lineContent = `BS_:`;
@@ -74,13 +79,13 @@ class Writer {
    * Generic list of nodes that exist for the CAN architecture
    * @param nodes List of nodes that are attached to messages and signals
    */
-  private writeNodes(nodes: string[]) {
+  writeNodes(nodes: string[]) {
     let lineContent = '';
     if (nodes === null || nodes.length === 0) {
       lineContent = `BU_:`;
     } else {
       // TODO: Actually enumerate list out
-      lineContent = `BU_:`;
+      lineContent = `BU_: ${nodes.join(' ')}`;
     }
     this.writeLine(lineContent);
     this.writeLine('');
@@ -90,7 +95,7 @@ class Writer {
    *
    * @param message Individual message to be written to the file
    */
-  private writeMessagesAndSignals(messages: Map<string, Message>) {
+  writeMessagesAndSignals(messages: Map<string, Message>) {
     for (const [name, message] of messages) {
       let node;
       if (message.sendingNode) {
@@ -114,7 +119,7 @@ class Writer {
    *
    * @param signal Signal to be writen to dbc file
    */
-  private writeSignal(signal: Signal) {
+  writeSignal(signal: Signal) {
     const endian = signal.endianness === 'Motorola' ? '0' : '1';
     const sign = signal.signed ? '-' : '+';
     const nodes = signal.receivingNodes.length === 0 ? 'Vector___XXXX' : signal.receivingNodes.join(' ');
@@ -141,11 +146,11 @@ class Writer {
     fs.writeFileSync(this.file, `${line}\n`, { flag: 'a+' });
   }
 
-  private writeBaseComment(comment: string) {
+  writeBaseComment(comment: string) {
     this.writeLine(`CM_ "${comment}" ;`);
   }
 
-  private writeMessageAndSignalComments(messages: Map<string, Message>) {
+  writeMessageAndSignalComments(messages: Map<string, Message>) {
     for (const [name, msg] of messages) {
       if (msg.description) {
         this.writeLine(`CM_ BO_ ${msg.id.toString()} "${msg.description}" ;`);
@@ -158,7 +163,7 @@ class Writer {
     }
   }
 
-  private generateEnumTable(tableMembers: ValueTable) {
+  generateEnumTable(tableMembers: ValueTable) {
     let members = '';
     for (const [enumVal, enumName] of tableMembers) {
       members = members + enumVal.toString() + ' ' + `"${enumName}"` + ' ';
@@ -166,7 +171,7 @@ class Writer {
     return `${members}`;
   }
 
-  private writeValTable(valueTable: Map<string, ValueTable>) {
+  writeValTable(valueTable: Map<string, ValueTable>) {
     for (const [name, tableMembers] of valueTable) {
       const members = this.generateEnumTable(tableMembers);
       const lineContent = `VAL_TABLE_ ${name} ${members};`;
@@ -175,7 +180,7 @@ class Writer {
     this.writeLine('');
   }
 
-  private writeSignalTables(messages: Map<string, Message>) {
+  writeSignalTables(messages: Map<string, Message>) {
     for (const [name, msg] of messages) {
       for (const [signalName, signal] of msg.signals) {
         if (signal.valueTable) {
@@ -185,6 +190,215 @@ class Writer {
         }
       }
     }
+    this.writeLine('');
+  }
+
+  private enumListToString(enumList: string[]) {
+    return enumList.reduce((accumulator, currentValue, idx) => {
+      let str = '';
+      if (idx === 0) {
+        str = `"${currentValue.trim()}"`;
+      } else {
+        str = `, "${currentValue.trim()}"`;
+      }
+      return accumulator + str;
+    }, '');
+  }
+
+  private createAttributeDefinitionStr(value: Attribute, type: 'BU_' | 'BO_' | 'SG_' | null): string {
+    let lineContent: string;
+    if (type) {
+      lineContent = `BA_DEF_ ${type} "${value.name}" ${value.dataType}`;
+    } else {
+      lineContent = `BA_DEF_ "${value.name}" ${value.dataType}`;
+    }
+    switch (value.dataType) {
+      case 'INT':
+      case 'FLOAT':
+        lineContent = lineContent + ` ${value.min} ${value.max};`;
+        break;
+      case 'ENUM':
+        if (value.options) {
+          lineContent = lineContent + ' ' + this.enumListToString(value.options) + ';';
+        }
+        break;
+      case 'STRING':
+        lineContent = lineContent + ';';
+        break;
+    }
+    return lineContent;
+  }
+
+  writeAttributeDefinitions(data: DbcData) {
+    // Write global attributes
+    data.attributes.forEach((value: Attribute, key: string) => {
+      this.writeLine(this.createAttributeDefinitionStr(value, null));
+    });
+
+    // Write node attributes
+    data.nodes.forEach((node) => {
+      node.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeDefinitionStr(value, 'BU_'));
+      });
+    });
+
+    // Write message attributes
+    const messages = data.messages;
+    messages.forEach((message) => {
+      message.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeDefinitionStr(value, 'BO_'));
+      });
+    });
+
+    // Write signal attributes
+    messages.forEach((message) => {
+      const signals = message.signals;
+      if (signals) {
+        signals.forEach((signal: Signal, key: string) => {
+          signal.attributes.forEach((value: Attribute, name: string) => {
+            this.writeLine(this.createAttributeDefinitionStr(value, 'SG_'));
+          });
+        });
+      }
+    });
+    this.writeLine('');
+  }
+
+  createAttributeDefaultString(value: Attribute): string {
+    let lineContent: string = `BA_DEF_DEF_ "${value.name}"`;
+    switch (value.dataType) {
+      case 'STRING':
+        lineContent = lineContent + ` "${value.defaultValue}";`;
+        break;
+      default:
+        lineContent = lineContent + ` ${value.defaultValue};`;
+        break;
+    }
+    return lineContent;
+  }
+
+  writeAttributeDefaults(data: DbcData) {
+    // Write global attributes
+    data.attributes.forEach((value: Attribute, key: string) => {
+      this.writeLine(this.createAttributeDefaultString(value));
+    });
+
+    // Write node attributes
+    data.nodes.forEach((node) => {
+      node.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeDefaultString(value));
+      });
+    });
+
+    // Write message attributes
+    const messages = data.messages;
+    messages.forEach((message) => {
+      message.attributes.forEach((value: Attribute, key: string) => {
+        this.writeLine(this.createAttributeDefaultString(value));
+      });
+    });
+
+    // Write signal attributes
+    messages.forEach((message) => {
+      const signals = message.signals;
+      if (signals) {
+        signals.forEach((signal: Signal, key: string) => {
+          signal.attributes.forEach((value: Attribute, name: string) => {
+            this.writeLine(this.createAttributeDefaultString(value));
+          });
+        });
+      }
+    });
+    this.writeLine('');
+  }
+
+  createAttributeValueString(
+    value: Attribute,
+    type: 'BU_' | 'BO_' | 'SG_' | null,
+    id: number | null,
+    node: string | null,
+    signal: string | null,
+  ): string {
+    let lineContent: string = `BA_ "${value.name}"`;
+    if (!type) {
+      if (value.dataType === 'STRING') {
+        lineContent = lineContent + ` "${value.value}";`;
+      } else {
+        lineContent = lineContent + ` ${value.value};`;
+      }
+      return lineContent;
+    }
+
+    // BA_ "BUIntAttribute" BU_ Node0 100;
+    // BA_ "BOStringAttribute" BO_ 1234 "MessageAttribute";
+    // BA_ "SGEnumAttribute" SG_ 1234 Signal0 2;
+    switch (type) {
+      case 'BU_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${node} "${value.value}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${node} ${value.value};`;
+        }
+        break;
+      case 'BO_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${id} "${value.value}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${id} ${value.value};`;
+        }
+        break;
+      case 'SG_':
+        if (value.dataType === 'STRING') {
+          lineContent = lineContent + ` ${type} ${id} ${signal} "${value.value}";`;
+        } else {
+          lineContent = lineContent + ` ${type} ${id} ${signal} ${value.value};`;
+        }
+        break;
+    }
+    return lineContent;
+  }
+
+  writeAttributeValues(data: DbcData) {
+    // Write global attributes
+    data.attributes.forEach((value: Attribute, key: string) => {
+      // skip if default = value so its no double defined in the dbc file output
+      if (value.defaultValue !== value.value) {
+        this.writeLine(this.createAttributeValueString(value, null, null, null, null));
+      }
+    });
+
+    // Write node attributes
+    data.nodes.forEach((node) => {
+      node.attributes.forEach((value: Attribute, key: string) => {
+        if (value.defaultValue !== value.value) {
+          this.writeLine(this.createAttributeValueString(value, 'BU_', null, node.name, null));
+        }
+      });
+    });
+
+    // Write message attributes
+    const messages = data.messages;
+    messages.forEach((message) => {
+      message.attributes.forEach((value: Attribute, key: string) => {
+        if (value.defaultValue !== value.value) {
+          this.writeLine(this.createAttributeValueString(value, 'BO_', message.id, null, null));
+        }
+      });
+    });
+
+    // Write signal attributes
+    messages.forEach((message) => {
+      const signals = message.signals;
+      if (signals) {
+        signals.forEach((signal: Signal, key: string) => {
+          signal.attributes.forEach((value: Attribute, name: string) => {
+            if (value.defaultValue !== value.value) {
+              this.writeLine(this.createAttributeValueString(value, 'SG_', message.id, null, signal.name));
+            }
+          });
+        });
+      }
+    });
     this.writeLine('');
   }
 }

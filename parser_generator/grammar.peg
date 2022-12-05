@@ -1,0 +1,91 @@
+---
+import { table2Enum, cleanComment, extractAttrType, 
+extractAttrNode, extractAttrVal, extractAttrId, extractMinVal, 
+extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
+---
+
+Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
+Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
+
+BlankLine := ''$
+
+Version := 'VERSION' '\s+' raw_version={'.*'}
+    .version = string {return cleanComment(raw_version);}
+
+NewSymbol := 'NS_\s*:'
+
+BusSpeed := 'BS_:'
+
+NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'?
+
+CanNode := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
+    .node_names = string[] { return raw_node_string.split(' '); }
+
+CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
+    .id = number {return parseInt(raw_id,10);}
+    .dlc = number {return parseInt(raw_dlc,10);}
+
+CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
+    .unit = string {return cleanComment(raw_unit);}
+    .nodes = string[] {return raw_node_str.split(' ');}
+    .start_bit = number {return parseInt(raw_start_bit,10);}
+    .length = number {return parseInt(raw_length,10);}
+    .endian = string {return raw_endian === '1' ? 'Intel' : 'Motorola'}
+    .signed = boolean {return raw_signed === '-' ? true : false;}
+    .factor = number {return parseFloat(raw_factor);}
+    .offset = number {return parseFloat(raw_offset);}
+    .min = number {return parseFloat(raw_min);}
+    .max = number {return parseFloat(raw_max);}
+
+ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+    .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+    .id = number {return parseInt(raw_id,10);}
+    .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+Comment := 'CM_\s' !'[SG_|BO_|BU_]' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+
+SignalComment := 'CM_ SG_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+    .id = number {return parseInt(raw_id,10);}
+
+MessageComment := 'CM_ BO_\s' raw_id={'[0-9]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+    .id = number {return parseInt(raw_id,10);}
+
+NodeComment := 'CM_ BU_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
+
+GlobalAttribute := 'BA_DEF_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s' raw_value={'.*'}
+    .min = number {return extractMinVal(type, raw_value);}
+    .max = number {return extractMaxVal(type, raw_value);}
+    .enum = string[] {return extractOptions(type, raw_value);}
+
+MessageAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+    .min = number {return extractMinVal(type, raw_value);}
+    .max = number {return extractMaxVal(type, raw_value);}
+    .enum = string[] {return extractOptions(type, raw_value);}
+
+NodeAttribute := 'BA_DEF_ BU_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+    .min = number {return extractMinVal(type, raw_value);}
+    .max = number {return extractMaxVal(type, raw_value);}
+    .enum = string[] {return extractOptions(type, raw_value);}
+
+SignalAttribute := 'BA_DEF_ SG_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+    .min = number {return extractMinVal(type, raw_value);}
+    .max = number {return extractMaxVal(type, raw_value);}
+    .enum = string[] {return extractOptions(type, raw_value);}
+
+AttributeDefault := 'BA_DEF_DEF_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' raw_value={'.*'}
+    .value = string {return cleanComment(raw_value);}
+
+AttributeValue := 'BA_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' raw={'.*'}
+    .type = string {return extractAttrType(raw);}
+    .node = string {return extractAttrNode(this.type,raw);}
+    .id = number {return parseInt(extractAttrId(this.type,raw),10);}
+    .signal = string {return extractAttrSignalName(this.type,raw);}
+    .value = string {return extractAttrVal(this.type,raw);}
+

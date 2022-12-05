@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
-import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable } from './types';
-import Parser from './parser';
+import DbcParser from '../parser/dbcParser';
+import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable, Node } from './types';
 import Writer from './writer';
 import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
@@ -29,20 +29,20 @@ import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from 
  * write() expects a path to the dbc file
  *
  */
-class Dbc extends Parser {
+class Dbc {
   data: DbcData;
+  errors: Map<number, SyntaxError[]> = new Map();
 
   constructor() {
-    super();
-
     this.data = {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: null,
-      attributes: null,
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
   }
 
@@ -59,14 +59,7 @@ class Dbc extends Parser {
   set busConfiguration(speed: number) {
     // TODO: Might need to do some input validation to ensure we are not writing bad
     // data to a dbc file
-    this.data.busConfiguration = speed;
-  }
-
-  /**
-   * Adds a list of CAN nodes that exist for the network topology
-   */
-  set canNodes(nodes: string[]) {
-    this.data.canNodes = nodes;
+    this.data.busSpeed = speed;
   }
 
   /**
@@ -101,6 +94,7 @@ class Dbc extends Parser {
       sendingNode,
       signals: new Map(),
       description,
+      attributes: new Map(),
     };
     return message;
   }
@@ -161,6 +155,7 @@ class Dbc extends Parser {
       receivingNodes,
       description,
       valueTable,
+      attributes: new Map(),
     };
     return signal;
   }
@@ -258,7 +253,7 @@ class Dbc extends Parser {
    * @param file string
    * @returns Promise<DbcData>
    */
-  async load(file: string): Promise<DbcData> {
+  async load(file: string, throwOnError: boolean = false): Promise<DbcData> {
     this.validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
 
@@ -269,20 +264,36 @@ class Dbc extends Parser {
       crlfDelay: Infinity,
     });
 
-    let lineInfo = null;
     let data: DbcData = {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: new Map(),
-      attributes: null,
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
+
+    let lineNum = 1;
+    const errMap = new Map();
+
     for await (const line of rl) {
-      lineInfo = this.parseLine(line);
-      data = this.parseLineFromBaseToken(lineInfo, data);
+      const parser = new DbcParser(line);
+      const parseErrors = parser.parseResult.errs;
+      if (parseErrors.length === 0) {
+        data = parser.updateData(data);
+      } else {
+        if (throwOnError) {
+          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
+        }
+        errMap.set(lineNum, parseErrors);
+      }
+      lineNum++;
     }
+
+    // Set parsing errors
+    this.errors = errMap;
 
     // Add table data to class instance for future referencing
     this.data = data;
@@ -296,26 +307,42 @@ class Dbc extends Parser {
    * @param file Full file path to the dbc file, including extension
    * @returns DbcData Data contained in the dbc file
    */
-  loadSync(file: string): DbcData {
+  loadSync(file: string, throwOnError: boolean = false): DbcData {
     this.validateFileExtension(file, '.dbc');
-    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
-    const lines = fileContents.split('\n');
-    let lineInfo = null;
     let data: DbcData = {
       version: null,
       messages: new Map(),
       description: null,
-      busConfiguration: null,
-      canNodes: new Array(),
+      busSpeed: null,
+      nodes: new Map(),
       valueTables: new Map(),
-      attributes: null,
+      attributes: new Map(),
+      newSymbols: new Array(),
     };
 
+    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
+
+    let lineNum = 1;
+    const errMap = new Map();
+
+    const lines = fileContents.split('\n');
     lines.forEach((line) => {
-      lineInfo = this.parseLine(line);
-      data = this.parseLineFromBaseToken(lineInfo, data);
+      const parser = new DbcParser(line);
+      const parseErrors = parser.parseResult.errs;
+      if (parseErrors.length === 0) {
+        data = parser.updateData(data);
+      } else {
+        if (throwOnError) {
+          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
+        }
+        errMap.set(lineNum, parseErrors);
+      }
+      lineNum++;
     });
+
+    // Set parsing errors
+    this.errors = errMap;
 
     // Add table data to class instance for future referencing
     this.data = data;

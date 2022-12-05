@@ -12,6 +12,7 @@ test('Create Simple Message Object', () => {
     sendingNode: null,
     signals: new Map(),
     description: null,
+    attributes: new Map(),
   });
 });
 
@@ -26,6 +27,7 @@ test('Create Complex Message Object', () => {
     sendingNode: 'Node1',
     signals: new Map(),
     description: 'Test Description',
+    attributes: new Map(),
   });
 });
 
@@ -48,6 +50,7 @@ test('Create Simple Signal Object', () => {
     multiplex: null,
     receivingNodes: new Array(),
     valueTable: null,
+    attributes: new Map(),
   });
 });
 
@@ -85,6 +88,7 @@ test('Create Complex Signal Object', () => {
     multiplex: null,
     receivingNodes: ['Node1'],
     valueTable: null,
+    attributes: new Map(),
   });
 });
 
