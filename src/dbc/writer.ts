@@ -50,9 +50,6 @@ class Writer {
   }
 
   writeNamespace(ns: string[] | null = null) {
-    // TODO: For now since name space technically doesn't need
-    // to be complete for a valid DBC file, we will skip it's content
-    // and just render the main token
     const lineContent = `NS_:`;
     this.writeLine(lineContent);
     if (ns) {
@@ -88,7 +85,7 @@ class Writer {
       lineContent = `BU_:`;
     } else {
       // TODO: Actually enumerate list out
-      lineContent = `BU_:`;
+      lineContent = `BU_: ${nodes.join(' ')}`
     }
     this.writeLine(lineContent);
     this.writeLine('');
@@ -365,25 +362,30 @@ class Writer {
   writeAttributeValues(data: DbcData) {
     // Write global attributes
     data.attributes.forEach((value: Attribute, key: string) => {
-      this.writeLine(this.createAttributeValueString(
-        value,
-        null,
-        null,
-        null,
-        null
-      ));
+      // skip if default = value so its no double defined in the dbc file output
+      if (value.defaultValue !== value.value) {
+        this.writeLine(this.createAttributeValueString(
+          value,
+          null,
+          null,
+          null,
+          null
+        ));
+      }
     })
 
     // Write node attributes
     data.nodes.forEach(node=>{
       node.attributes.forEach((value: Attribute, key: string) =>{
-        this.writeLine(this.createAttributeValueString(
-          value,
-          'BU_',
-          null,
-          node.name,
-          null
-        ));
+        if (value.defaultValue !== value.value) {
+          this.writeLine(this.createAttributeValueString(
+            value,
+            'BU_',
+            null,
+            node.name,
+            null
+          ));
+        }
       })
     })
 
@@ -391,13 +393,15 @@ class Writer {
     const messages = data.messages;
     messages.forEach(message => {
       message.attributes.forEach((value: Attribute, key: string) => {
-        this.writeLine(this.createAttributeValueString(
-          value,
-          'BO_',
-          message.id,
-          null,
-          null
-        ));
+        if (value.defaultValue !== value.value) {
+          this.writeLine(this.createAttributeValueString(
+            value,
+            'BO_',
+            message.id,
+            null,
+            null
+          ));
+        }
       })
     })
 
@@ -407,13 +411,15 @@ class Writer {
       if (signals) {
         signals.forEach((signal: Signal, key: string)=>{
           signal.attributes.forEach((value: Attribute, key: string)=>{
-            this.writeLine(this.createAttributeValueString(
-              value,
-              'SG_',
-              message.id,
-              null,
-              signal.name
-            ));
+            if (value.defaultValue !== value.value) {
+              this.writeLine(this.createAttributeValueString(
+                value,
+                'SG_',
+                message.id,
+                null,
+                signal.name
+              ));
+            }
           })
         })  
       }

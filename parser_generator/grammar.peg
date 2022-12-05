@@ -13,11 +13,11 @@ BlankLine := ''$
 Version := 'VERSION' '\s+' raw_version={'.*'}
     .version = string {return cleanComment(raw_version);}
 
-NewSymbol := 'NS_:'
+NewSymbol := 'NS_\s*:'
 
 BusSpeed := 'BS_:'
 
-NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
+NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'?
 
 CanNode := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
     .node_names = string[] { return raw_node_string.split(' '); }

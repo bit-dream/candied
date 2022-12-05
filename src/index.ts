@@ -21,12 +21,12 @@ export { Can };
 // TODO: when parsed node list is empty, it's generating a map with a key of '' in the data
 // TODO: Perform cleanup after parse to remove non-global attributes from main attributes map
 const dbc = new Dbc();
-const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc';
+const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/SimpleDBC.dbc';
 const writeFile = '/Users/headquarters/Documents/Code/can-dbc/test.dbc';
 const data = dbc.loadSync(file);
 dbc.write(writeFile)
 
-const writerDbc = new Dbc();
-const writerData = writerDbc.loadSync(writeFile);
 let a = 2;
 
+console.log(data)
+console.log(dbc.errors)

@@ -31,6 +31,7 @@ import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from 
  */
 class Dbc {
   data: DbcData;
+  errors: Map<number,SyntaxError[]> = new Map();
 
   constructor() {
     this.data = {
@@ -290,6 +291,9 @@ class Dbc {
       }
       lineNum++;
     }
+    
+    // Set parsing errors
+    this.errors = errMap;
 
     // Add table data to class instance for future referencing
     this.data = data;
@@ -336,6 +340,9 @@ class Dbc {
       }
       lineNum++;
     });
+
+    // Set parsing errors
+    this.errors = errMap;
 
     // Add table data to class instance for future referencing
     this.data = data;

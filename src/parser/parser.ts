@@ -11,9 +11,9 @@
 * BlankLine := ''$
 * Version := 'VERSION' '\s+' raw_version={'.*'}
 *     .version = string {return cleanComment(raw_version);}
-* NewSymbol := 'NS_:'
+* NewSymbol := 'NS_\s*:'
 * BusSpeed := 'BS_:'
-* NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'
+* NewSymbolValue := '\s+' symbol={'[a-zA-Z_]+_'} '$'?
 * CanNode := 'BU_:\s*' raw_node_string={'[a-zA-Z0-9_\s]*'} '\s*' ';'?
 *     .node_names = string[] { return raw_node_string.split(' '); }
 * CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_dlc={'[0-9]'} '\s*' node={'[a-zA-Z0-9_]*'}
@@ -720,7 +720,7 @@ export class Parser {
         return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
     }
     public matchNewSymbol($$dpth: number, $$cr?: ErrorTracker): Nullable<NewSymbol> {
-        return this.regexAccept(String.raw`(?:NS_:)`, $$dpth + 1, $$cr);
+        return this.regexAccept(String.raw`(?:NS_\s*:)`, $$dpth + 1, $$cr);
     }
     public matchBusSpeed($$dpth: number, $$cr?: ErrorTracker): Nullable<BusSpeed> {
         return this.regexAccept(String.raw`(?:BS_:)`, $$dpth + 1, $$cr);
@@ -733,7 +733,7 @@ export class Parser {
                 if (true
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
                     && ($scope$symbol = this.matchNewSymbolValue_$0($$dpth + 1, $$cr)) !== null
-                    && this.regexAccept(String.raw`(?:$)`, $$dpth + 1, $$cr) !== null
+                    && ((this.regexAccept(String.raw`(?:$)`, $$dpth + 1, $$cr)) || true)
                 ) {
                     $$res = {kind: ASTKinds.NewSymbolValue, symbol: $scope$symbol};
                 }

@@ -103,7 +103,9 @@ export default class DbcParser extends Parser {
       node.name = nodeName;
       node.description = null;
       node.attributes = new Map();
-      dbc.nodes.set(nodeName, node);
+      if (node.name !== '') {
+        dbc.nodes.set(nodeName, node);
+      }
     });
   }
 
@@ -236,8 +238,8 @@ export default class DbcParser extends Parser {
     attribute.options = new Array();
     attribute.defaultValue = null;
     attribute.value = null;
-    attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
-    attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
+    attribute.min = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.min : null;
+    attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
         dbc.attributes.set(attribute.name, attribute);
@@ -253,8 +255,8 @@ export default class DbcParser extends Parser {
     attribute.options = new Array();
     attribute.defaultValue = null;
     attribute.value = null;
-    attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
-    attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
+    attribute.min = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.min : null;
+    attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
         dbc.attributes.set(attribute.name, attribute);
@@ -270,8 +272,8 @@ export default class DbcParser extends Parser {
     attribute.options = new Array();
     attribute.defaultValue = null;
     attribute.value = null;
-    attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
-    attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
+    attribute.min = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.min : null;
+    attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
         dbc.attributes.set(attribute.name, attribute);
@@ -287,8 +289,8 @@ export default class DbcParser extends Parser {
     attribute.options = new Array();
     attribute.defaultValue = null;
     attribute.value = null;
-    attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
-    attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
+    attribute.min = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.min : null;
+    attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
         dbc.attributes.set(attribute.name, attribute);
@@ -299,6 +301,7 @@ export default class DbcParser extends Parser {
     const attr = dbc.attributes.get(data.name);
     if (attr) {
       attr.defaultValue = data.value;
+      attr.value = data.value;
     }
   }
 
