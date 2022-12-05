@@ -242,7 +242,7 @@ export default class DbcParser extends Parser {
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
-        dbc.attributes.set(attribute.name, attribute);
+      dbc.attributes.set(attribute.name, attribute);
     }
   }
 
@@ -259,7 +259,7 @@ export default class DbcParser extends Parser {
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
-        dbc.attributes.set(attribute.name, attribute);
+      dbc.attributes.set(attribute.name, attribute);
     }
   }
 
@@ -276,7 +276,7 @@ export default class DbcParser extends Parser {
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
-        dbc.attributes.set(attribute.name, attribute);
+      dbc.attributes.set(attribute.name, attribute);
     }
   }
 
@@ -293,7 +293,7 @@ export default class DbcParser extends Parser {
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
     if (attribute.name && attribute.name !== '') {
-        dbc.attributes.set(attribute.name, attribute);
+      dbc.attributes.set(attribute.name, attribute);
     }
   }
 

@@ -96,7 +96,7 @@ export function extractAttrVal(type: string, str: string): string {
 
 export function extractAttrSignalName(type: string, str: string): string {
   let matches: RegExpMatchArray | null;
-  let signalName = ''
+  let signalName = '';
   switch (type) {
     case 'Message':
       break;
