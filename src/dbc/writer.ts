@@ -339,23 +339,23 @@ class Writer {
     switch (type) {
       case 'BU_':
         if (value.dataType === 'STRING') {
-          lineContent = lineContent + ` ${type} ${node} "${value.defaultValue}";`;
+          lineContent = lineContent + ` ${type} ${node} "${value.value}";`;
         } else {
-          lineContent = lineContent + ` ${type} ${node} ${value.defaultValue};`;
+          lineContent = lineContent + ` ${type} ${node} ${value.value};`;
         }
         break;
       case 'BO_':
         if (value.dataType === 'STRING') {
-          lineContent = lineContent + ` ${type} ${id} "${value.defaultValue}";`;
+          lineContent = lineContent + ` ${type} ${id} "${value.value}";`;
         } else {
-          lineContent = lineContent + ` ${type} ${id} ${value.defaultValue};`;
+          lineContent = lineContent + ` ${type} ${id} ${value.value};`;
         }
         break;
       case 'SG_':
         if (value.dataType === 'STRING') {
-          lineContent = lineContent + ` ${type} ${id} ${signal} "${value.defaultValue}";`;
+          lineContent = lineContent + ` ${type} ${id} ${signal} "${value.value}";`;
         } else {
-          lineContent = lineContent + ` ${type} ${id} ${signal} ${value.defaultValue};`;
+          lineContent = lineContent + ` ${type} ${id} ${signal} ${value.value};`;
         }
         break;
     }
@@ -381,7 +381,7 @@ class Writer {
           value,
           'BU_',
           null,
-          key,
+          node.name,
           null
         ));
       })
@@ -412,7 +412,7 @@ class Writer {
               'SG_',
               message.id,
               null,
-              key
+              signal.name
             ));
           })
         })  

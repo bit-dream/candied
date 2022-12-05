@@ -22,7 +22,11 @@ export { Can };
 // TODO: Perform cleanup after parse to remove non-global attributes from main attributes map
 const dbc = new Dbc();
 const file = '/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/DBC_template.dbc';
-dbc.load(file).then((data) => {
-  console.log(data);
-  dbc.write('/Users/headquarters/Documents/Code/can-dbc/test.dbc');
-});
+const writeFile = '/Users/headquarters/Documents/Code/can-dbc/test.dbc';
+const data = dbc.loadSync(file);
+dbc.write(writeFile)
+
+const writerDbc = new Dbc();
+const writerData = writerDbc.loadSync(writeFile);
+let a = 2;
+

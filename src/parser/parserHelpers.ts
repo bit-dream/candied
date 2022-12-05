@@ -205,7 +205,7 @@ export function extractOptions(type: string, str: string): string[] {
   const newStr = str.replace(';', '');
   const strArr = newStr.split(',');
   const final = strArr.map((s: string) => {
-    return s.replace(/"/gi, '');
+    return s.replace(/"/gi, '').trim();
   });
   return final;
 }

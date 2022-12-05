@@ -16,7 +16,8 @@
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
     "go": "npm run build && node lib/index.js",
-    "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts"
+    "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts",
+    "test:debug": "jest --runInBand"
   },
   "files": [
     "lib/**/*"

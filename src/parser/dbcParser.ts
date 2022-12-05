@@ -239,7 +239,9 @@ export default class DbcParser extends Parser {
     attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
-    dbc.attributes.set(attribute.name, attribute);
+    if (attribute.name && attribute.name !== '') {
+        dbc.attributes.set(attribute.name, attribute);
+    }
   }
 
   private addMessageAttribute(dbc: DbcData, data: MessageAttribute) {
@@ -254,7 +256,9 @@ export default class DbcParser extends Parser {
     attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
-    dbc.attributes.set(attribute.name, attribute);
+    if (attribute.name && attribute.name !== '') {
+        dbc.attributes.set(attribute.name, attribute);
+    }
   }
 
   private addSignalAttribute(dbc: DbcData, data: SignalAttribute) {
@@ -269,7 +273,9 @@ export default class DbcParser extends Parser {
     attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
-    dbc.attributes.set(attribute.name, attribute);
+    if (attribute.name && attribute.name !== '') {
+        dbc.attributes.set(attribute.name, attribute);
+    }
   }
 
   private addNodeAttribute(dbc: DbcData, data: NodeAttribute) {
@@ -284,7 +290,9 @@ export default class DbcParser extends Parser {
     attribute.min = dataType === 'FLOAT' || dataType === 'INT' ? data.min : null;
     attribute.max = dataType === 'FLOAT' || dataType === 'INT' ? data.max : null;
     attribute.options = dataType === 'ENUM' ? data.enum : null;
-    dbc.attributes.set(attribute.name, attribute);
+    if (attribute.name && attribute.name !== '') {
+        dbc.attributes.set(attribute.name, attribute);
+    }
   }
 
   private addAttributeDefaultValue(dbc: DbcData, data: AttributeDefault) {
