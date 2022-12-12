@@ -11,3 +11,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
   module.exports = Object.assign(module.exports.default, module.exports);
 }
 export { Can };
+
+const dbc = new Dbc();
+const data = dbc.loadSync('src/__tests__/testFiles/DBC_template_v2.dbc');
+console.log(data)
