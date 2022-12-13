@@ -10,6 +10,7 @@ const dummyData: DbcData = {
   valueTables: null,
   attributes: new Map(),
   newSymbols: new Array(),
+  environmentVariables: new Map()
 };
 
 test('Can Frame Creation', () => {

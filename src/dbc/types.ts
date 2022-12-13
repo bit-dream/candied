@@ -31,6 +31,20 @@ export type Message = {
   attributes: Attributes;
 };
 
+export type EnvType = 'Integer' | 'Float' | 'String';
+export type AccessType = 'Unrestricted' | 'Read' | 'Write' | 'ReadWrite';
+
+export type EnvironmentVariable = {
+  name: string;
+  type: EnvType;
+  min: number;
+  max: number;
+  initalValue: number;
+  evId: number;
+  accessType: AccessType;
+  accessNode: string;
+}
+
 export type Node = {
   name: string;
   description: string | null;
@@ -55,6 +69,7 @@ export type DbcData = {
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes;
   newSymbols: string[];
+  environmentVariables: Map<string,EnvironmentVariable>;
 };
 
 export type ValueTable = Map<number, string>;

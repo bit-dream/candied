@@ -6,7 +6,7 @@ extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 
 Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
-Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | EnvironmentVariable | EnvironmentVarData |
+Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
 EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal
 
 BlankLine := ''$
@@ -15,7 +15,7 @@ MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.
     .id = number {return parseInt(raw_id,10);}
     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
 
-EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
     .min = number {return parseFloat(raw_min);}
     .max = number {return parseFloat(raw_max);}
     .unit = string {return cleanComment(raw_unit);}

@@ -21,7 +21,7 @@ import {
   SignalComment,
   MessageComment,
   NodeComment,
-  EnvironmentVariable,
+  CanEnvironmentVariable,
   EnvironmentVarData,
   EnvironmentVariableComment,
   MessageTransmitter,
@@ -92,7 +92,7 @@ export default class DbcParser extends Parser {
         case ASTKinds.Comment:
           this.addComment(data, this.parseResult.ast);
           break;
-        case ASTKinds.EnvironmentVariable:
+        case ASTKinds.CanEnvironmentVariable:
           break;
         case ASTKinds.EnvironmentAttribute:
           break;

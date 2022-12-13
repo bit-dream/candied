@@ -43,6 +43,7 @@ class Dbc {
       valueTables: null,
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map()
     };
   }
 
@@ -273,6 +274,7 @@ class Dbc {
       valueTables: new Map(),
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map()
     };
 
     let lineNum = 1;
@@ -319,6 +321,7 @@ class Dbc {
       valueTables: new Map(),
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map()
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
