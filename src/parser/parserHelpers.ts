@@ -20,7 +20,7 @@ export function cleanComment(comment: string): string {
 }
 
 export function extractAttrType(str: string): AttributeType {
-  const match = str.match(/BO_|BU_|SG_/);
+  const match = str.match(/BO_|BU_|SG_|EV_/);
   if (match) {
     switch (match?.toString()) {
       case 'BO_':
@@ -30,7 +30,7 @@ export function extractAttrType(str: string): AttributeType {
       case 'SG_':
         return 'Signal';
       case 'EV_':
-        return 'EnvironmentVariable'
+        return 'EnvironmentVariable';
       default:
         return 'Global';
     }
@@ -55,6 +55,13 @@ export function extractAttrNode(type: string, str: string): string {
       }
     case 'Global':
       return '';
+    case 'EnvironmentVariable':
+      matches = str.match(/EV_\s(?<node>[a-zA-Z0-9_]+)\s(?<value>.*)\s*;/);
+      if (matches) {
+        if (matches.groups) {
+          return matches.groups.node;
+        }
+      }
     default:
       return '';
   }
@@ -86,6 +93,13 @@ export function extractAttrVal(type: string, str: string): string {
       }
     case 'Global':
       matches = str.match(/(?<value>.*)\s*;/);
+      if (matches) {
+        if (matches.groups) {
+          return cleanComment(matches.groups.value);
+        }
+      }
+    case 'EnvironmentVariable':
+      matches = str.match(/EV_\s(?<node>[a-zA-Z0-9_]+)\s(?<value>.*)\s*;/);
       if (matches) {
         if (matches.groups) {
           return cleanComment(matches.groups.value);
@@ -162,7 +176,7 @@ export function extractMinVal(type: string, str: string): number {
       if (hexMatches && hexMatches.groups) {
         min = parseFloat(hexMatches.groups.min);
       }
-      break;;
+      break;
     case 'ENUM':
       break;
     case 'INT':
@@ -193,7 +207,7 @@ export function extractMaxVal(type: string, str: string): number {
       if (hexMatches && hexMatches.groups) {
         max = parseFloat(hexMatches.groups.max);
       }
-      break;;
+      break;
     case 'ENUM':
       break;
     case 'INT':

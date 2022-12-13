@@ -13,9 +13,9 @@ test('DBC_template.dbc: Global attributes', () => {
       defaultValue: '25.25',
       value: '45.9',
       min: 0,
-      max: 50.5
-    }
-    attributes.set('FloatAttribute',attribute)
+      max: 50.5,
+    };
+    attributes.set('FloatAttribute', attribute);
     expect(data.attributes).toEqual(attributes);
   });
 });
@@ -32,9 +32,9 @@ test('DBC_template.dbc: Message attributes', () => {
       defaultValue: 'String',
       value: 'MessageAttribute',
       min: null,
-      max: null
-    }
-    attributes.set('BOStringAttribute',attribute)
+      max: null,
+    };
+    attributes.set('BOStringAttribute', attribute);
     expect(data.messages.get('CANMessage')?.attributes).toEqual(attributes);
   });
 });
@@ -51,9 +51,9 @@ test('DBC_template.dbc: Signal attributes', () => {
       defaultValue: '1',
       value: '2',
       min: null,
-      max: null
-    }
-    attributes.set('SGEnumAttribute',attribute)
+      max: null,
+    };
+    attributes.set('SGEnumAttribute', attribute);
     expect(data.messages.get('CANMessage')?.signals.get('Signal0')?.attributes).toEqual(attributes);
   });
 });

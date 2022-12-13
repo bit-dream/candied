@@ -22,7 +22,8 @@ CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2
     .initial_value = number {return parseFloat(raw_inital_value);}
     .ev_id = number {return parseInt(raw_ev_id,10);}
 
-EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' value={'[0-9]+'}
+EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' raw_value={'[0-9]+'}
+    .value = number {return parseInt(raw_value);}
 
 EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
     .comment = string {return cleanComment(raw_comment);}

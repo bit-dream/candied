@@ -14,5 +14,5 @@ export { Can };
 
 const dbc = new Dbc();
 const data = dbc.loadSync('src/__tests__/testFiles/DBC_template_v2.dbc');
-console.log(data)
-console.log(dbc.errors)
+console.log(data);
+console.log(dbc.errors);

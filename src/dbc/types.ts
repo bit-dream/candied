@@ -44,7 +44,10 @@ export type EnvironmentVariable = {
   accessType: AccessType;
   accessNode: string;
   attributes: Attributes;
-}
+  valueTable: ValueTable | null;
+  description: string | null;
+  dataBytesLength: number | null;
+};
 
 export type Node = {
   name: string;
@@ -70,7 +73,7 @@ export type DbcData = {
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes;
   newSymbols: string[];
-  environmentVariables: Map<string,EnvironmentVariable>;
+  environmentVariables: Map<string, EnvironmentVariable>;
 };
 
 export type ValueTable = Map<number, string>;
