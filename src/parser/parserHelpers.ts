@@ -29,6 +29,8 @@ export function extractAttrType(str: string): AttributeType {
         return 'Node';
       case 'SG_':
         return 'Signal';
+      case 'EV_':
+        return 'EnvironmentVariable'
       default:
         return 'Global';
     }

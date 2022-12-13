@@ -1,4 +1,4 @@
-import { DbcData, Message, Signal, EndianType, ValueTable, Node, Attribute, AttributeDataType } from '../dbc/types';
+import { DbcData, Message, Signal, EndianType, ValueTable, Node, Attribute, AttributeDataType, EnvironmentVariable, EnvType, AccessType } from '../dbc/types';
 import {
   ASTKinds,
   ASTNodeIntf,
@@ -93,6 +93,7 @@ export default class DbcParser extends Parser {
           this.addComment(data, this.parseResult.ast);
           break;
         case ASTKinds.CanEnvironmentVariable:
+          this.addEnvironmentVariable(data, this.parseResult.ast);
           break;
         case ASTKinds.EnvironmentAttribute:
           break;
@@ -125,6 +126,20 @@ export default class DbcParser extends Parser {
         dbc.nodes.set(nodeName, node);
       }
     });
+  }
+
+  private addEnvironmentVariable(dbc: DbcData, data: CanEnvironmentVariable) {
+    const envVar = {} as EnvironmentVariable;
+    envVar.name = data.name;
+    envVar.type = this.convert2EnvType(data.type);
+    envVar.initalValue = data.initial_value;
+    envVar.min = data.min;
+    envVar.max = data.max;
+    envVar.evId = data.ev_id;
+    envVar.accessNode = data.node;
+    envVar.accessType = this.convert2AccessType(data.access_type);
+    envVar.attributes = new Map();
+    dbc.environmentVariables.set(envVar.name,envVar);
   }
 
   private addMessage(dbc: DbcData, data: CanMessage) {
@@ -363,6 +378,34 @@ export default class DbcParser extends Parser {
         default:
           break;
       }
+    }
+  }
+
+  private convert2EnvType(type: string): EnvType {
+    switch (type) {
+      case '0':
+        return 'Integer'
+      case '1':
+        return 'Float'
+      case '2':
+        return 'String'
+      default:
+        return 'String'
+    }
+  }
+
+  private convert2AccessType(type: string): AccessType {
+    switch (type.trim().slice(-1)) {
+      case '0':
+        return 'Unrestricted'
+      case '1':
+        return 'Read'
+      case '2':
+        return 'Write'
+      case '3':
+        return 'ReadWrite'
+      default:
+        return 'Read'
     }
   }
 

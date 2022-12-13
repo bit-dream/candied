@@ -15,10 +15,12 @@ MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.
     .id = number {return parseInt(raw_id,10);}
     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
 
-CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' raw_inital_value={'[\-0-9.]+'} '\s+' raw_ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
     .min = number {return parseFloat(raw_min);}
     .max = number {return parseFloat(raw_max);}
     .unit = string {return cleanComment(raw_unit);}
+    .initial_value = number {return parseFloat(raw_inital_value);}
+    .ev_id = number {return parseInt(raw_ev_id,10);}
 
 EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' value={'[0-9]+'}
 

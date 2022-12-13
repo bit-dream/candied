@@ -43,6 +43,7 @@ export type EnvironmentVariable = {
   evId: number;
   accessType: AccessType;
   accessNode: string;
+  attributes: Attributes;
 }
 
 export type Node = {
@@ -82,7 +83,7 @@ export type CanFrame = {
 };
 
 export type Attributes = Map<string, Attribute>;
-export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node';
+export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';
 export type AttributeDataType = 'FLOAT' | 'STRING' | 'ENUM' | 'INT' | 'HEX';
 export type Attribute = {
   name: string;

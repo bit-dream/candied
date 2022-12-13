@@ -13,10 +13,12 @@
 * MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
 *     .id = number {return parseInt(raw_id,10);}
 *     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
-* CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+* CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' raw_inital_value={'[\-0-9.]+'} '\s+' raw_ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
 *     .min = number {return parseFloat(raw_min);}
 *     .max = number {return parseFloat(raw_max);}
 *     .unit = string {return cleanComment(raw_unit);}
+*     .initial_value = number {return parseFloat(raw_inital_value);}
+*     .ev_id = number {return parseInt(raw_ev_id,10);}
 * EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' value={'[0-9]+'}
 * EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
 *     .comment = string {return cleanComment(raw_comment);}
@@ -276,21 +278,23 @@ export class CanEnvironmentVariable {
     public raw_min: CanEnvironmentVariable_$2;
     public raw_max: CanEnvironmentVariable_$3;
     public raw_unit: CanEnvironmentVariable_$4;
-    public inital_value: CanEnvironmentVariable_$5;
-    public ev_id: CanEnvironmentVariable_$6;
+    public raw_inital_value: CanEnvironmentVariable_$5;
+    public raw_ev_id: CanEnvironmentVariable_$6;
     public access_type: CanEnvironmentVariable_$7;
     public node: CanEnvironmentVariable_$8;
     public min: number;
     public max: number;
     public unit: string;
-    constructor(name: CanEnvironmentVariable_$0, type: CanEnvironmentVariable_$1, raw_min: CanEnvironmentVariable_$2, raw_max: CanEnvironmentVariable_$3, raw_unit: CanEnvironmentVariable_$4, inital_value: CanEnvironmentVariable_$5, ev_id: CanEnvironmentVariable_$6, access_type: CanEnvironmentVariable_$7, node: CanEnvironmentVariable_$8){
+    public initial_value: number;
+    public ev_id: number;
+    constructor(name: CanEnvironmentVariable_$0, type: CanEnvironmentVariable_$1, raw_min: CanEnvironmentVariable_$2, raw_max: CanEnvironmentVariable_$3, raw_unit: CanEnvironmentVariable_$4, raw_inital_value: CanEnvironmentVariable_$5, raw_ev_id: CanEnvironmentVariable_$6, access_type: CanEnvironmentVariable_$7, node: CanEnvironmentVariable_$8){
         this.name = name;
         this.type = type;
         this.raw_min = raw_min;
         this.raw_max = raw_max;
         this.raw_unit = raw_unit;
-        this.inital_value = inital_value;
-        this.ev_id = ev_id;
+        this.raw_inital_value = raw_inital_value;
+        this.raw_ev_id = raw_ev_id;
         this.access_type = access_type;
         this.node = node;
         this.min = ((): number => {
@@ -301,6 +305,12 @@ export class CanEnvironmentVariable {
         })();
         this.unit = ((): string => {
         return cleanComment(raw_unit);
+        })();
+        this.initial_value = ((): number => {
+        return parseFloat(raw_inital_value);
+        })();
+        this.ev_id = ((): number => {
+        return parseInt(raw_ev_id,10);
         })();
     }
 }
@@ -937,8 +947,8 @@ export class Parser {
                 let $scope$raw_min: Nullable<CanEnvironmentVariable_$2>;
                 let $scope$raw_max: Nullable<CanEnvironmentVariable_$3>;
                 let $scope$raw_unit: Nullable<CanEnvironmentVariable_$4>;
-                let $scope$inital_value: Nullable<CanEnvironmentVariable_$5>;
-                let $scope$ev_id: Nullable<CanEnvironmentVariable_$6>;
+                let $scope$raw_inital_value: Nullable<CanEnvironmentVariable_$5>;
+                let $scope$raw_ev_id: Nullable<CanEnvironmentVariable_$6>;
                 let $scope$access_type: Nullable<CanEnvironmentVariable_$7>;
                 let $scope$node: Nullable<CanEnvironmentVariable_$8>;
                 let $$res: Nullable<CanEnvironmentVariable> = null;
@@ -954,15 +964,15 @@ export class Parser {
                     && this.regexAccept(String.raw`(?:\]\s)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_unit = this.matchCanEnvironmentVariable_$4($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$inital_value = this.matchCanEnvironmentVariable_$5($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_inital_value = this.matchCanEnvironmentVariable_$5($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
-                    && ($scope$ev_id = this.matchCanEnvironmentVariable_$6($$dpth + 1, $$cr)) !== null
+                    && ($scope$raw_ev_id = this.matchCanEnvironmentVariable_$6($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
                     && ($scope$access_type = this.matchCanEnvironmentVariable_$7($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
                     && ($scope$node = this.matchCanEnvironmentVariable_$8($$dpth + 1, $$cr)) !== null
                 ) {
-                    $$res = new CanEnvironmentVariable($scope$name, $scope$type, $scope$raw_min, $scope$raw_max, $scope$raw_unit, $scope$inital_value, $scope$ev_id, $scope$access_type, $scope$node);
+                    $$res = new CanEnvironmentVariable($scope$name, $scope$type, $scope$raw_min, $scope$raw_max, $scope$raw_unit, $scope$raw_inital_value, $scope$raw_ev_id, $scope$access_type, $scope$node);
                 }
                 return $$res;
             });
