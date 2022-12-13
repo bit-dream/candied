@@ -21,6 +21,12 @@ import {
   SignalComment,
   MessageComment,
   NodeComment,
+  EnvironmentVariable,
+  EnvironmentVarData,
+  EnvironmentVariableComment,
+  MessageTransmitter,
+  EnvironmentAttribute,
+  EnvironmentVal
 } from '../parser/parser';
 
 export default class DbcParser extends Parser {
@@ -85,6 +91,24 @@ export default class DbcParser extends Parser {
           break;
         case ASTKinds.Comment:
           this.addComment(data, this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVariable:
+          console.log(this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentAttribute:
+          console.log(this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVal:
+          console.log(this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVariableComment:
+          console.log(this.parseResult.ast);
+          break;
+        case ASTKinds.MessageTransmitter:
+          console.log(this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVarData:
+          console.log(this.parseResult.ast);
           break;
       }
     }

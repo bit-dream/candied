@@ -11,16 +11,16 @@ EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | Environ
 
 BlankLine := ''$
 
-MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'} ';'
+MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
     .id = number {return parseInt(raw_id,10);}
     .nodes = string[] { return raw_nodes.split(' '); }
 
-EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
     .min = number {return parseFloat(raw_min);}
     .max = number {return parseFloat(raw_max);}
     .unit = string {return cleanComment(raw_unit);}
 
-EnvironmentVarData := 'ENVVAR_DATA_'
+EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' value={'[0-9]+'}
 
 EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
     .comment = string {return cleanComment(raw_comment);}
@@ -87,7 +87,7 @@ MessageAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A
     .max = number {return extractMaxVal(type, raw_value);}
     .enum = string[] {return extractOptions(type, raw_value);}
 
-EnvironmentAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+EnvironmentAttribute := 'BA_DEF_ EV_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
     .min = number {return extractMinVal(type, raw_value);}
     .max = number {return extractMaxVal(type, raw_value);}
     .enum = string[] {return extractOptions(type, raw_value);}

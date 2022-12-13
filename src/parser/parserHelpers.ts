@@ -156,7 +156,11 @@ export function extractMinVal(type: string, str: string): number {
     case 'STRING':
       break;
     case 'HEX':
-      break;
+      const hexMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (hexMatches && hexMatches.groups) {
+        min = parseFloat(hexMatches.groups.min);
+      }
+      break;;
     case 'ENUM':
       break;
     case 'INT':
@@ -183,7 +187,11 @@ export function extractMaxVal(type: string, str: string): number {
     case 'STRING':
       break;
     case 'HEX':
-      break;
+      const hexMatches = str.match(/\s*(?<min>[0-9.]+)\s(?<max>[0-9.]+)\s*;/);
+      if (hexMatches && hexMatches.groups) {
+        max = parseFloat(hexMatches.groups.max);
+      }
+      break;;
     case 'ENUM':
       break;
     case 'INT':

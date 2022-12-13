@@ -10,14 +10,14 @@
 * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | EnvironmentVariable | EnvironmentVarData |
 * EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal
 * BlankLine := ''$
-* MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'} ';'
+* MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
 *     .id = number {return parseInt(raw_id,10);}
 *     .nodes = string[] { return raw_nodes.split(' '); }
-* EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+* EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
 *     .min = number {return parseFloat(raw_min);}
 *     .max = number {return parseFloat(raw_max);}
 *     .unit = string {return cleanComment(raw_unit);}
-* EnvironmentVarData := 'ENVVAR_DATA_'
+* EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' value={'[0-9]+'}
 * EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
 *     .comment = string {return cleanComment(raw_comment);}
 * Version := 'VERSION' '\s+' raw_version={'.*'}
@@ -66,7 +66,7 @@
 *     .min = number {return extractMinVal(type, raw_value);}
 *     .max = number {return extractMaxVal(type, raw_value);}
 *     .enum = string[] {return extractOptions(type, raw_value);}
-* EnvironmentAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+* EnvironmentAttribute := 'BA_DEF_ EV_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
 *     .min = number {return extractMinVal(type, raw_value);}
 *     .max = number {return extractMaxVal(type, raw_value);}
 *     .enum = string[] {return extractOptions(type, raw_value);}
@@ -139,6 +139,8 @@ export enum ASTKinds {
     EnvironmentVariable_$7 = "EnvironmentVariable_$7",
     EnvironmentVariable_$8 = "EnvironmentVariable_$8",
     EnvironmentVarData = "EnvironmentVarData",
+    EnvironmentVarData_$0 = "EnvironmentVarData_$0",
+    EnvironmentVarData_$1 = "EnvironmentVarData_$1",
     EnvironmentVariableComment = "EnvironmentVariableComment",
     EnvironmentVariableComment_$0 = "EnvironmentVariableComment_$0",
     EnvironmentVariableComment_$1 = "EnvironmentVariableComment_$1",
@@ -311,7 +313,13 @@ export type EnvironmentVariable_$5 = string;
 export type EnvironmentVariable_$6 = string;
 export type EnvironmentVariable_$7 = string;
 export type EnvironmentVariable_$8 = string;
-export type EnvironmentVarData = string;
+export interface EnvironmentVarData {
+    kind: ASTKinds.EnvironmentVarData;
+    name: EnvironmentVarData_$0;
+    value: EnvironmentVarData_$1;
+}
+export type EnvironmentVarData_$0 = string;
+export type EnvironmentVarData_$1 = string;
 export class EnvironmentVariableComment {
     public kind: ASTKinds.EnvironmentVariableComment = ASTKinds.EnvironmentVariableComment;
     public name: EnvironmentVariableComment_$0;
@@ -909,7 +917,6 @@ export class Parser {
                     && ($scope$raw_id = this.matchMessageTransmitter_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_nodes = this.matchMessageTransmitter_$1($$dpth + 1, $$cr)) !== null
-                    && this.regexAccept(String.raw`(?:;)`, $$dpth + 1, $$cr) !== null
                 ) {
                     $$res = new MessageTransmitter($scope$raw_id, $scope$raw_nodes);
                 }
@@ -940,7 +947,7 @@ export class Parser {
                     && ($scope$name = this.matchEnvironmentVariable_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null
                     && ($scope$type = this.matchEnvironmentVariable_$1($$dpth + 1, $$cr)) !== null
-                    && this.regexAccept(String.raw`(?:\)\s\[)`, $$dpth + 1, $$cr) !== null
+                    && this.regexAccept(String.raw`(?:\s+\[)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_min = this.matchEnvironmentVariable_$2($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:\|)`, $$dpth + 1, $$cr) !== null
                     && ($scope$raw_max = this.matchEnvironmentVariable_$3($$dpth + 1, $$cr)) !== null
@@ -988,7 +995,27 @@ export class Parser {
         return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
     }
     public matchEnvironmentVarData($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData> {
-        return this.regexAccept(String.raw`(?:ENVVAR_DATA_)`, $$dpth + 1, $$cr);
+        return this.run<EnvironmentVarData>($$dpth,
+            () => {
+                let $scope$name: Nullable<EnvironmentVarData_$0>;
+                let $scope$value: Nullable<EnvironmentVarData_$1>;
+                let $$res: Nullable<EnvironmentVarData> = null;
+                if (true
+                    && this.regexAccept(String.raw`(?:ENVVAR_DATA_\s+)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$name = this.matchEnvironmentVarData_$0($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$value = this.matchEnvironmentVarData_$1($$dpth + 1, $$cr)) !== null
+                ) {
+                    $$res = {kind: ASTKinds.EnvironmentVarData, name: $scope$name, value: $scope$value};
+                }
+                return $$res;
+            });
+    }
+    public matchEnvironmentVarData_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData_$0> {
+        return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+    }
+    public matchEnvironmentVarData_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData_$1> {
+        return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
     }
     public matchEnvironmentVariableComment($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVariableComment> {
         return this.run<EnvironmentVariableComment>($$dpth,
@@ -1430,7 +1457,7 @@ export class Parser {
                 let $scope$raw_value: Nullable<EnvironmentAttribute_$2>;
                 let $$res: Nullable<EnvironmentAttribute> = null;
                 if (true
-                    && this.regexAccept(String.raw`(?:BA_DEF_ BO_\s+)`, $$dpth + 1, $$cr) !== null
+                    && this.regexAccept(String.raw`(?:BA_DEF_ EV_\s+)`, $$dpth + 1, $$cr) !== null
                     && this.regexAccept(String.raw`(?:")`, $$dpth + 1, $$cr) !== null
                     && ($scope$name = this.matchEnvironmentAttribute_$0($$dpth + 1, $$cr)) !== null
                     && this.regexAccept(String.raw`(?:")`, $$dpth + 1, $$cr) !== null
