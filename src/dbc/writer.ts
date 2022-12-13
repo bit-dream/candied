@@ -1,5 +1,15 @@
 import * as fs from 'fs';
-import { Attribute, AttributeDataType, DbcData, Message, NetworkBridges, Signal, SignalGroup, TxMessages, ValueTable } from './types';
+import {
+  Attribute,
+  AttributeDataType,
+  DbcData,
+  Message,
+  NetworkBridges,
+  Signal,
+  SignalGroup,
+  TxMessages,
+  ValueTable,
+} from './types';
 
 class Writer {
   file: string;
@@ -52,11 +62,11 @@ class Writer {
   }
 
   writeMessageTransmitters(transmitters: NetworkBridges) {
-    transmitters.forEach((transmitter: TxMessages, canId: number) =>{
-      let lineContent = `BO_TX_BU_ ${canId} : ${transmitter.join(',')};`
+    transmitters.forEach((transmitter: TxMessages, canId: number) => {
+      const lineContent = `BO_TX_BU_ ${canId} : ${transmitter.join(',')};`;
       this.writeLine(lineContent);
       this.writeLine('');
-    })
+    });
     this.writeLine('');
   }
 
@@ -102,19 +112,18 @@ class Writer {
     this.writeLine('');
   }
 
-   /**
+  /**
    * Generic the signal groups as provided from the model
    * @param groups Map of available signal groups to write
    */
-   writeSignalGroups(messages: Map<string, Message>) {
-
+  writeSignalGroups(messages: Map<string, Message>) {
     messages.forEach((message: Message) => {
-      message.signalGroups.forEach((group: SignalGroup)=> {
+      message.signalGroups.forEach((group: SignalGroup) => {
         const signalList = group.signals.join(' ');
         const lineContent = `SIG_GROUP_ ${group.id} ${group.name} ${group.groupId} : ${signalList};`;
         this.writeLine(lineContent);
-      })
-    })
+      });
+    });
     this.writeLine('');
   }
 

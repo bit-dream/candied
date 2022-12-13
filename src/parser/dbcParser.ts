@@ -466,8 +466,8 @@ export default class DbcParser extends Parser {
           name: data.name,
           id: data.id,
           groupId: data.group_number,
-          signals: data.signals
-        }
+          signals: data.signals,
+        };
         msg.signalGroups.set(data.name, groupData);
       }
     }

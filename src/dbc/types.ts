@@ -26,7 +26,7 @@ export type SignalGroup = {
   id: number;
   groupId: number;
   signals: string[];
-}
+};
 
 export type Message = {
   name: string;
@@ -75,7 +75,7 @@ export type Token = {
 
 export type TxMessages = string[];
 export type CanId = number;
-export type NetworkBridges = Map<CanId,TxMessages>;
+export type NetworkBridges = Map<CanId, TxMessages>;
 
 export type DbcData = {
   version: string | null;

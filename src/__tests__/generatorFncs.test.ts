@@ -13,7 +13,7 @@ test('Create Simple Message Object', () => {
     signals: new Map(),
     description: null,
     attributes: new Map(),
-    signalGroups: new Map()
+    signalGroups: new Map(),
   });
 });
 
@@ -29,7 +29,7 @@ test('Create Complex Message Object', () => {
     signals: new Map(),
     description: 'Test Description',
     attributes: new Map(),
-    signalGroups: new Map()
+    signalGroups: new Map(),
   });
 });
 

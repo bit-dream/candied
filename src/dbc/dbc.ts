@@ -3,27 +3,27 @@ import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
 import {
-    Message,
-    Signal,
-    DbcData,
-    CanFrame,
-    EndianType,
-    ValueTable,
-    Node,
-    AttributeType,
-    AttributeDataType,
-    Attribute
+  Message,
+  Signal,
+  DbcData,
+  CanFrame,
+  EndianType,
+  ValueTable,
+  Node,
+  AttributeType,
+  AttributeDataType,
+  Attribute,
 } from './types';
 import Writer from './writer';
 import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
 
 export type AttributeOptions = {
-  value?: string,
-  defaultValue?: string,
-  options?: string[],
-  min?: number,
-  max?: number
-}
+  value?: string;
+  defaultValue?: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+};
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -63,7 +63,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
-      networkBridges: new Map()
+      networkBridges: new Map(),
     };
   }
 
@@ -88,67 +88,6 @@ class Dbc {
    */
   set description(description: string) {
     this.data.description = description;
-  }
-
-  /**
-   * 
-   * Creates an attribute based on type that can be appended to the DBC data
-   * 
-   * @param name The name of the attribute property
-   * @param type The type of attribute that is being added: Global, Message, Signal, EnvironmentalVariable, Node
-   * @param dataType The data type of the attribute: HEX, STRING, INT, ENUM, FLOAT
-   * @param properties An object of additional properties to be set for the attribute. properties is a required field if the data type is
-   * anything other than type STRING
-   * @throws An error will be throw if the incorrect properties are passed based on the provided data type
-   * @returns Attribute
-   */
-  createAttribute(
-    name: string,
-    type: AttributeType,
-    dataType: AttributeDataType,
-    properties?: AttributeOptions
-  ): Attribute | undefined {
-      // Check that correct settings are passed in based on data type specified
-      if (properties) {
-        if (dataType === 'ENUM' && !properties.options) {
-          throw new Error('Data Type ENUM requires that the enumeration property not be null')
-        } else if (dataType !== 'STRING' && dataType !== 'ENUM') {
-          if (properties.min && properties.max) {
-            // Check that min and max not swapped.
-            if (properties.min >= properties.max) {
-              throw new Error('Min value can not be equal or greater than the max value')
-            } else if (properties.max <= properties.min) {
-              throw new Error('max value can not be equal or less than the min value')
-            }
-          } else {
-            throw new Error('Data Type specified requires that the min/max properties not be null')
-          }
-          
-        } else {
-        }
-        if (properties.value && properties.defaultValue === null) {
-          throw new Error('When an attribute value is set, a default value needs to be specified')
-        }
-
-        // Automatically set the value to be the default value if not specified
-        if (properties.defaultValue && properties.value === null) {
-          properties.value = properties.defaultValue;
-        }
-
-        const attribute: Attribute = {
-          name,
-          type,
-          dataType,
-          value: properties.value ? properties.value : null,
-          defaultValue: properties.defaultValue ? properties.defaultValue : null,
-          options: properties.options ? properties.options : null,
-          min: properties.min ? properties.min : null,
-          max: properties.max ? properties.max : null
-        }
-        return attribute;
-      } else if (dataType !== 'STRING') {
-        throw new Error(`Additional properties are required to create an attribute for type ${dataType}`)
-      }
   }
 
   /**
@@ -177,7 +116,7 @@ class Dbc {
       signals: new Map(),
       description,
       attributes: new Map(),
-      signalGroups: new Map()
+      signalGroups: new Map(),
     };
     return message;
   }
@@ -357,7 +296,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
-      networkBridges: new Map()
+      networkBridges: new Map(),
     };
 
     let lineNum = 1;
@@ -405,7 +344,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
-      networkBridges: new Map()
+      networkBridges: new Map(),
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
