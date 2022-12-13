@@ -12,7 +12,7 @@
 * BlankLine := ''$
 * MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
 *     .id = number {return parseInt(raw_id,10);}
-*     .nodes = string[] { return raw_nodes.split(' '); }
+*     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
 * EnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' inital_value={'[\-0-9.]+'} '\s+' ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
 *     .min = number {return parseFloat(raw_min);}
 *     .max = number {return parseFloat(raw_max);}
@@ -32,7 +32,7 @@
 *     .dlc = number {return parseInt(raw_dlc,10);}
 * CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
 *     .unit = string {return cleanComment(raw_unit);}
-*     .nodes = string[] {return raw_node_str.split(' ');}
+*     .nodes = string[] {return raw_node_str.trim().split(',');}
 *     .start_bit = number {return parseInt(raw_start_bit,10);}
 *     .length = number {return parseInt(raw_length,10);}
 *     .endian = string {return raw_endian === '1' ? 'Intel' : 'Motorola'}
@@ -263,7 +263,7 @@ export class MessageTransmitter {
         return parseInt(raw_id,10);
         })();
         this.nodes = ((): string[] => {
-        return raw_nodes.split(' ');
+        return raw_nodes.replace(';', '').split(',');
         })();
     }
 }
@@ -432,7 +432,7 @@ export class CanSignal {
         return cleanComment(raw_unit);
         })();
         this.nodes = ((): string[] => {
-        return raw_node_str.split(' ');
+        return raw_node_str.trim().split(',');
         })();
         this.start_bit = ((): number => {
         return parseInt(raw_start_bit,10);
