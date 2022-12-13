@@ -8,8 +8,12 @@
 * Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
-* EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal
+* EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
 * BlankLine := ''$
+* CanSignalGroup := 'SIG_GROUP_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s+' raw_group_number={'[0-9]+'} '\s+:\s*' raw_signal_string={'[a-zA-Z0-9_\s]*'} '\s*'
+*     .signals = string[] { return raw_signal_string.replace(';', '').split(' '); }
+*     .id = number {return parseInt(raw_id,10);}
+*     .group_number = number {return parseInt(raw_group_number,10);}
 * MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
 *     .id = number {return parseInt(raw_id,10);}
 *     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
@@ -127,7 +131,13 @@ export enum ASTKinds {
     Choice_24 = "Choice_24",
     Choice_25 = "Choice_25",
     Choice_26 = "Choice_26",
+    Choice_27 = "Choice_27",
     BlankLine = "BlankLine",
+    CanSignalGroup = "CanSignalGroup",
+    CanSignalGroup_$0 = "CanSignalGroup_$0",
+    CanSignalGroup_$1 = "CanSignalGroup_$1",
+    CanSignalGroup_$2 = "CanSignalGroup_$2",
+    CanSignalGroup_$3 = "CanSignalGroup_$3",
     MessageTransmitter = "MessageTransmitter",
     MessageTransmitter_$0 = "MessageTransmitter_$0",
     MessageTransmitter_$1 = "MessageTransmitter_$1",
@@ -223,7 +233,7 @@ export enum ASTKinds {
     AttributeValue_$1 = "AttributeValue_$1",
     $EOF = "$EOF",
 }
-export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19 | Choice_20 | Choice_21 | Choice_22 | Choice_23 | Choice_24 | Choice_25 | Choice_26;
+export type Choice = Choice_1 | Choice_2 | Choice_3 | Choice_4 | Choice_5 | Choice_6 | Choice_7 | Choice_8 | Choice_9 | Choice_10 | Choice_11 | Choice_12 | Choice_13 | Choice_14 | Choice_15 | Choice_16 | Choice_17 | Choice_18 | Choice_19 | Choice_20 | Choice_21 | Choice_22 | Choice_23 | Choice_24 | Choice_25 | Choice_26 | Choice_27;
 export type Choice_1 = CanNode;
 export type Choice_2 = CanMessage;
 export type Choice_3 = CanSignal;
@@ -250,9 +260,39 @@ export type Choice_23 = EnvironmentVariableComment;
 export type Choice_24 = MessageTransmitter;
 export type Choice_25 = EnvironmentAttribute;
 export type Choice_26 = EnvironmentVal;
+export type Choice_27 = CanSignalGroup;
 export interface BlankLine {
     kind: ASTKinds.BlankLine;
 }
+export class CanSignalGroup {
+    public kind: ASTKinds.CanSignalGroup = ASTKinds.CanSignalGroup;
+    public raw_id: CanSignalGroup_$0;
+    public name: CanSignalGroup_$1;
+    public raw_group_number: CanSignalGroup_$2;
+    public raw_signal_string: CanSignalGroup_$3;
+    public signals: string[];
+    public id: number;
+    public group_number: number;
+    constructor(raw_id: CanSignalGroup_$0, name: CanSignalGroup_$1, raw_group_number: CanSignalGroup_$2, raw_signal_string: CanSignalGroup_$3){
+        this.raw_id = raw_id;
+        this.name = name;
+        this.raw_group_number = raw_group_number;
+        this.raw_signal_string = raw_signal_string;
+        this.signals = ((): string[] => {
+        return raw_signal_string.replace(';', '').split(' ');
+        })();
+        this.id = ((): number => {
+        return parseInt(raw_id,10);
+        })();
+        this.group_number = ((): number => {
+        return parseInt(raw_group_number,10);
+        })();
+    }
+}
+export type CanSignalGroup_$0 = string;
+export type CanSignalGroup_$1 = string;
+export type CanSignalGroup_$2 = string;
+export type CanSignalGroup_$3 = string;
 export class MessageTransmitter {
     public kind: ASTKinds.MessageTransmitter = ASTKinds.MessageTransmitter;
     public raw_id: MessageTransmitter_$0;
@@ -832,6 +872,7 @@ export class Parser {
             () => this.matchChoice_24($$dpth + 1, $$cr),
             () => this.matchChoice_25($$dpth + 1, $$cr),
             () => this.matchChoice_26($$dpth + 1, $$cr),
+            () => this.matchChoice_27($$dpth + 1, $$cr),
         ]);
     }
     public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -912,6 +953,9 @@ export class Parser {
     public matchChoice_26($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_26> {
         return this.matchEnvironmentVal($$dpth + 1, $$cr);
     }
+    public matchChoice_27($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_27> {
+        return this.matchCanSignalGroup($$dpth + 1, $$cr);
+    }
     public matchBlankLine($$dpth: number, $$cr?: ErrorTracker): Nullable<BlankLine> {
         return this.run<BlankLine>($$dpth,
             () => {
@@ -924,6 +968,42 @@ export class Parser {
                 }
                 return $$res;
             });
+    }
+    public matchCanSignalGroup($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup> {
+        return this.run<CanSignalGroup>($$dpth,
+            () => {
+                let $scope$raw_id: Nullable<CanSignalGroup_$0>;
+                let $scope$name: Nullable<CanSignalGroup_$1>;
+                let $scope$raw_group_number: Nullable<CanSignalGroup_$2>;
+                let $scope$raw_signal_string: Nullable<CanSignalGroup_$3>;
+                let $$res: Nullable<CanSignalGroup> = null;
+                if (true
+                    && this.regexAccept(String.raw`(?:SIG_GROUP_\s+)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$raw_id = this.matchCanSignalGroup_$0($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$name = this.matchCanSignalGroup_$1($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$raw_group_number = this.matchCanSignalGroup_$2($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s+:\s*)`, $$dpth + 1, $$cr) !== null
+                    && ($scope$raw_signal_string = this.matchCanSignalGroup_$3($$dpth + 1, $$cr)) !== null
+                    && this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
+                ) {
+                    $$res = new CanSignalGroup($scope$raw_id, $scope$name, $scope$raw_group_number, $scope$raw_signal_string);
+                }
+                return $$res;
+            });
+    }
+    public matchCanSignalGroup_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$0> {
+        return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+    }
+    public matchCanSignalGroup_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$1> {
+        return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+    }
+    public matchCanSignalGroup_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$2> {
+        return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+    }
+    public matchCanSignalGroup_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$3> {
+        return this.regexAccept(String.raw`(?:[a-zA-Z0-9_\s]*)`, $$dpth + 1, $$cr);
     }
     public matchMessageTransmitter($$dpth: number, $$cr?: ErrorTracker): Nullable<MessageTransmitter> {
         return this.run<MessageTransmitter>($$dpth,

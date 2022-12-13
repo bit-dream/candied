@@ -13,8 +13,6 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 export { Can };
 
 const dbc = new Dbc();
-const data = dbc.loadSync('src/__tests__/testFiles/DBC_template_v2.dbc');
-
-
-const attr = dbc.createAttribute('ThisIsATestAttribute', 'Message', 'STRING');
-console.log(attr)
+const data = dbc.loadSync('src/__tests__/testFiles/DBC_template.dbc');
+dbc.write('src/TEST.dbc')
+console.log(data)

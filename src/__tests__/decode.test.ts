@@ -11,6 +11,7 @@ const dummyData: DbcData = {
   attributes: new Map(),
   newSymbols: new Array(),
   environmentVariables: new Map(),
+  networkBridges: new Map()
 };
 
 test('Can Frame Creation', () => {

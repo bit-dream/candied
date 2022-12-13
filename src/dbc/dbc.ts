@@ -63,6 +63,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
+      networkBridges: new Map()
     };
   }
 
@@ -176,6 +177,7 @@ class Dbc {
       signals: new Map(),
       description,
       attributes: new Map(),
+      signalGroups: new Map()
     };
     return message;
   }
@@ -355,6 +357,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
+      networkBridges: new Map()
     };
 
     let lineNum = 1;
@@ -402,6 +405,7 @@ class Dbc {
       attributes: new Map(),
       newSymbols: new Array(),
       environmentVariables: new Map(),
+      networkBridges: new Map()
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });

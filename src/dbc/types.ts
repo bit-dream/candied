@@ -21,6 +21,13 @@ export type Signal = {
   attributes: Attributes;
 };
 
+export type SignalGroup = {
+  name: string;
+  id: number;
+  groupId: number;
+  signals: string[];
+}
+
 export type Message = {
   name: string;
   id: number;
@@ -29,6 +36,7 @@ export type Message = {
   signals: Map<string, Signal>;
   description: string | null;
   attributes: Attributes;
+  signalGroups: Map<string, SignalGroup>;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';
@@ -65,6 +73,10 @@ export type Token = {
   dataFormat: RegExp;
 };
 
+export type TxMessages = string[];
+export type CanId = number;
+export type NetworkBridges = Map<CanId,TxMessages>;
+
 export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
@@ -75,6 +87,7 @@ export type DbcData = {
   attributes: Attributes;
   newSymbols: string[];
   environmentVariables: Map<string, EnvironmentVariable>;
+  networkBridges: NetworkBridges;
 };
 
 export type ValueTable = Map<number, string>;

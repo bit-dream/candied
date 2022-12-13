@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Attribute, AttributeDataType, DbcData, Message, Signal, ValueTable } from './types';
+import { Attribute, AttributeDataType, DbcData, Message, NetworkBridges, Signal, SignalGroup, TxMessages, ValueTable } from './types';
 
 class Writer {
   file: string;
@@ -20,9 +20,13 @@ class Writer {
     this.writeNamespace(data.newSymbols);
     this.writeBusSpeed(data.busSpeed);
     this.writeNodes(Array.from(data.nodes.keys()));
+    if (data.valueTables) {
+      this.writeValTable(data.valueTables);
+    }
 
     // Both messages and signals
     this.writeMessagesAndSignals(data.messages);
+    this.writeMessageTransmitters(data.networkBridges);
 
     // Write all comments
     if (data.description) {
@@ -30,13 +34,11 @@ class Writer {
     }
     this.writeMessageAndSignalComments(data.messages);
 
-    if (data.valueTables) {
-      this.writeValTable(data.valueTables);
-    }
     this.writeSignalTables(data.messages);
     this.writeAttributeDefinitions(data);
     this.writeAttributeDefaults(data);
     this.writeAttributeValues(data);
+    this.writeSignalGroups(data.messages);
   }
 
   /**
@@ -46,6 +48,15 @@ class Writer {
   writeVersion(version: string) {
     const lineContent = `VERSION "${version}"`;
     this.writeLine(lineContent);
+    this.writeLine('');
+  }
+
+  writeMessageTransmitters(transmitters: NetworkBridges) {
+    transmitters.forEach((transmitter: TxMessages, canId: number) =>{
+      let lineContent = `BO_TX_BU_ ${canId} : ${transmitter.join(',')};`
+      this.writeLine(lineContent);
+      this.writeLine('');
+    })
     this.writeLine('');
   }
 
@@ -91,6 +102,22 @@ class Writer {
     this.writeLine('');
   }
 
+   /**
+   * Generic the signal groups as provided from the model
+   * @param groups Map of available signal groups to write
+   */
+   writeSignalGroups(messages: Map<string, Message>) {
+
+    messages.forEach((message: Message) => {
+      message.signalGroups.forEach((group: SignalGroup)=> {
+        const signalList = group.signals.join(' ');
+        const lineContent = `SIG_GROUP_ ${group.id} ${group.name} ${group.groupId} : ${signalList};`;
+        this.writeLine(lineContent);
+      })
+    })
+    this.writeLine('');
+  }
+
   /**
    *
    * @param message Individual message to be written to the file
@@ -122,7 +149,7 @@ class Writer {
   writeSignal(signal: Signal) {
     const endian = signal.endianness === 'Motorola' ? '0' : '1';
     const sign = signal.signed ? '-' : '+';
-    const nodes = signal.receivingNodes.length === 0 ? 'Vector___XXXX' : signal.receivingNodes.join(' ');
+    const nodes = signal.receivingNodes.length === 0 ? 'Vector___XXXX' : signal.receivingNodes.join(',');
     const name = signal.multiplex ? signal.name + ' ' + signal.multiplex : signal.name;
 
     // Format: SG_ Signal0 : 0|32@1- (1,0) [0|0] "" Node1
@@ -214,6 +241,8 @@ class Writer {
     }
     switch (value.dataType) {
       case 'INT':
+        lineContent = lineContent + ` ${value.min} ${value.max};`;
+        break;
       case 'FLOAT':
         lineContent = lineContent + ` ${value.min} ${value.max};`;
         break;
@@ -224,6 +253,9 @@ class Writer {
         break;
       case 'STRING':
         lineContent = lineContent + ';';
+        break;
+      case 'HEX':
+        lineContent = lineContent + ` ${value.min} ${value.max};`;
         break;
     }
     return lineContent;

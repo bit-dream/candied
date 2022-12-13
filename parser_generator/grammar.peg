@@ -7,9 +7,14 @@ extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
-EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal
+EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
 
 BlankLine := ''$
+
+CanSignalGroup := 'SIG_GROUP_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s+' raw_group_number={'[0-9]+'} '\s+:\s*' raw_signal_string={'[a-zA-Z0-9_\s]*'} '\s*'
+    .signals = string[] { return raw_signal_string.replace(';', '').split(' '); }
+    .id = number {return parseInt(raw_id,10);}
+    .group_number = number {return parseInt(raw_group_number,10);}
 
 MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
     .id = number {return parseInt(raw_id,10);}

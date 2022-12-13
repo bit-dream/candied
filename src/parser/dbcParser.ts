@@ -39,6 +39,7 @@ import {
   MessageTransmitter,
   EnvironmentAttribute,
   EnvironmentVal,
+  CanSignalGroup,
 } from '../parser/parser';
 
 export default class DbcParser extends Parser {
@@ -120,6 +121,10 @@ export default class DbcParser extends Parser {
           this.addEnvironmentVariableData(data, this.parseResult.ast);
           break;
         case ASTKinds.MessageTransmitter:
+          this.addMessageTransmitter(data, this.parseResult.ast);
+          break;
+        case ASTKinds.CanSignalGroup:
+          this.addSignalGroup(data, this.parseResult.ast);
           break;
       }
     }
@@ -178,6 +183,7 @@ export default class DbcParser extends Parser {
     message.signals = new Map();
     message.description = null;
     message.attributes = new Map();
+    message.signalGroups = new Map();
     dbc.messages.set(message.name, message);
   }
 
@@ -443,6 +449,26 @@ export default class DbcParser extends Parser {
           break;
         default:
           break;
+      }
+    }
+  }
+
+  private addMessageTransmitter(dbc: DbcData, data: MessageTransmitter) {
+    dbc.networkBridges.set(data.id, data.nodes);
+  }
+
+  private addSignalGroup(dbc: DbcData, data: CanSignalGroup) {
+    const name = this.getMessageNameFromId(dbc, data.id);
+    if (name) {
+      const msg = dbc.messages.get(name);
+      if (msg) {
+        const groupData = {
+          name: data.name,
+          id: data.id,
+          groupId: data.group_number,
+          signals: data.signals
+        }
+        msg.signalGroups.set(data.name, groupData);
       }
     }
   }
