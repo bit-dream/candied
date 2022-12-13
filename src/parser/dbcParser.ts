@@ -165,6 +165,7 @@ export default class DbcParser extends Parser {
     envVar.valueTable = null;
     envVar.dataBytesLength = null;
     envVar.description = null;
+    envVar.unit = data.unit;
     dbc.environmentVariables.set(envVar.name, envVar);
   }
 

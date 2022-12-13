@@ -47,6 +47,7 @@ export type EnvironmentVariable = {
   valueTable: ValueTable | null;
   description: string | null;
   dataBytesLength: number | null;
+  unit: string;
 };
 
 export type Node = {

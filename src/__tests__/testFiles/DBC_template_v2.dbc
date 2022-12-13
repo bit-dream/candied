@@ -58,6 +58,7 @@ EV_ WriteOnlyEnvVar: 1 [0|1234] "" 60 3 DUMMY_NODE_VECTOR2  Node2;
 EV_ ReadOnlyEnvVar: 0 [0|100] "MPH" 20 4 DUMMY_NODE_VECTOR1  Node2;
 ENVVAR_DATA_ RWEnvVar_wData: 10;
 
+
 CM_ "DBC Template with multi-
 line 
  

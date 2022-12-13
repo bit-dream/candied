@@ -1,7 +1,7 @@
 import Dbc from '../dbc/dbc';
 import { Attribute, Attributes } from '../dbc/types';
 
-test('DBC_template.dbc: Global attributes', () => {
+test('DBC_template.dbc: Global attributes', (done) => {
   const dbc = new Dbc();
   dbc.load('src/__tests__/testFiles/DBC_template.dbc').then((data) => {
     let attributes: Attributes = new Map();
@@ -17,10 +17,11 @@ test('DBC_template.dbc: Global attributes', () => {
     };
     attributes.set('FloatAttribute', attribute);
     expect(data.attributes).toEqual(attributes);
+    done();
   });
 });
 
-test('DBC_template.dbc: Message attributes', () => {
+test('DBC_template.dbc: Message attributes', (done) => {
   const dbc = new Dbc();
   dbc.load('src/__tests__/testFiles/DBC_template.dbc').then((data) => {
     let attributes: Attributes = new Map();
@@ -36,10 +37,11 @@ test('DBC_template.dbc: Message attributes', () => {
     };
     attributes.set('BOStringAttribute', attribute);
     expect(data.messages.get('CANMessage')?.attributes).toEqual(attributes);
+    done();
   });
 });
 
-test('DBC_template.dbc: Signal attributes', () => {
+test('DBC_template.dbc: Signal attributes', (done) => {
   const dbc = new Dbc();
   dbc.load('src/__tests__/testFiles/DBC_template.dbc').then((data) => {
     let attributes: Attributes = new Map();
@@ -55,5 +57,6 @@ test('DBC_template.dbc: Signal attributes', () => {
     };
     attributes.set('SGEnumAttribute', attribute);
     expect(data.messages.get('CANMessage')?.signals.get('Signal0')?.attributes).toEqual(attributes);
+    done();
   });
 });
