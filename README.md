@@ -5,8 +5,9 @@
 ![npm](https://img.shields.io/npm/dw/dbc-can)
 ![license](https://img.shields.io/github/license/bit-dream/can-dbc)
 <br/>
+![Heading Image](/assets/CAN_NETWORK.png)
 
-## *A zero dependency, lightly weight parser, written in pure Javascript/Typescript*
+## *A zero dependency, lightly weight CAN DBC parser, written in pure Javascript/Typescript*
 <br/>
 <br/>
 
