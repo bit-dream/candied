@@ -1,20 +1,58 @@
-# DBC-CAN
-### A zero dependency, lightly weight parser, written in pure Javascript/Typescript
+# **DBC-CAN**
+<br/>
 
-## Motivation
-### What is a DBC file?
+## *A zero dependency, lightly weight parser, written in pure Javascript/Typescript*
+<br/>
+<br/>
+
+## **Motivation**
+<br/>
+
+### <i><b>What is a DBC file?</b><i>
+<br/>
 The DBC file is an ASCII based translation file used to apply identifying names, scaling, offsets, and defining information, to data transmitted within a CAN frame. 
-
+<br/>
 Simply put, it helps decode raw CAN (Controller Area Network) frames into something that is human readable.
+<br/>
+<br/>
 
-### What are the goals of DBC-CAN
+### <i><b>What are the goals of DBC-CAN</b></i>
+<br/>
 To develop and deploy a very simple, lightweight library that doesn't relay on external dependecies.
+<br/>
+
 You should be able to do the following with this library:
 1. Load and parse a .dbc file so that its contents can be analysed (messages, signals, etc.)
 2. Create your own .dbc file by creating messages, signals, value tables, enumerations.
 3. Decode individual CAN frames into human readable content.
 4. Encode to a raw CAN frame from a DBC message
 5. Use utility functions to help analyize DBC files.
+<br/>
+<br/>
+
+### <i><b>Why you should use this library</b></i>
+<br/>
+CAN-DBC is really the only full feldge DBC parsing library that exists in the javascript-sphere. There are other parsers that exist
+out in the wild, however they are very limited in capabilities. Most can only pull simple message and signal definitions.
+<br/>
+<br/>
+
+With CAN-DBC, you can translate the majority of a .dbc file's content into something that is human readable
+<br/>
+
+CAN-DBC handles:
+1. Message definitions
+2. Signal definitions
+3. Environment variables
+4. Network bridges
+5. CAN Network Nodes/ECUs
+6. Value table definitions
+7. Signal groupings
+8. Comments/descriptions for all signals, nodes, environment variables, messages, and others.
+9. All defined attributes (global, signals, nodes, EVs, messages, etc)
+10. File version number
+11. All defined 'New Symbols'
+
 
 ## Usage
 
@@ -43,27 +81,38 @@ After creating messages/signals or loading directly from a dbc file, you can see
 the contents of the data by using the `.` operator on that specific class instance and calling the data variable,
 e.g. `const dbc = new Dbc(); dbc.data;`
 
+<br/>
+
 The structure of the data is as follows:
-- Data
-    - version: string | null -> Version of the DBC file
-    - messages: Map<string, Message> -> A container of all available CAN messages
-    - description: string | null; -> Short description of the DBC file
-    - busConfiguration: number | null; -> Expected CAN bus speed
-    - canNodes: string[]; -> List of nodes as they exist for the network topology
-    - valueTables: Map<string, ValueTable> | null; -> Value Tables/Enumerations
-    - attributes: Attributes | null; -> Any and all top level attributes
+| Name          | Type          | Description  |
+| ------------- |:-------------:| -----:|
+| Version      | String        | Version number of the file |
+| Messages     | Map Container |  Messages parsed from the dbc |
+| Description  | String        | A short description of the file |
+| Bus Speed    | String        | Typically undefeined, this has been depreciated by Vector |
+| Nodes        | Map Container | Network Nodes/ECUs |
+| Environment Variables  | Map Container      | All defined 'environmental variables' and definitions |
+| Attributes   | Map Container      | All attributes for messages, signals, etc |
+| Can Bridges  | Map Container      | Messages that bridge CAN networks |
+
+<br/>
 
 Invidiual messages can be pulled out by key (since the data structure is a Map) or by using the 
 builtin uility function `getMessageById()` or `getMessageByName()`.
 Each individual message contains a substructure with the following items:
 
-- Message
-    - name: string -> Name of the message
-    - id: number -> CAN ID of the message
-    - dlc: number -> Data Length Code (DLC) of the message
-    - sendingNode: string | null -> Any node that sends this message
-    - signals: Map<string, Signal> -> Map of all available signals attached to this message
-    - description: string | null -> Short description of this message
+| Name          | Type          | Description  |
+| ------------- |:-------------:| -----:|
+| Message Name      | String        | Name of the message |
+| ID     | Number |  CAN Id of the message |
+| DLC  | Number        | Data length code |
+| Sending Node  | String        | Node that sends this message |
+| Signals        | Map Container | Signals that make up this message |
+| Signal Groupings  | Map Container      | How the signals are grouped in the message |
+| Description   | String    | A short description of what the message is |
+| Attributes  | Map Container      | All other misc. attributes for this message |
+
+<br/>
 
 Messages typically contain a list of signals. Signals can be access access in a similar way to that
 of messages, since each message contains a Map data structure for its signals. DBC-CAN has built
@@ -71,21 +120,26 @@ in utility functions to make the process a little bit easier, namely `getSignalB
 
 The structure of an individual signal is:
 
-- Signal
-    - name: string
-    - multiplex: string | null
-    - startBit: number
-    - length: number
-    - endianness: string
-    - signed: boolean
-    - factor: number
-    - offset: number
-    - min: number
-    - max: number
-    - unit: string
-    - receivingNodes: string[]
-    - description: string | null
-    - valueTable: ValueTable | null
+| Name          | Type          |
+| ------------- |:-------------:|
+| Name     | String        |
+| Multiplexor     | String |
+| Start Bit  | Number        |
+| Length  | Number        |
+| Endian        | String |
+| Signed  | Boolean     |
+| Factor   | Number    |
+| Offset  | Number |
+| Min  | Number |
+| Max  | Number |
+| Unit  | String |
+| Receiving Nodes  | List |
+| Description  | String |
+| Value Table  | Map Container |
+
+
+<br/>
+
 
 ### Loading a dbc
 
@@ -482,28 +536,53 @@ Returns
   "attributes": null
 }
 ```
+<br/>
+
+# Contributing
+<br/>
+
+Contributing is highly encouraged.
+
+<br/>
+If you want to become a contributer you can either create a new issue for this project or comment on an existing issue indicating that you would like to do the pull request for that feature. You can also join the discussion board or message be directly.
+<br/>
 
 
-## Missing Functionality
-Not all functionality stated in the motivation section is currently implemented in DBC-CAN. However,
-this library is to be actively maintained and as such, all functionality is eventually intended to be implemented.
+The project should be already be setup to make you a successful contributor.
+<br/>
 
-As of writing, there is no/limited support for: 
-1. When parsing DBC files, not all attributes are pulled out, specifically: BA_DEF_, BA_DEF_DEF_, BA_, BO_TX_BU_, SIG_GROUP_ (Reference DBC_Specification.md to understand more of what these tokens represent). These fields will be the main target of the next release.
-2. NS_ and BU_ are not filled out when generating the dbc file. These fields are not technically needed for a valid DBC file. But will be added in a future release.
-3. More general configurability of parsing, writing, and creation of DBC files
-4. Continue to develop addToken() uility function that will allow a user to manually add parsing tokens. This will help in allowing the dbc parser to be more configurable and allow users greater control so that if this library falls behind a DBC standard update.
-5. Input and output validation:
-    a. Disallow adding of messages with the same name
-    b. Disallow adding of signals that overlap due to start bits and length
-    c. Validate entire data structure before writing to a dbc file. The Writer() class that generates the dbc file
-    will generate a DBC file that can be parsed by popular tools like CANDB++, but that does not guarentee that
-    the everything is completely correct. For example, older DBC files do not support Message/Signal names that are greater
-    than 32 characters long.
+**What you'll be using out of the box:**
+1. Jest for tesing
+2. TSLint for all linting
+3. Prettier for file formatting and clean code
+4. Typescript
 
-## Contributing
+Suggestions for new tooling are more than welcome.
+<br/>
 
-Contributing is highly encourage and if wishing to contribute the Missing Functionality section is a great place to start. We are also open to any and all fresh ideas.
+**The package.json has many utility scripts that can be run via npm run**
 
-We ask that the formatter and linter is ran before submitting a pull request.
+| Name          | Type          |
+| ------------- |:-------------:|
+| test          | Run all unit test suites       |
+| coverage          | Code coverage report      |
+| build          | Build the typescript files    |
+| format          | Code Formatting      |
+| lint          | Linting      |
+| go          | Quick utility function that will build and run index.ts      |
+| buildparser          | Builds the DBC parser class      |
+| test:debug          | Debug jest test files      |
+
+This project uses TSPeg for it's parser generator. As such, a PEG style grammar file is defined
+in the parser_generator folder of this project. There really isn't a need to run the npm buildparser command if you need
+to make grammar updates/parser updates to this project, `npm run build`  will both build the parser and typescript files for you.
+The parser output gets automatically migrated to the src/parser folder.
+
+<br/>
+
+In addition to all of the above utility scripts, this project contains all of the necessary functions to eventually publish to NPM via the `npm run publish` command.
+
+<br/>
+
+We ask that the linter and format commands are ran before you issue a pull request.
 
