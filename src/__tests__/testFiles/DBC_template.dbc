@@ -47,5 +47,7 @@ BA_ "SGEnumAttribute" SG_ 1234 Signal0 2;
 VAL_TABLE_ Numbers 3 "Three" 2 "Two" 1 "One" 0 "Zero";
 VAL_ 4321 Value0 2 "Value2" 1 "Value1" 0 "Value0";
 VAL_ 4321 Value1 Numbers;
+SIG_GROUP_ 1234 SignalGroup1 1 : Signal0 Signal1;
+SIG_GROUP_ 4321 SignalGroup2 1 :;
 
 BO_TX_BU_ 4321 : Node0,Node2;

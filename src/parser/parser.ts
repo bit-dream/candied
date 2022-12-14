@@ -7,8 +7,26 @@
  * ---
  * Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
  * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
- * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
+ * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
+ * EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
  * BlankLine := ''$
+ * CanSignalGroup := 'SIG_GROUP_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s+' raw_group_number={'[0-9]+'} '\s+:\s*' raw_signal_string={'[a-zA-Z0-9_\s]*'} '\s*'
+ *     .signals = string[] { return raw_signal_string.replace(';', '').split(' '); }
+ *     .id = number {return parseInt(raw_id,10);}
+ *     .group_number = number {return parseInt(raw_group_number,10);}
+ * MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
+ *     .id = number {return parseInt(raw_id,10);}
+ *     .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
+ * CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' raw_inital_value={'[\-0-9.]+'} '\s+' raw_ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+ *     .min = number {return parseFloat(raw_min);}
+ *     .max = number {return parseFloat(raw_max);}
+ *     .unit = string {return cleanComment(raw_unit);}
+ *     .initial_value = number {return parseFloat(raw_inital_value);}
+ *     .ev_id = number {return parseInt(raw_ev_id,10);}
+ * EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' raw_value={'[0-9]+'}
+ *     .value = number {return parseInt(raw_value);}
+ * EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+ *     .comment = string {return cleanComment(raw_comment);}
  * Version := 'VERSION' '\s+' raw_version={'.*'}
  *     .version = string {return cleanComment(raw_version);}
  * NewSymbol := 'NS_\s*:'
@@ -21,7 +39,7 @@
  *     .dlc = number {return parseInt(raw_dlc,10);}
  * CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
  *     .unit = string {return cleanComment(raw_unit);}
- *     .nodes = string[] {return raw_node_str.split(' ');}
+ *     .nodes = string[] {return raw_node_str.trim().split(',');}
  *     .start_bit = number {return parseInt(raw_start_bit,10);}
  *     .length = number {return parseInt(raw_length,10);}
  *     .endian = string {return raw_endian === '1' ? 'Intel' : 'Motorola'}
@@ -35,7 +53,9 @@
  * Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
  *     .id = number {return parseInt(raw_id,10);}
  *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
- * Comment := 'CM_\s' !'[SG_|BO_|BU_]' raw_comment={'.*'}
+ * EnvironmentVal := 'VAL_\s' !'0-9' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+ *     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+ * Comment := 'CM_\s' !'[SG_|BO_|BU_|EV_]' raw_comment={'.*'}
  *     .comment = string {return cleanComment(raw_comment);}
  * SignalComment := 'CM_ SG_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
  *     .comment = string {return cleanComment(raw_comment);}
@@ -50,6 +70,10 @@
  *     .max = number {return extractMaxVal(type, raw_value);}
  *     .enum = string[] {return extractOptions(type, raw_value);}
  * MessageAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+ *     .min = number {return extractMinVal(type, raw_value);}
+ *     .max = number {return extractMaxVal(type, raw_value);}
+ *     .enum = string[] {return extractOptions(type, raw_value);}
+ * EnvironmentAttribute := 'BA_DEF_ EV_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
  *     .min = number {return extractMinVal(type, raw_value);}
  *     .max = number {return extractMaxVal(type, raw_value);}
  *     .enum = string[] {return extractOptions(type, raw_value);}
@@ -110,7 +134,38 @@ export enum ASTKinds {
   Choice_18 = 'Choice_18',
   Choice_19 = 'Choice_19',
   Choice_20 = 'Choice_20',
+  Choice_21 = 'Choice_21',
+  Choice_22 = 'Choice_22',
+  Choice_23 = 'Choice_23',
+  Choice_24 = 'Choice_24',
+  Choice_25 = 'Choice_25',
+  Choice_26 = 'Choice_26',
+  Choice_27 = 'Choice_27',
   BlankLine = 'BlankLine',
+  CanSignalGroup = 'CanSignalGroup',
+  CanSignalGroup_$0 = 'CanSignalGroup_$0',
+  CanSignalGroup_$1 = 'CanSignalGroup_$1',
+  CanSignalGroup_$2 = 'CanSignalGroup_$2',
+  CanSignalGroup_$3 = 'CanSignalGroup_$3',
+  MessageTransmitter = 'MessageTransmitter',
+  MessageTransmitter_$0 = 'MessageTransmitter_$0',
+  MessageTransmitter_$1 = 'MessageTransmitter_$1',
+  CanEnvironmentVariable = 'CanEnvironmentVariable',
+  CanEnvironmentVariable_$0 = 'CanEnvironmentVariable_$0',
+  CanEnvironmentVariable_$1 = 'CanEnvironmentVariable_$1',
+  CanEnvironmentVariable_$2 = 'CanEnvironmentVariable_$2',
+  CanEnvironmentVariable_$3 = 'CanEnvironmentVariable_$3',
+  CanEnvironmentVariable_$4 = 'CanEnvironmentVariable_$4',
+  CanEnvironmentVariable_$5 = 'CanEnvironmentVariable_$5',
+  CanEnvironmentVariable_$6 = 'CanEnvironmentVariable_$6',
+  CanEnvironmentVariable_$7 = 'CanEnvironmentVariable_$7',
+  CanEnvironmentVariable_$8 = 'CanEnvironmentVariable_$8',
+  EnvironmentVarData = 'EnvironmentVarData',
+  EnvironmentVarData_$0 = 'EnvironmentVarData_$0',
+  EnvironmentVarData_$1 = 'EnvironmentVarData_$1',
+  EnvironmentVariableComment = 'EnvironmentVariableComment',
+  EnvironmentVariableComment_$0 = 'EnvironmentVariableComment_$0',
+  EnvironmentVariableComment_$1 = 'EnvironmentVariableComment_$1',
   Version = 'Version',
   Version_$0 = 'Version_$0',
   NewSymbol = 'NewSymbol',
@@ -144,6 +199,9 @@ export enum ASTKinds {
   Val_$0 = 'Val_$0',
   Val_$1 = 'Val_$1',
   Val_$2 = 'Val_$2',
+  EnvironmentVal = 'EnvironmentVal',
+  EnvironmentVal_$0 = 'EnvironmentVal_$0',
+  EnvironmentVal_$1 = 'EnvironmentVal_$1',
   Comment = 'Comment',
   Comment_$0 = 'Comment_$0',
   SignalComment = 'SignalComment',
@@ -164,6 +222,10 @@ export enum ASTKinds {
   MessageAttribute_$0 = 'MessageAttribute_$0',
   MessageAttribute_$1 = 'MessageAttribute_$1',
   MessageAttribute_$2 = 'MessageAttribute_$2',
+  EnvironmentAttribute = 'EnvironmentAttribute',
+  EnvironmentAttribute_$0 = 'EnvironmentAttribute_$0',
+  EnvironmentAttribute_$1 = 'EnvironmentAttribute_$1',
+  EnvironmentAttribute_$2 = 'EnvironmentAttribute_$2',
   NodeAttribute = 'NodeAttribute',
   NodeAttribute_$0 = 'NodeAttribute_$0',
   NodeAttribute_$1 = 'NodeAttribute_$1',
@@ -200,7 +262,14 @@ export type Choice =
   | Choice_17
   | Choice_18
   | Choice_19
-  | Choice_20;
+  | Choice_20
+  | Choice_21
+  | Choice_22
+  | Choice_23
+  | Choice_24
+  | Choice_25
+  | Choice_26
+  | Choice_27;
 export type Choice_1 = CanNode;
 export type Choice_2 = CanMessage;
 export type Choice_3 = CanSignal;
@@ -221,9 +290,161 @@ export type Choice_17 = BlankLine;
 export type Choice_18 = NewSymbol;
 export type Choice_19 = BusSpeed;
 export type Choice_20 = Comment;
+export type Choice_21 = CanEnvironmentVariable;
+export type Choice_22 = EnvironmentVarData;
+export type Choice_23 = EnvironmentVariableComment;
+export type Choice_24 = MessageTransmitter;
+export type Choice_25 = EnvironmentAttribute;
+export type Choice_26 = EnvironmentVal;
+export type Choice_27 = CanSignalGroup;
 export interface BlankLine {
   kind: ASTKinds.BlankLine;
 }
+export class CanSignalGroup {
+  public kind: ASTKinds.CanSignalGroup = ASTKinds.CanSignalGroup;
+  public raw_id: CanSignalGroup_$0;
+  public name: CanSignalGroup_$1;
+  public raw_group_number: CanSignalGroup_$2;
+  public raw_signal_string: CanSignalGroup_$3;
+  public signals: string[];
+  public id: number;
+  public group_number: number;
+  constructor(
+    raw_id: CanSignalGroup_$0,
+    name: CanSignalGroup_$1,
+    raw_group_number: CanSignalGroup_$2,
+    raw_signal_string: CanSignalGroup_$3,
+  ) {
+    this.raw_id = raw_id;
+    this.name = name;
+    this.raw_group_number = raw_group_number;
+    this.raw_signal_string = raw_signal_string;
+    this.signals = ((): string[] => {
+      return raw_signal_string.replace(';', '').split(' ');
+    })();
+    this.id = ((): number => {
+      return parseInt(raw_id, 10);
+    })();
+    this.group_number = ((): number => {
+      return parseInt(raw_group_number, 10);
+    })();
+  }
+}
+export type CanSignalGroup_$0 = string;
+export type CanSignalGroup_$1 = string;
+export type CanSignalGroup_$2 = string;
+export type CanSignalGroup_$3 = string;
+export class MessageTransmitter {
+  public kind: ASTKinds.MessageTransmitter = ASTKinds.MessageTransmitter;
+  public raw_id: MessageTransmitter_$0;
+  public raw_nodes: MessageTransmitter_$1;
+  public id: number;
+  public nodes: string[];
+  constructor(raw_id: MessageTransmitter_$0, raw_nodes: MessageTransmitter_$1) {
+    this.raw_id = raw_id;
+    this.raw_nodes = raw_nodes;
+    this.id = ((): number => {
+      return parseInt(raw_id, 10);
+    })();
+    this.nodes = ((): string[] => {
+      return raw_nodes.replace(';', '').split(',');
+    })();
+  }
+}
+export type MessageTransmitter_$0 = string;
+export type MessageTransmitter_$1 = string;
+export class CanEnvironmentVariable {
+  public kind: ASTKinds.CanEnvironmentVariable = ASTKinds.CanEnvironmentVariable;
+  public name: CanEnvironmentVariable_$0;
+  public type: CanEnvironmentVariable_$1;
+  public raw_min: CanEnvironmentVariable_$2;
+  public raw_max: CanEnvironmentVariable_$3;
+  public raw_unit: CanEnvironmentVariable_$4;
+  public raw_inital_value: CanEnvironmentVariable_$5;
+  public raw_ev_id: CanEnvironmentVariable_$6;
+  public access_type: CanEnvironmentVariable_$7;
+  public node: CanEnvironmentVariable_$8;
+  public min: number;
+  public max: number;
+  public unit: string;
+  public initial_value: number;
+  public ev_id: number;
+  constructor(
+    name: CanEnvironmentVariable_$0,
+    type: CanEnvironmentVariable_$1,
+    raw_min: CanEnvironmentVariable_$2,
+    raw_max: CanEnvironmentVariable_$3,
+    raw_unit: CanEnvironmentVariable_$4,
+    raw_inital_value: CanEnvironmentVariable_$5,
+    raw_ev_id: CanEnvironmentVariable_$6,
+    access_type: CanEnvironmentVariable_$7,
+    node: CanEnvironmentVariable_$8,
+  ) {
+    this.name = name;
+    this.type = type;
+    this.raw_min = raw_min;
+    this.raw_max = raw_max;
+    this.raw_unit = raw_unit;
+    this.raw_inital_value = raw_inital_value;
+    this.raw_ev_id = raw_ev_id;
+    this.access_type = access_type;
+    this.node = node;
+    this.min = ((): number => {
+      return parseFloat(raw_min);
+    })();
+    this.max = ((): number => {
+      return parseFloat(raw_max);
+    })();
+    this.unit = ((): string => {
+      return cleanComment(raw_unit);
+    })();
+    this.initial_value = ((): number => {
+      return parseFloat(raw_inital_value);
+    })();
+    this.ev_id = ((): number => {
+      return parseInt(raw_ev_id, 10);
+    })();
+  }
+}
+export type CanEnvironmentVariable_$0 = string;
+export type CanEnvironmentVariable_$1 = string;
+export type CanEnvironmentVariable_$2 = string;
+export type CanEnvironmentVariable_$3 = string;
+export type CanEnvironmentVariable_$4 = string;
+export type CanEnvironmentVariable_$5 = string;
+export type CanEnvironmentVariable_$6 = string;
+export type CanEnvironmentVariable_$7 = string;
+export type CanEnvironmentVariable_$8 = string;
+export class EnvironmentVarData {
+  public kind: ASTKinds.EnvironmentVarData = ASTKinds.EnvironmentVarData;
+  public name: EnvironmentVarData_$0;
+  public raw_value: EnvironmentVarData_$1;
+  public value: number;
+  constructor(name: EnvironmentVarData_$0, raw_value: EnvironmentVarData_$1) {
+    this.name = name;
+    this.raw_value = raw_value;
+    this.value = ((): number => {
+      return parseInt(raw_value);
+    })();
+  }
+}
+export type EnvironmentVarData_$0 = string;
+export type EnvironmentVarData_$1 = string;
+export class EnvironmentVariableComment {
+  public kind: ASTKinds.EnvironmentVariableComment = ASTKinds.EnvironmentVariableComment;
+  public name: EnvironmentVariableComment_$0;
+  public raw_comment: EnvironmentVariableComment_$1;
+  public comment: string;
+  constructor(name: EnvironmentVariableComment_$0, raw_comment: EnvironmentVariableComment_$1) {
+    this.name = name;
+    this.raw_comment = raw_comment;
+    this.comment = ((): string => {
+      return cleanComment(raw_comment);
+    })();
+  }
+}
+export type EnvironmentVariableComment_$0 = string;
+export type EnvironmentVariableComment_$1 = string;
 export class Version {
   public kind: ASTKinds.Version = ASTKinds.Version;
   public raw_version: Version_$0;
@@ -334,7 +555,7 @@ export class CanSignal {
       return cleanComment(raw_unit);
     })();
     this.nodes = ((): string[] => {
-      return raw_node_str.split(' ');
+      return raw_node_str.trim().split(',');
     })();
     this.start_bit = ((): number => {
       return parseInt(raw_start_bit, 10);
@@ -411,6 +632,21 @@ export class Val {
 export type Val_$0 = string;
 export type Val_$1 = string;
 export type Val_$2 = string;
+export class EnvironmentVal {
+  public kind: ASTKinds.EnvironmentVal = ASTKinds.EnvironmentVal;
+  public name: EnvironmentVal_$0;
+  public raw_table: EnvironmentVal_$1;
+  public enum: Map<number, string>;
+  constructor(name: EnvironmentVal_$0, raw_table: EnvironmentVal_$1) {
+    this.name = name;
+    this.raw_table = raw_table;
+    this.enum = ((): Map<number, string> => {
+      return table2Enum(raw_table.replace(';', ''));
+    })();
+  }
+}
+export type EnvironmentVal_$0 = string;
+export type EnvironmentVal_$1 = string;
 export class Comment {
   public kind: ASTKinds.Comment = ASTKinds.Comment;
   public raw_comment: Comment_$0;
@@ -531,6 +767,32 @@ export class MessageAttribute {
 export type MessageAttribute_$0 = string;
 export type MessageAttribute_$1 = string;
 export type MessageAttribute_$2 = string;
+export class EnvironmentAttribute {
+  public kind: ASTKinds.EnvironmentAttribute = ASTKinds.EnvironmentAttribute;
+  public name: EnvironmentAttribute_$0;
+  public type: EnvironmentAttribute_$1;
+  public raw_value: EnvironmentAttribute_$2;
+  public min: number;
+  public max: number;
+  public enum: string[];
+  constructor(name: EnvironmentAttribute_$0, type: EnvironmentAttribute_$1, raw_value: EnvironmentAttribute_$2) {
+    this.name = name;
+    this.type = type;
+    this.raw_value = raw_value;
+    this.min = ((): number => {
+      return extractMinVal(type, raw_value);
+    })();
+    this.max = ((): number => {
+      return extractMaxVal(type, raw_value);
+    })();
+    this.enum = ((): string[] => {
+      return extractOptions(type, raw_value);
+    })();
+  }
+}
+export type EnvironmentAttribute_$0 = string;
+export type EnvironmentAttribute_$1 = string;
+export type EnvironmentAttribute_$2 = string;
 export class NodeAttribute {
   public kind: ASTKinds.NodeAttribute = ASTKinds.NodeAttribute;
   public name: NodeAttribute_$0;
@@ -667,6 +929,13 @@ export class Parser {
       () => this.matchChoice_18($$dpth + 1, $$cr),
       () => this.matchChoice_19($$dpth + 1, $$cr),
       () => this.matchChoice_20($$dpth + 1, $$cr),
+      () => this.matchChoice_21($$dpth + 1, $$cr),
+      () => this.matchChoice_22($$dpth + 1, $$cr),
+      () => this.matchChoice_23($$dpth + 1, $$cr),
+      () => this.matchChoice_24($$dpth + 1, $$cr),
+      () => this.matchChoice_25($$dpth + 1, $$cr),
+      () => this.matchChoice_26($$dpth + 1, $$cr),
+      () => this.matchChoice_27($$dpth + 1, $$cr),
     ]);
   }
   public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -729,6 +998,27 @@ export class Parser {
   public matchChoice_20($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_20> {
     return this.matchComment($$dpth + 1, $$cr);
   }
+  public matchChoice_21($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_21> {
+    return this.matchCanEnvironmentVariable($$dpth + 1, $$cr);
+  }
+  public matchChoice_22($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_22> {
+    return this.matchEnvironmentVarData($$dpth + 1, $$cr);
+  }
+  public matchChoice_23($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_23> {
+    return this.matchEnvironmentVariableComment($$dpth + 1, $$cr);
+  }
+  public matchChoice_24($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_24> {
+    return this.matchMessageTransmitter($$dpth + 1, $$cr);
+  }
+  public matchChoice_25($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_25> {
+    return this.matchEnvironmentAttribute($$dpth + 1, $$cr);
+  }
+  public matchChoice_26($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_26> {
+    return this.matchEnvironmentVal($$dpth + 1, $$cr);
+  }
+  public matchChoice_27($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_27> {
+    return this.matchCanSignalGroup($$dpth + 1, $$cr);
+  }
   public matchBlankLine($$dpth: number, $$cr?: ErrorTracker): Nullable<BlankLine> {
     return this.run<BlankLine>($$dpth, () => {
       let $$res: Nullable<BlankLine> = null;
@@ -737,6 +1027,192 @@ export class Parser {
       }
       return $$res;
     });
+  }
+  public matchCanSignalGroup($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup> {
+    return this.run<CanSignalGroup>($$dpth, () => {
+      let $scope$raw_id: Nullable<CanSignalGroup_$0>;
+      let $scope$name: Nullable<CanSignalGroup_$1>;
+      let $scope$raw_group_number: Nullable<CanSignalGroup_$2>;
+      let $scope$raw_signal_string: Nullable<CanSignalGroup_$3>;
+      let $$res: Nullable<CanSignalGroup> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:SIG_GROUP_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_id = this.matchCanSignalGroup_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchCanSignalGroup_$1($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_group_number = this.matchCanSignalGroup_$2($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+:\s*)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_signal_string = this.matchCanSignalGroup_$3($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s*)`, $$dpth + 1, $$cr) !== null
+      ) {
+        $$res = new CanSignalGroup($scope$raw_id, $scope$name, $scope$raw_group_number, $scope$raw_signal_string);
+      }
+      return $$res;
+    });
+  }
+  public matchCanSignalGroup_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$0> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanSignalGroup_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$1> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanSignalGroup_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$2> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanSignalGroup_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<CanSignalGroup_$3> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_\s]*)`, $$dpth + 1, $$cr);
+  }
+  public matchMessageTransmitter($$dpth: number, $$cr?: ErrorTracker): Nullable<MessageTransmitter> {
+    return this.run<MessageTransmitter>($$dpth, () => {
+      let $scope$raw_id: Nullable<MessageTransmitter_$0>;
+      let $scope$raw_nodes: Nullable<MessageTransmitter_$1>;
+      let $$res: Nullable<MessageTransmitter> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:BO_TX_BU_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_id = this.matchMessageTransmitter_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_nodes = this.matchMessageTransmitter_$1($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new MessageTransmitter($scope$raw_id, $scope$raw_nodes);
+      }
+      return $$res;
+    });
+  }
+  public matchMessageTransmitter_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<MessageTransmitter_$0> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchMessageTransmitter_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<MessageTransmitter_$1> {
+    return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable> {
+    return this.run<CanEnvironmentVariable>($$dpth, () => {
+      let $scope$name: Nullable<CanEnvironmentVariable_$0>;
+      let $scope$type: Nullable<CanEnvironmentVariable_$1>;
+      let $scope$raw_min: Nullable<CanEnvironmentVariable_$2>;
+      let $scope$raw_max: Nullable<CanEnvironmentVariable_$3>;
+      let $scope$raw_unit: Nullable<CanEnvironmentVariable_$4>;
+      let $scope$raw_inital_value: Nullable<CanEnvironmentVariable_$5>;
+      let $scope$raw_ev_id: Nullable<CanEnvironmentVariable_$6>;
+      let $scope$access_type: Nullable<CanEnvironmentVariable_$7>;
+      let $scope$node: Nullable<CanEnvironmentVariable_$8>;
+      let $$res: Nullable<CanEnvironmentVariable> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:EV_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchCanEnvironmentVariable_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$type = this.matchCanEnvironmentVariable_$1($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+\[)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_min = this.matchCanEnvironmentVariable_$2($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\|)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_max = this.matchCanEnvironmentVariable_$3($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\]\s)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_unit = this.matchCanEnvironmentVariable_$4($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_inital_value = this.matchCanEnvironmentVariable_$5($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_ev_id = this.matchCanEnvironmentVariable_$6($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$access_type = this.matchCanEnvironmentVariable_$7($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$node = this.matchCanEnvironmentVariable_$8($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new CanEnvironmentVariable(
+          $scope$name,
+          $scope$type,
+          $scope$raw_min,
+          $scope$raw_max,
+          $scope$raw_unit,
+          $scope$raw_inital_value,
+          $scope$raw_ev_id,
+          $scope$access_type,
+          $scope$node,
+        );
+      }
+      return $$res;
+    });
+  }
+  public matchCanEnvironmentVariable_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$0> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$1> {
+    return this.regexAccept(String.raw`(?:0|1|2)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$2> {
+    return this.regexAccept(String.raw`(?:[\-0-9.]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$3($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$3> {
+    return this.regexAccept(String.raw`(?:[\-0-9.]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$4($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$4> {
+    return this.regexAccept(String.raw`(?:".*")`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$5($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$5> {
+    return this.regexAccept(String.raw`(?:[\-0-9.]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$6($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$6> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$7($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$7> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchCanEnvironmentVariable_$8($$dpth: number, $$cr?: ErrorTracker): Nullable<CanEnvironmentVariable_$8> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentVarData($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData> {
+    return this.run<EnvironmentVarData>($$dpth, () => {
+      let $scope$name: Nullable<EnvironmentVarData_$0>;
+      let $scope$raw_value: Nullable<EnvironmentVarData_$1>;
+      let $$res: Nullable<EnvironmentVarData> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:ENVVAR_DATA_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchEnvironmentVarData_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_value = this.matchEnvironmentVarData_$1($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new EnvironmentVarData($scope$name, $scope$raw_value);
+      }
+      return $$res;
+    });
+  }
+  public matchEnvironmentVarData_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData_$0> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentVarData_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVarData_$1> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentVariableComment($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVariableComment> {
+    return this.run<EnvironmentVariableComment>($$dpth, () => {
+      let $scope$name: Nullable<EnvironmentVariableComment_$0>;
+      let $scope$raw_comment: Nullable<EnvironmentVariableComment_$1>;
+      let $$res: Nullable<EnvironmentVariableComment> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:CM_ EV_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchEnvironmentVariableComment_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_comment = this.matchEnvironmentVariableComment_$1($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new EnvironmentVariableComment($scope$name, $scope$raw_comment);
+      }
+      return $$res;
+    });
+  }
+  public matchEnvironmentVariableComment_$0(
+    $$dpth: number,
+    $$cr?: ErrorTracker,
+  ): Nullable<EnvironmentVariableComment_$0> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentVariableComment_$1(
+    $$dpth: number,
+    $$cr?: ErrorTracker,
+  ): Nullable<EnvironmentVariableComment_$1> {
+    return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
   }
   public matchVersion($$dpth: number, $$cr?: ErrorTracker): Nullable<Version> {
     return this.run<Version>($$dpth, () => {
@@ -981,6 +1457,30 @@ export class Parser {
   public matchVal_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<Val_$2> {
     return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
   }
+  public matchEnvironmentVal($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVal> {
+    return this.run<EnvironmentVal>($$dpth, () => {
+      let $scope$name: Nullable<EnvironmentVal_$0>;
+      let $scope$raw_table: Nullable<EnvironmentVal_$1>;
+      let $$res: Nullable<EnvironmentVal> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:VAL_\s)`, $$dpth + 1, $$cr) !== null &&
+        this.negate(() => this.regexAccept(String.raw`(?:0-9)`, $$dpth + 1, $$cr)) !== null &&
+        ($scope$name = this.matchEnvironmentVal_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_table = this.matchEnvironmentVal_$1($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new EnvironmentVal($scope$name, $scope$raw_table);
+      }
+      return $$res;
+    });
+  }
+  public matchEnvironmentVal_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVal_$0> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentVal_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentVal_$1> {
+    return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+  }
   public matchComment($$dpth: number, $$cr?: ErrorTracker): Nullable<Comment> {
     return this.run<Comment>($$dpth, () => {
       let $scope$raw_comment: Nullable<Comment_$0>;
@@ -988,7 +1488,7 @@ export class Parser {
       if (
         true &&
         this.regexAccept(String.raw`(?:CM_\s)`, $$dpth + 1, $$cr) !== null &&
-        this.negate(() => this.regexAccept(String.raw`(?:[SG_|BO_|BU_])`, $$dpth + 1, $$cr)) !== null &&
+        this.negate(() => this.regexAccept(String.raw`(?:[SG_|BO_|BU_|EV_])`, $$dpth + 1, $$cr)) !== null &&
         ($scope$raw_comment = this.matchComment_$0($$dpth + 1, $$cr)) !== null
       ) {
         $$res = new Comment($scope$raw_comment);
@@ -1134,6 +1634,37 @@ export class Parser {
     return this.regexAccept(String.raw`(?:[A-Z]+)`, $$dpth + 1, $$cr);
   }
   public matchMessageAttribute_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<MessageAttribute_$2> {
+    return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentAttribute($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentAttribute> {
+    return this.run<EnvironmentAttribute>($$dpth, () => {
+      let $scope$name: Nullable<EnvironmentAttribute_$0>;
+      let $scope$type: Nullable<EnvironmentAttribute_$1>;
+      let $scope$raw_value: Nullable<EnvironmentAttribute_$2>;
+      let $$res: Nullable<EnvironmentAttribute> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:BA_DEF_ EV_\s+)`, $$dpth + 1, $$cr) !== null &&
+        this.regexAccept(String.raw`(?:")`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchEnvironmentAttribute_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:")`, $$dpth + 1, $$cr) !== null &&
+        this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$type = this.matchEnvironmentAttribute_$1($$dpth + 1, $$cr)) !== null &&
+        (this.regexAccept(String.raw`(?:\s)`, $$dpth + 1, $$cr) || true) &&
+        ($scope$raw_value = this.matchEnvironmentAttribute_$2($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new EnvironmentAttribute($scope$name, $scope$type, $scope$raw_value);
+      }
+      return $$res;
+    });
+  }
+  public matchEnvironmentAttribute_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentAttribute_$0> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentAttribute_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentAttribute_$1> {
+    return this.regexAccept(String.raw`(?:[A-Z]+)`, $$dpth + 1, $$cr);
+  }
+  public matchEnvironmentAttribute_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<EnvironmentAttribute_$2> {
     return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
   }
   public matchNodeAttribute($$dpth: number, $$cr?: ErrorTracker): Nullable<NodeAttribute> {

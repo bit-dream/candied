@@ -1,4 +1,16 @@
-import { DbcData, Message, Signal, EndianType, ValueTable, Node, Attribute, AttributeDataType } from '../dbc/types';
+import {
+  DbcData,
+  Message,
+  Signal,
+  EndianType,
+  ValueTable,
+  Node,
+  Attribute,
+  AttributeDataType,
+  EnvironmentVariable,
+  EnvType,
+  AccessType,
+} from '../dbc/types';
 import {
   ASTKinds,
   ASTNodeIntf,
@@ -21,6 +33,13 @@ import {
   SignalComment,
   MessageComment,
   NodeComment,
+  CanEnvironmentVariable,
+  EnvironmentVarData,
+  EnvironmentVariableComment,
+  MessageTransmitter,
+  EnvironmentAttribute,
+  EnvironmentVal,
+  CanSignalGroup,
 } from '../parser/parser';
 
 export default class DbcParser extends Parser {
@@ -86,6 +105,27 @@ export default class DbcParser extends Parser {
         case ASTKinds.Comment:
           this.addComment(data, this.parseResult.ast);
           break;
+        case ASTKinds.CanEnvironmentVariable:
+          this.addEnvironmentVariable(data, this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentAttribute:
+          this.addEnvironmentAttribute(data, this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVal:
+          this.addEnvironmentVal(data, this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVariableComment:
+          this.addEnvironmentVariableComment(data, this.parseResult.ast);
+          break;
+        case ASTKinds.EnvironmentVarData:
+          this.addEnvironmentVariableData(data, this.parseResult.ast);
+          break;
+        case ASTKinds.MessageTransmitter:
+          this.addMessageTransmitter(data, this.parseResult.ast);
+          break;
+        case ASTKinds.CanSignalGroup:
+          this.addSignalGroup(data, this.parseResult.ast);
+          break;
       }
     }
     return data;
@@ -109,6 +149,31 @@ export default class DbcParser extends Parser {
     });
   }
 
+  private addEnvironmentVariableData(dbc: DbcData, data: EnvironmentVarData) {
+    const envVar = dbc.environmentVariables.get(data.name);
+    if (envVar) {
+      envVar.dataBytesLength = data.value;
+    }
+  }
+
+  private addEnvironmentVariable(dbc: DbcData, data: CanEnvironmentVariable) {
+    const envVar = {} as EnvironmentVariable;
+    envVar.name = data.name;
+    envVar.type = this.convert2EnvType(data.type);
+    envVar.initalValue = data.initial_value;
+    envVar.min = data.min;
+    envVar.max = data.max;
+    envVar.evId = data.ev_id;
+    envVar.accessNode = data.node;
+    envVar.accessType = this.convert2AccessType(data.access_type);
+    envVar.attributes = new Map();
+    envVar.valueTable = null;
+    envVar.dataBytesLength = null;
+    envVar.description = null;
+    envVar.unit = data.unit;
+    dbc.environmentVariables.set(envVar.name, envVar);
+  }
+
   private addMessage(dbc: DbcData, data: CanMessage) {
     const message = {} as Message;
     message.id = data.id;
@@ -118,6 +183,7 @@ export default class DbcParser extends Parser {
     message.signals = new Map();
     message.description = null;
     message.attributes = new Map();
+    message.signalGroups = new Map();
     dbc.messages.set(message.name, message);
   }
 
@@ -162,6 +228,14 @@ export default class DbcParser extends Parser {
     }
   }
 
+  private addEnvironmentVariableComment(dbc: DbcData, data: EnvironmentVariableComment) {
+    const envVars = dbc.environmentVariables;
+    const envVar = envVars.get(data.name);
+    if (envVar) {
+      envVar.description = data.comment;
+    }
+  }
+
   private addMessageComment(dbc: DbcData, data: MessageComment) {
     const msgName = this.getMessageNameFromId(dbc, data.id);
     if (msgName) {
@@ -187,6 +261,13 @@ export default class DbcParser extends Parser {
 
   private addNewSymbolValue(dbc: DbcData, data: NewSymbolValue) {
     dbc.newSymbols.push(data.symbol);
+  }
+
+  private addEnvironmentVal(dbc: DbcData, data: EnvironmentVal) {
+    const envVar = dbc.environmentVariables.get(data.name);
+    if (envVar) {
+      envVar.valueTable = data.enum;
+    }
   }
 
   private addVal(dbc: DbcData, data: Val) {
@@ -297,6 +378,23 @@ export default class DbcParser extends Parser {
     }
   }
 
+  private addEnvironmentAttribute(dbc: DbcData, data: EnvironmentAttribute) {
+    const attribute = {} as Attribute;
+    const dataType = this.convert2AttributeType(data.type);
+    attribute.name = data.name;
+    attribute.type = 'EnvironmentVariable';
+    attribute.dataType = this.convert2AttributeType(data.type);
+    attribute.options = new Array();
+    attribute.defaultValue = null;
+    attribute.value = null;
+    attribute.min = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.min : null;
+    attribute.max = dataType === 'FLOAT' || dataType === 'INT' || dataType === 'HEX' ? data.max : null;
+    attribute.options = dataType === 'ENUM' ? data.enum : null;
+    if (attribute.name && attribute.name !== '') {
+      dbc.attributes.set(attribute.name, attribute);
+    }
+  }
+
   private addAttributeDefaultValue(dbc: DbcData, data: AttributeDefault) {
     const attr = dbc.attributes.get(data.name);
     if (attr) {
@@ -342,9 +440,64 @@ export default class DbcParser extends Parser {
           break;
         case 'Global':
           break;
+        case 'EnvironmentVariable':
+          const ev = dbc.environmentVariables.get(data.node);
+          if (ev) {
+            ev.attributes.set(attr.name, attr);
+            dbc.attributes.delete(attr.name);
+          }
+          break;
         default:
           break;
       }
+    }
+  }
+
+  private addMessageTransmitter(dbc: DbcData, data: MessageTransmitter) {
+    dbc.networkBridges.set(data.id, data.nodes);
+  }
+
+  private addSignalGroup(dbc: DbcData, data: CanSignalGroup) {
+    const name = this.getMessageNameFromId(dbc, data.id);
+    if (name) {
+      const msg = dbc.messages.get(name);
+      if (msg) {
+        const groupData = {
+          name: data.name,
+          id: data.id,
+          groupId: data.group_number,
+          signals: data.signals,
+        };
+        msg.signalGroups.set(data.name, groupData);
+      }
+    }
+  }
+
+  private convert2EnvType(type: string): EnvType {
+    switch (type) {
+      case '0':
+        return 'Integer';
+      case '1':
+        return 'Float';
+      case '2':
+        return 'String';
+      default:
+        return 'String';
+    }
+  }
+
+  private convert2AccessType(type: string): AccessType {
+    switch (type.trim().slice(-1)) {
+      case '0':
+        return 'Unrestricted';
+      case '1':
+        return 'Read';
+      case '2':
+        return 'Write';
+      case '3':
+        return 'ReadWrite';
+      default:
+        return 'Read';
     }
   }
 

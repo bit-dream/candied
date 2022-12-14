@@ -2,9 +2,28 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
-import { Message, Signal, DbcData, CanFrame, EndianType, ValueTable, Node } from './types';
+import {
+  Message,
+  Signal,
+  DbcData,
+  CanFrame,
+  EndianType,
+  ValueTable,
+  Node,
+  AttributeType,
+  AttributeDataType,
+  Attribute,
+} from './types';
 import Writer from './writer';
 import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
+
+export type AttributeOptions = {
+  value?: string;
+  defaultValue?: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+};
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -43,6 +62,8 @@ class Dbc {
       valueTables: null,
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map(),
+      networkBridges: new Map(),
     };
   }
 
@@ -86,7 +107,7 @@ class Dbc {
     dlc: number,
     sendingNode: null | string = null,
     description: null | string = null,
-  ) {
+  ): Message {
     const message: Message = {
       name,
       id,
@@ -95,6 +116,7 @@ class Dbc {
       signals: new Map(),
       description,
       attributes: new Map(),
+      signalGroups: new Map(),
     };
     return message;
   }
@@ -273,6 +295,8 @@ class Dbc {
       valueTables: new Map(),
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map(),
+      networkBridges: new Map(),
     };
 
     let lineNum = 1;
@@ -319,6 +343,8 @@ class Dbc {
       valueTables: new Map(),
       attributes: new Map(),
       newSymbols: new Array(),
+      environmentVariables: new Map(),
+      networkBridges: new Map(),
     };
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });

@@ -21,6 +21,13 @@ export type Signal = {
   attributes: Attributes;
 };
 
+export type SignalGroup = {
+  name: string;
+  id: number;
+  groupId: number;
+  signals: string[];
+};
+
 export type Message = {
   name: string;
   id: number;
@@ -29,6 +36,26 @@ export type Message = {
   signals: Map<string, Signal>;
   description: string | null;
   attributes: Attributes;
+  signalGroups: Map<string, SignalGroup>;
+};
+
+export type EnvType = 'Integer' | 'Float' | 'String';
+export type AccessType = 'Unrestricted' | 'Read' | 'Write' | 'ReadWrite';
+
+export type EnvironmentVariable = {
+  name: string;
+  type: EnvType;
+  min: number;
+  max: number;
+  initalValue: number;
+  evId: number;
+  accessType: AccessType;
+  accessNode: string;
+  attributes: Attributes;
+  valueTable: ValueTable | null;
+  description: string | null;
+  dataBytesLength: number | null;
+  unit: string;
 };
 
 export type Node = {
@@ -46,6 +73,10 @@ export type Token = {
   dataFormat: RegExp;
 };
 
+export type TxMessages = string[];
+export type CanId = number;
+export type NetworkBridges = Map<CanId, TxMessages>;
+
 export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
@@ -55,6 +86,8 @@ export type DbcData = {
   valueTables: Map<string, ValueTable> | null;
   attributes: Attributes;
   newSymbols: string[];
+  environmentVariables: Map<string, EnvironmentVariable>;
+  networkBridges: NetworkBridges;
 };
 
 export type ValueTable = Map<number, string>;
@@ -67,7 +100,7 @@ export type CanFrame = {
 };
 
 export type Attributes = Map<string, Attribute>;
-export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node';
+export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';
 export type AttributeDataType = 'FLOAT' | 'STRING' | 'ENUM' | 'INT' | 'HEX';
 export type Attribute = {
   name: string;

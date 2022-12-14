@@ -6,9 +6,32 @@ extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 
 Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
-Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment
+Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
+EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
 
 BlankLine := ''$
+
+CanSignalGroup := 'SIG_GROUP_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s+' raw_group_number={'[0-9]+'} '\s+:\s*' raw_signal_string={'[a-zA-Z0-9_\s]*'} '\s*'
+    .signals = string[] { return raw_signal_string.replace(';', '').split(' '); }
+    .id = number {return parseInt(raw_id,10);}
+    .group_number = number {return parseInt(raw_group_number,10);}
+
+MessageTransmitter := 'BO_TX_BU_\s+' raw_id={'[0-9]+'} '\s*:\s*' raw_nodes = {'.*'}
+    .id = number {return parseInt(raw_id,10);}
+    .nodes = string[] {return raw_nodes.replace(';', '').split(',');}
+
+CanEnvironmentVariable := 'EV_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' type={'0|1|2'} '\s+\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s+' raw_inital_value={'[\-0-9.]+'} '\s+' raw_ev_id={'[0-9]+'} '\s+' access_type={'[a-zA-Z0-9_]+'} '\s+' node={'[a-zA-Z0-9_]+'}
+    .min = number {return parseFloat(raw_min);}
+    .max = number {return parseFloat(raw_max);}
+    .unit = string {return cleanComment(raw_unit);}
+    .initial_value = number {return parseFloat(raw_inital_value);}
+    .ev_id = number {return parseInt(raw_ev_id,10);}
+
+EnvironmentVarData := 'ENVVAR_DATA_\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' raw_value={'[0-9]+'}
+    .value = number {return parseInt(raw_value);}
+
+EnvironmentVariableComment := 'CM_ EV_\s+' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
+    .comment = string {return cleanComment(raw_comment);}
 
 Version := 'VERSION' '\s+' raw_version={'.*'}
     .version = string {return cleanComment(raw_version);}
@@ -28,7 +51,7 @@ CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_
 
 CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
     .unit = string {return cleanComment(raw_unit);}
-    .nodes = string[] {return raw_node_str.split(' ');}
+    .nodes = string[] {return raw_node_str.trim().split(',');}
     .start_bit = number {return parseInt(raw_start_bit,10);}
     .length = number {return parseInt(raw_length,10);}
     .endian = string {return raw_endian === '1' ? 'Intel' : 'Motorola'}
@@ -45,7 +68,10 @@ Val := 'VAL_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.
     .id = number {return parseInt(raw_id,10);}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
 
-Comment := 'CM_\s' !'[SG_|BO_|BU_]' raw_comment={'.*'}
+EnvironmentVal := 'VAL_\s' !'0-9' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
+    .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}
+
+Comment := 'CM_\s' !'[SG_|BO_|BU_|EV_]' raw_comment={'.*'}
     .comment = string {return cleanComment(raw_comment);}
 
 SignalComment := 'CM_ SG_\s' raw_id={'[0-9]+'} '\s' name={'[a-zA-Z0-9_]+'} '\s' raw_comment={'.*'}
@@ -65,6 +91,11 @@ GlobalAttribute := 'BA_DEF_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'
     .enum = string[] {return extractOptions(type, raw_value);}
 
 MessageAttribute := 'BA_DEF_ BO_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
+    .min = number {return extractMinVal(type, raw_value);}
+    .max = number {return extractMaxVal(type, raw_value);}
+    .enum = string[] {return extractOptions(type, raw_value);}
+
+EnvironmentAttribute := 'BA_DEF_ EV_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' type={'[A-Z]+'} '\s'? raw_value={'.*'}
     .min = number {return extractMinVal(type, raw_value);}
     .max = number {return extractMaxVal(type, raw_value);}
     .enum = string[] {return extractOptions(type, raw_value);}
