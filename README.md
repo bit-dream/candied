@@ -1,4 +1,9 @@
 # **DBC-CAN**
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/bit-dream/can-dbc)
+![npm bundle size](https://img.shields.io/bundlephobia/min/dbc-can)
+![GitHub issues](https://img.shields.io/github/issues-raw/bit-dream/can-dbc)
+![npm](https://img.shields.io/npm/dw/dbc-can)
+![license](https://img.shields.io/github/license/bit-dream/can-dbc)
 <br/>
 
 ## *A zero dependency, lightly weight parser, written in pure Javascript/Typescript*
