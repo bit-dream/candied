@@ -18,7 +18,7 @@ Simply put, it helps decode raw CAN (Controller Area Network) frames into someth
 
 ### <i><b>What are the goals of DBC-CAN</b></i>
 <br/>
-To develop and deploy a very simple, lightweight library that doesn't relay on external dependecies.
+To develop and deploy a very simple, lightweight library that doesn't rely on external dependencies.
 <br/>
 
 You should be able to do the following with this library:
