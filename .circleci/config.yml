@@ -1,5 +1,6 @@
 version: 2.1
-
+orbs:
+  node: circleci/node@5.0.3
 jobs:
   run-tests:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
