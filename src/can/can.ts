@@ -1,4 +1,3 @@
-import Dbc from '../dbc/Dbc';
 import { MessageDoesNotExist } from '../dbc/errors';
 import { DbcData, EndianType, Message, Signal } from '../dbc/types';
 import { Frame, BoundMessage, BoundSignal, Payload } from './types';
