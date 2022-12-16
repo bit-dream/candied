@@ -1,5 +1,4 @@
 import Dbc from '../dbc/dbc';
-import { MessageDoesNotExist } from '../dbc/errors';
 
 // Async loading tests
 test('DBC_template.dbc: Correct Message Count', () => {

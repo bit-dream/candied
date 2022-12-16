@@ -1,5 +1,4 @@
 import Dbc from '../dbc/dbc';
-import { Attribute, Attributes } from '../dbc/types';
 
 test('DBC_template.dbc: Has Signal Groups', () => {
   const dbc = new Dbc();

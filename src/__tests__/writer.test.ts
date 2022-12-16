@@ -1,5 +1,4 @@
 import Dbc from '../dbc/dbc';
-import { MessageDoesNotExist } from '../dbc/errors';
 import Writer from '../dbc/writer';
 import * as fs from 'fs';
 

@@ -1,5 +1,4 @@
 import Dbc from '../dbc/dbc';
-import { Attribute, Attributes } from '../dbc/types';
 
 test('DBC_template_v2.dbc: Environmental Variables Exist', () => {
   const dbc = new Dbc();
