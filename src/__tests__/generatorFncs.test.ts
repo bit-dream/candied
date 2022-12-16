@@ -1,5 +1,4 @@
 import Dbc from '../dbc/dbc';
-import { MessageDoesNotExist } from '../dbc/errors';
 
 test('Create Simple Message Object', () => {
   const dbc = new Dbc();

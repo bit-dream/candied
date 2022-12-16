@@ -1,5 +1,5 @@
-import Can from '../can/Can';
-import { DbcData } from '../dbc/types';
+import Can from '../can/can';
+import {DbcData} from '../dbc/types';
 
 const dummyData: DbcData = {
   version: null,

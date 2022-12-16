@@ -1,6 +1,5 @@
-import Can from '../can/Can';
-import { DbcData } from '../dbc/types';
-import Dbc from '../dbc/Dbc';
+import Can from '../can/can';
+import Dbc from '../dbc/dbc';
 
 // All return values validated using Kvaser CANKing
 test('SimpleDBC: Decode TestMessageStandard', () => {
