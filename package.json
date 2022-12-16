@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "jest --config jestconfig.json",
+    "test": "jest --config jestconfig.json --collectCoverage=true",
     "coverage": "jest --config jestconfig.json --coverage",
     "build": "npm run buildparser && tsc",
     "format": "prettier --write \"src/**/*.ts\"",
