@@ -14,6 +14,55 @@ const dummyData: DbcData = {
   networkBridges: new Map(),
 };
 
+test('Get Value: Unsigned/Intel', () =>{
+  const can = new Can();
+
+  // Settings for decode
+  const payload = [20,255,255,2,4,13,16,255];
+  const startbit = 36;
+  const bitLength = 23;
+  const byteOrder = 'Intel';
+  const signed = false;
+
+  const value = can.getValue(payload,startbit,bitLength,byteOrder,signed);
+  expect(value).toEqual(7405776)
+})
+
+test('Get Value: [20,255,255,2,4,13,16,255]', () =>{
+  const can = new Can();
+
+  // Settings for decode
+  const payload = [20,255,255,2,4,13,16,255];
+
+  // Signal1
+  expect(can.getValue(payload,32,20,'Motorola',false))
+      .toBe(983556);
+  // Signal2
+  expect(can.getValue(payload,14,10,'Motorola',false))
+      .toBe(83);
+  // Signal3
+  expect(can.getValue(payload,50,4,'Motorola',false))
+      .toBe(4);
+  // Signal4
+  expect(can.getValue(payload,40,9,'Intel',false))
+      .toBe(13);
+  // Signal5
+  expect(can.getValue(payload,54,10,'Intel',true))
+      .toBe(-4);
+  // Signal6
+  expect(can.getValue(payload,22,6,'Motorola',true))
+      .toBe(-1);
+  expect(can.getValue([20,255,65,54,3,20,55,45],22,10,'Motorola',true))
+      .toBe(-3);
+  expect(can.getValue(payload,20,27,'Intel',true))
+      .toBe(13647919);
+  expect(can.getValue(payload,13,32,'Intel',true))
+      .toBe(1746933759);
+  expect(can.getValue(payload,56,3,'Intel',true))
+      .toBe(-1);
+})
+
+/*
 test('Can Frame Creation', () => {
   const can = new Can(dummyData);
   expect(can.createFrame(100, [100, 100, 100])).toStrictEqual({
@@ -45,3 +94,4 @@ test('Get Value From Payload', () => {
     payload: [100, 100, 100],
   });
 });
+*/

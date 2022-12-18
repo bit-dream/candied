@@ -5,13 +5,12 @@ import { InvalidPayloadLength } from './errors';
 import BitUtils from './BitUtils';
 
 class Can extends BitUtils {
-  #dbc: DbcData;
+  #dbc: DbcData | undefined;
   #idMap: Map<number, Message>;
 
-  constructor(dbc: DbcData) {
+  constructor() {
     super();
-    this.#dbc = dbc;
-    this.#idMap = this.messageMapTransform(this.#dbc.messages);
+    this.#idMap = new Map();
   }
 
   set dbc(dbc: DbcData) {
@@ -110,34 +109,25 @@ class Can extends BitUtils {
     };
   }
 
-  getValue(data: number[], startBit: number, signalLength: number, endian: EndianType, signed: boolean) {
-    let signalData: number[] = new Array(signalLength).fill(0);
+  /*
+  setValue(payload: number[], value: number, startBit: number, signalLength: number, endian: EndianType, signed: boolean): number[] {
+    const bitField = this.payload2Binary(payload,endian);
+    const valBitField = this.extractBitRange(bitField,startBit,signalLength,endian);
+    const valueBits = parseInt(value,2);
+    return [10];
+  }
+  */
 
-    let targetBit = startBit;
+  getValue(payload: number[], startBit: number, signalLength: number, endian: EndianType, signed: boolean): number {
 
-    for (let i = 0; i < signalLength; ++i) {
-      const targetByteIndex = Math.ceil((targetBit + 1) / 8);
-
-      // Need to handle bit field correctly since LSB starts at end of array
-      const targetBitIdx = 7 - (targetBit - (targetByteIndex - 1) * 8);
-      const val = this.bitGet(data[targetByteIndex - 1], targetBitIdx);
-
-      if (val) {
-        signalData = this.bitSet(signalData, i, Number(val));
-      }
-
-      if (endian === 'Motorola' && targetBitIdx === 0) {
-        targetBit = targetBit - 15;
-      } else {
-        targetBit = targetBit + 1;
-      }
-    }
+    const bitField = this.payload2Binary(payload, endian);
+    const valBitField = this.extractBitRange(bitField, startBit, signalLength, endian);
 
     let prcValue;
     if (signed) {
-      prcValue = Number(this.bin2decSigned(signalData.join('')));
+      prcValue = Number(this.bin2decSigned(valBitField.join('')));
     } else {
-      prcValue = Number(this.bin2dec(signalData.join('')));
+      prcValue = Number(this.bin2dec(valBitField.join('')));
     }
 
     return prcValue;
