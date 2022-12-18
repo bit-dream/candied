@@ -109,6 +109,9 @@ class Can extends BitUtils {
    * @returns BoundMessage | undefined
    */
   decode(frame: Frame): BoundMessage | undefined {
+    if (this._database === undefined) {
+      throw new Error('No database is attached to class instance')
+    }
     const msg = this.getMessageById(frame.id);
     // return undefined and make user handle non-decoded frames
     if (!msg) return msg;
