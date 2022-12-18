@@ -1,6 +1,14 @@
 import Can from '../can/can';
 import {DbcData} from '../dbc/types';
 
+/*
+All the expected data in the following toBe functions are not
+magic numbers. These numbers were pre-calculated using tools like
+Mathworks MATLAB's Vehicle Network Toolbox and Kvaser's CANKing using the
+same input parameters. This was to ensure that tested values returned would
+actually match more sophisticated tooling that is known to work.
+ */
+
 const dummyData: DbcData = {
   version: null,
   messages: new Map(),
@@ -52,14 +60,38 @@ test('Get Value: [20,255,255,2,4,13,16,255]', () =>{
   // Signal6
   expect(can.getValue(payload,22,6,'Motorola',true))
       .toBe(-1);
-  expect(can.getValue([20,255,65,54,3,20,55,45],22,10,'Motorola',true))
-      .toBe(-3);
   expect(can.getValue(payload,20,27,'Intel',true))
       .toBe(13647919);
   expect(can.getValue(payload,13,32,'Intel',true))
       .toBe(1746933759);
   expect(can.getValue(payload,56,3,'Intel',true))
       .toBe(-1);
+})
+
+test('Get Value: [20,255,65,54,3,20,55,45]', () => {
+  const can = new Can();
+
+  // Settings for decode
+  const payload = [20, 255, 65, 54, 3, 20, 55, 45];
+
+  expect(can.getValue(payload, 22, 10, 'Motorola', true))
+      .toBe(-3);
+})
+
+test('Get Value: [54,20,45,2]', () => {
+  const can = new Can();
+
+  // Settings for decode
+  const payload = [54,20,45,2];
+
+  expect(can.getValue(payload, 10, 10, 'Motorola', false))
+      .toBe(389);
+  expect(can.getValue(payload, 10, 10, 'Intel', false))
+      .toBe(837);
+  expect(can.getValue(payload, 10, 10, 'Motorola', true))
+      .toBe(389);
+  expect(can.getValue(payload, 10, 10, 'Intel', true))
+      .toBe(-187);
 })
 
 /*
