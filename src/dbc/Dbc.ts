@@ -13,9 +13,9 @@ import {
   AttributeType,
   AttributeDataType,
   Attribute,
-} from './types';
-import Writer from './writer';
-import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './errors';
+} from './DbcTypes';
+import Writer from './Writer';
+import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './Errors';
 
 export type AttributeOptions = {
   value?: string;

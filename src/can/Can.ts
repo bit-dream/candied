@@ -1,7 +1,7 @@
-import { MessageDoesNotExist } from '../dbc/errors';
-import { DbcData, EndianType, Message, Signal } from '../dbc/types';
-import { Frame, BoundMessage, BoundSignal, Payload } from './types';
-import { InvalidPayloadLength } from './errors';
+import { MessageDoesNotExist } from '../dbc/Errors';
+import { DbcData, EndianType, Message, Signal } from '../dbc/DbcTypes';
+import { Frame, BoundMessage, BoundSignal, Payload } from './CanTypes';
+import { InvalidPayloadLength } from './Errors';
 import BitUtils from './BitUtils';
 
 class Can extends BitUtils {

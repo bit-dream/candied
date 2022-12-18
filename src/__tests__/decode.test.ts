@@ -1,5 +1,5 @@
-import Can from '../can/can';
-import {DbcData} from '../dbc/types';
+import Can from '../can/Can';
+import {DbcData} from '../dbc/DbcTypes';
 
 /*
 All the expected data in the following toBe functions are not

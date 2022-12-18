@@ -1,5 +1,5 @@
-import Can from '../can/can';
-import Dbc from '../dbc/dbc';
+import Can from '../can/Can';
+import Dbc from '../dbc/Dbc';
 
 
 test('dummy test', () =>{

@@ -1,4 +1,4 @@
-import Dbc from '../dbc/dbc';
+import Dbc from '../dbc/Dbc';
 
 // Async loading tests
 test('DBC_template.dbc: Correct Message Count', () => {

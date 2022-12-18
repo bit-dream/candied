@@ -1,5 +1,5 @@
-import Dbc from '../dbc/dbc';
-import Writer from '../dbc/writer';
+import Dbc from '../dbc/Dbc';
+import Writer from '../dbc/Writer';
 import * as fs from 'fs';
 
 test('DBC_template.dbc: Correct Messages Written to File', (done) => {

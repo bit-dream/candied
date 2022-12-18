@@ -1,4 +1,4 @@
-import {EndianType} from "../dbc/types";
+import {EndianType} from "../dbc/DbcTypes";
 
 class BitUtils {
   protected bitGet(num: number, idx: number) {

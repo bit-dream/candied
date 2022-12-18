@@ -10,7 +10,7 @@ import {
   EnvironmentVariable,
   EnvType,
   AccessType,
-} from '../dbc/types';
+} from '../dbc/DbcTypes';
 import {
   ASTKinds,
   ASTNodeIntf,

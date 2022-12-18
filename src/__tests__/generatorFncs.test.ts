@@ -1,4 +1,4 @@
-import Dbc from '../dbc/dbc';
+import Dbc from '../dbc/Dbc';
 
 test('Create Simple Message Object', () => {
   const dbc = new Dbc();
