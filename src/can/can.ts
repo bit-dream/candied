@@ -26,7 +26,7 @@ class Can extends BitUtils {
     return idMap;
   }
 
-  createFrame(id: number, payload: number[]): Frame {
+  createFrame(id: number, payload: number[], isExtended: boolean = false): Frame {
     if (payload.length > 8) {
       throw new InvalidPayloadLength(`Can not have payloads over 8 bytes: ${payload}`);
     } else if (payload.length === 0) {
@@ -39,7 +39,7 @@ class Can extends BitUtils {
     const canFrame: Frame = {
       id,
       dlc: payload.length,
-      isExtended: id > 2048, // Only 2048 identifiers allowed in a standard frame
+      isExtended,
       payload: Array.from(byteArray),
     };
     return canFrame;
@@ -47,7 +47,8 @@ class Can extends BitUtils {
 
   decode(frame: Frame): BoundMessage | undefined {
     const msg = this.getMessageById(frame.id);
-
+    // return undefined and make user handle non-decoded frames
+    if (!msg) return msg;
     if (msg.dlc !== frame.dlc) {
       return undefined;
     }
@@ -58,21 +59,15 @@ class Can extends BitUtils {
       signals.set(name, bndSig);
     }
 
-    const boundMessage = {
+    return {
       name: msg.name,
       id: msg.id,
       signals,
     };
-    return boundMessage;
   }
 
-  private getMessageById(id: number): Message {
-    let message: Message | undefined;
-    message = this.#idMap.get(id);
-    if (message === undefined) {
-      throw new MessageDoesNotExist(`No message with id ${id} exists in the database.`);
-    }
-    return message;
+  private getMessageById(id: number): Message | undefined {
+    return this.#idMap.get(id);
   }
 
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
@@ -108,15 +103,6 @@ class Can extends BitUtils {
       physValue,
     };
   }
-
-  /*
-  setValue(payload: number[], value: number, startBit: number, signalLength: number, endian: EndianType, signed: boolean): number[] {
-    const bitField = this.payload2Binary(payload,endian);
-    const valBitField = this.extractBitRange(bitField,startBit,signalLength,endian);
-    const valueBits = parseInt(value,2);
-    return [10];
-  }
-  */
 
   getValue(payload: number[], startBit: number, signalLength: number, endian: EndianType, signed: boolean): number {
 
