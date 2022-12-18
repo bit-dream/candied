@@ -9,7 +9,7 @@ import {
   SignalGroup,
   TxMessages,
   ValueTable,
-} from './types';
+} from './DbcTypes';
 
 class Writer {
   file: string;

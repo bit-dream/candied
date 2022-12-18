@@ -1,6 +1,8 @@
+import { EndianType } from '../dbc/DbcTypes';
+
 class BitUtils {
   protected bitGet(num: number, idx: number) {
-    const bitField = this.dec2bin(num).split('');
+    const bitField = this.uint8ToBinary(num).split('');
     // Assumes least significant bit starts at the end of the array
     return bitField[idx];
   }
@@ -27,10 +29,49 @@ class BitUtils {
     return parseInt(bin, 2);
   }
 
-  protected dec2bin(dec: number): string {
+  protected uint8ToBinary(dec: number): string {
     const paddedBin = '000000000' + (dec >>> 0).toString(2);
     return paddedBin.substring(paddedBin.length - 8);
   }
-}
 
+  /**
+   * Converts an uint8[] payload to a binary string
+   * @param payload number[] CAN payload in decimal.
+   * @param endian The type of encoding, Intel vs Motorola for the payload
+   */
+  protected payload2Binary(payload: number[], endian: EndianType): string[] {
+    let byteArray;
+    if (endian === 'Intel') {
+      // The splice method is here because reverse modifies
+      // the original array. This could cause errors to
+      // subsequent calls to this function when the top level reference is the
+      // same
+      byteArray = payload.slice().reverse();
+    } else {
+      byteArray = payload;
+    }
+
+    // Convert payload into binary string
+    const bitField = byteArray
+      .reduce((previous, current) => {
+        return previous + this.uint8ToBinary(current);
+      }, '')
+      .split('');
+
+    return bitField;
+  }
+
+  protected extractBitRange(binary: string[], startBit: number, bitRange: number, endian: EndianType): string[] {
+    let startOfBit: number;
+    if (endian === 'Intel') {
+      startOfBit = binary.length - startBit - bitRange;
+    } else {
+      const endOfBitField = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
+      // Need to account for sawtooth bit numbering in CAN messages
+      startOfBit = endOfBitField - bitRange + 1;
+      // startOfBit = binary.length - (binary.length - startBit + bitRange);
+    }
+    return binary.slice(startOfBit, startOfBit + bitRange);
+  }
+}
 export default BitUtils;

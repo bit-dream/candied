@@ -1,4 +1,4 @@
-import { AttributeType } from '../dbc/types';
+import { AttributeType } from '../dbc/DbcTypes';
 
 export function table2Enum(table: string): Map<number, string> {
   const regEx = /(?<value>[0-9-]+) "(?<description>(?:[^"\\]|\\.)*)"/gi;

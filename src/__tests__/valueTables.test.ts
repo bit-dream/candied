@@ -1,4 +1,4 @@
-import Dbc from '../dbc/dbc';
+import Dbc from '../dbc/Dbc';
 
 test('tesla_can.dbc: Number of Value Tables', () => {
   const dbc = new Dbc();

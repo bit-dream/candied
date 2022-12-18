@@ -1,4 +1,4 @@
-import Dbc from '../dbc/dbc';
+import Dbc from '../dbc/Dbc';
 
 test('DBC_template.dbc: Bridge Exists', () => {
   const dbc = new Dbc();
