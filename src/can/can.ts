@@ -5,7 +5,7 @@ import { InvalidPayloadLength } from './errors';
 import BitUtils from './BitUtils';
 
 class Can extends BitUtils {
-  #dbc: DbcData | undefined;
+  #database: DbcData | undefined;
   #idMap: Map<number, Message>;
 
   constructor() {
@@ -13,9 +13,9 @@ class Can extends BitUtils {
     this.#idMap = new Map();
   }
 
-  set dbc(dbc: DbcData) {
-    this.#dbc = dbc;
-    this.#idMap = this.messageMapTransform(this.#dbc.messages);
+  set database(dbc: DbcData) {
+    this.#database = dbc;
+    this.#idMap = this.messageMapTransform(this.#database.messages);
   }
 
   private messageMapTransform(messages: Map<string, Message>): Map<number, Message> {

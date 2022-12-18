@@ -67,7 +67,7 @@ test('Get Value: Signed Intel', () =>{
 
 test('Can Frame Creation', () => {
   const can = new Can();
-  can.dbc = dummyData;
+  can.database = dummyData;
   expect(can.createFrame(100, [100, 100, 100], false)).toStrictEqual({
     id: 100,
     dlc: 3,
@@ -90,7 +90,7 @@ test('Can Frame Creation', () => {
 
 test('Get Value From Payload', () => {
   const can = new Can();
-  can.dbc = dummyData;
+  can.database = dummyData;
   expect(can.createFrame(100, [100, 100, 100], false)).toStrictEqual({
     id: 100,
     dlc: 3,

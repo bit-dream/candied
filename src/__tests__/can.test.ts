@@ -5,12 +5,13 @@ import Dbc from '../dbc/dbc';
 test('dummy test', () =>{
   expect(2).toBe(2);
 })
-/*
+
 // All return values validated using Kvaser CANKing
 test('SimpleDBC: Decode TestMessageStandard', () => {
   const dbc = new Dbc();
   let data = dbc.load('src/__tests__/testFiles/SimpleDBC.dbc').then((data) => {
-    const can = new Can(data);
+    const can = new Can();
+    can.database = data;
     const frame = can.createFrame(256, [100, 100, 255, 55, 30, 50, 80, 50]);
     const bndMsg = can.decode(frame);
 
@@ -42,7 +43,8 @@ test('SimpleDBC: Decode TestMessageStandard', () => {
 test('SimpleDBC: Decode TestMessageExtended', () => {
   const dbc = new Dbc();
   let data = dbc.load('src/__tests__/testFiles/SimpleDBC.dbc').then((data) => {
-    const can = new Can(data);
+    const can = new Can();
+    can.database = data;
     const frame = can.createFrame(2147484160, [20, 25, 250, 50, 60, 120, 40, 53]);
     const bndMsg = can.decode(frame);
 
@@ -74,7 +76,8 @@ test('SimpleDBC: Decode TestMessageExtended', () => {
 test('tesla_can: Decode TestMessageExtended', () => {
   const dbc = new Dbc();
   let data = dbc.load('src/__tests__/testFiles/tesla_can.dbc').then((data) => {
-    const can = new Can(data);
+    const can = new Can();
+    can.database = data;
     const frame = can.createFrame(280, [20, 25, 250, 50, 60, 120]);
     const bndMsg = can.decode(frame);
     let signals = new Map();
@@ -136,5 +139,3 @@ test('tesla_can: Decode TestMessageExtended', () => {
     expect(bndMsg?.signals).toEqual(signals);
   });
 });
-
-*/
