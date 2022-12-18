@@ -1,5 +1,5 @@
 import Dbc from '../dbc/Dbc';
-import {IncorrectFileExtension} from '../dbc/Errors';
+import { IncorrectFileExtension } from '../dbc/Errors';
 
 // All return values validated using Kvaser CANKing
 test('Load: Invalid File', async () => {

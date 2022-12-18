@@ -16,15 +16,15 @@ export type BoundMessage = {
   };
   boundSignals: Map<string, BoundSignal>;
   id: number;
-  name: string
+  name: string;
   setSignalValue: (signal: string, value: number) => {};
-}
+};
 
 export type BoundSignal = {
   boundData: {
     signal: Signal;
     payload: Payload;
-  }
+  };
   value: number;
   rawValue: number;
   physValue: string;
@@ -32,7 +32,6 @@ export type BoundSignal = {
 };
 
 export type Payload = number[];
-
 
 /**
  * The Can class offers utility functions that aid in the processing of general CAN data/information
@@ -110,7 +109,7 @@ class Can extends BitUtils {
    */
   decode(frame: Frame): BoundMessage | undefined {
     if (this._database === undefined) {
-      throw new Error('No database is attached to class instance')
+      throw new Error('No database is attached to class instance');
     }
     const msg = this.getMessageById(frame.id);
     // return undefined and make user handle non-decoded frames
@@ -131,9 +130,11 @@ class Can extends BitUtils {
       boundSignals: signals,
       boundData: {
         frame,
-        message: msg
+        message: msg,
       },
-      setSignalValue: (signal, value) => {return {}}
+      setSignalValue: (signal, value) => {
+        return {};
+      },
     };
   }
 
@@ -141,10 +142,13 @@ class Can extends BitUtils {
     return this.#idMap.get(id);
   }
 
-  private applyPropsToSignalValue(signal: Signal, rawValue: number): {
+  private applyPropsToSignalValue(
+    signal: Signal,
     rawValue: number,
-    prcValue: number,
-    physValue: string
+  ): {
+    rawValue: number;
+    prcValue: number;
+    physValue: string;
   } {
     // Apply scaling and offset
     let prcValue = rawValue * signal.factor + signal.offset;
@@ -173,8 +177,8 @@ class Can extends BitUtils {
     return {
       rawValue,
       prcValue,
-      physValue
-    }
+      physValue,
+    };
   }
 
   /**
@@ -188,18 +192,26 @@ class Can extends BitUtils {
    * @param signal Signal
    */
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
-    const rawValue = this.extractValFromPayload(payload, signal.startBit, signal.length, signal.endianness, signal.signed);
+    const rawValue = this.extractValFromPayload(
+      payload,
+      signal.startBit,
+      signal.length,
+      signal.endianness,
+      signal.signed,
+    );
 
-    const signalValues = this.applyPropsToSignalValue(signal,rawValue);
+    const signalValues = this.applyPropsToSignalValue(signal, rawValue);
     return {
       boundData: {
         payload,
-        signal
+        signal,
       },
-      setValue(value: number): {} {return {};},
+      setValue(value: number): {} {
+        return {};
+      },
       value: signalValues.prcValue,
       rawValue: signalValues.rawValue,
-      physValue: signalValues.physValue
+      physValue: signalValues.physValue,
     };
   }
 
@@ -213,8 +225,13 @@ class Can extends BitUtils {
    * @param endian 'Motorola' | 'Intel'
    * @param signed boolean
    */
-  extractValFromPayload(payload: number[], startBit: number, signalLength: number, endian: EndianType, signed: boolean): number {
-
+  extractValFromPayload(
+    payload: number[],
+    startBit: number,
+    signalLength: number,
+    endian: EndianType,
+    signed: boolean,
+  ): number {
     const bitField = this.payload2Binary(payload, endian);
     const valBitField = this.extractBitRange(bitField, startBit, signalLength, endian);
 
@@ -229,28 +246,28 @@ class Can extends BitUtils {
   }
 
   setSignalValues() {
-    return null
+    return null;
   }
 
   private createBoundSignal(signal: Signal, payload: Payload, initalValue: number = 0): BoundSignal {
-    const signalValues = this.applyPropsToSignalValue(signal,initalValue);
+    const signalValues = this.applyPropsToSignalValue(signal, initalValue);
 
     const boundSignal = {
       boundData: {
         signal,
-        payload
+        payload,
       },
       value: signalValues.prcValue,
       rawValue: signalValues.rawValue,
       physValue: signalValues.physValue,
-      setValue: (value: number) =>{
-        const newValues = this.applyPropsToSignalValue(signal,value);
+      setValue: (value: number) => {
+        const newValues = this.applyPropsToSignalValue(signal, value);
         boundSignal.value = newValues.prcValue;
         boundSignal.rawValue = newValues.rawValue;
         boundSignal.physValue = newValues.physValue;
-      }
-    }
-    return boundSignal as BoundSignal
+      },
+    };
+    return boundSignal as BoundSignal;
   }
 
   /**
@@ -262,13 +279,17 @@ class Can extends BitUtils {
    * @param message Message
    * @param frameData {payload: number[], isExtended: boolean} | null
    */
-  createBoundMessage(message: Message, frameData: {payload: Payload, isExtended: boolean} | null = null): BoundMessage {
-
+  createBoundMessage(
+    message: Message,
+    frameData: { payload: Payload; isExtended: boolean } | null = null,
+  ): BoundMessage {
     // Initialize an empty payload based on message dlc if payload is not specified
     let boundPayload: Payload;
     if (frameData && frameData.payload) {
       if (frameData.payload.length !== message.dlc) {
-        throw new Error(`Supplied payload length: ${frameData.payload.length} does not match message DLC length: ${message.dlc}`)
+        throw new Error(
+          `Supplied payload length: ${frameData.payload.length} does not match message DLC length: ${message.dlc}`,
+        );
       }
       boundPayload = frameData.payload;
     } else {
@@ -285,9 +306,9 @@ class Can extends BitUtils {
     const frame = this.createFrame(message.id, boundPayload, extended);
 
     const boundSignals = new Map();
-    message.signals.forEach((signal: Signal)=>{
-      boundSignals.set(signal.name, this.createBoundSignal(signal,boundPayload,0))
-    })
+    message.signals.forEach((signal: Signal) => {
+      boundSignals.set(signal.name, this.createBoundSignal(signal, boundPayload, 0));
+    });
 
     const boundMessage = {
       name: message.name,
@@ -295,18 +316,17 @@ class Can extends BitUtils {
       boundSignals,
       boundData: {
         frame,
-        message
+        message,
       },
       setSignalValue: (signal: string, value: number) => {
-          const bndSignal = boundMessage.boundSignals.get(signal);
-          if (bndSignal) {
-            bndSignal.setValue(value);
-          }
-      }
+        const bndSignal = boundMessage.boundSignals.get(signal);
+        if (bndSignal) {
+          bndSignal.setValue(value);
+        }
+      },
     };
 
-    return boundMessage as BoundMessage
+    return boundMessage as BoundMessage;
   }
-
 }
 export default Can;

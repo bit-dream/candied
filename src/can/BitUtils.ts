@@ -1,4 +1,4 @@
-import {EndianType} from "../dbc/DbcTypes";
+import { EndianType } from '../dbc/DbcTypes';
 
 class BitUtils {
   protected bitGet(num: number, idx: number) {
@@ -46,14 +46,17 @@ class BitUtils {
       // the original array. This could cause errors to
       // subsequent calls to this function when the top level reference is the
       // same
-      byteArray = payload.slice().reverse()
+      byteArray = payload.slice().reverse();
     } else {
       byteArray = payload;
     }
 
     // Convert payload into binary string
-    const bitField = byteArray.reduce((previous,current) =>{
-      return previous + this.uint8ToBinary(current)}, '').split('');
+    const bitField = byteArray
+      .reduce((previous, current) => {
+        return previous + this.uint8ToBinary(current);
+      }, '')
+      .split('');
 
     return bitField;
   }
@@ -63,7 +66,7 @@ class BitUtils {
     if (endian === 'Intel') {
       startOfBit = binary.length - startBit - bitRange;
     } else {
-      const endOfBitField = 8 * Math.floor((startBit / 8)) + (7 - (startBit % 8));
+      const endOfBitField = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
       // Need to account for sawtooth bit numbering in CAN messages
       startOfBit = endOfBitField - bitRange + 1;
       // startOfBit = binary.length - (binary.length - startBit + bitRange);
