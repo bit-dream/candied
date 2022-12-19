@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import {
   Attribute,
   AttributeDataType,
-  DbcData,
+  DbcData, EnvironmentVariable,
   Message,
   NetworkBridges,
   Signal,
@@ -43,12 +43,12 @@ class Writer {
       this.writeBaseComment(data.description);
     }
     this.writeMessageAndSignalComments(data.messages);
-
-    this.writeSignalTables(data.messages);
     this.writeAttributeDefinitions(data);
     this.writeAttributeDefaults(data);
     this.writeAttributeValues(data);
     this.writeSignalGroups(data.messages);
+    this.writeSignalTables(data.messages);
+    this.writeEnvVarTables(data.environmentVariables);
   }
 
   /**
@@ -229,6 +229,16 @@ class Writer {
     this.writeLine('');
   }
 
+  writeEnvVarTables(environmentVariables: Map<string, EnvironmentVariable>) {
+    environmentVariables.forEach((ev: EnvironmentVariable)=>{
+      if (ev.valueTable) {
+        const members = this.generateEnumTable(ev.valueTable);
+        const lineContent = `VAL_ ${ev.name} ${members};`;
+        this.writeLine(lineContent);
+      }
+    })
+  }
+
   private enumListToString(enumList: string[]) {
     return enumList.reduce((accumulator, currentValue, idx) => {
       let str = '';
@@ -309,6 +319,9 @@ class Writer {
     let lineContent: string = `BA_DEF_DEF_ "${value.name}"`;
     switch (value.dataType) {
       case 'STRING':
+        lineContent = lineContent + ` "${value.defaultValue}";`;
+        break;
+      case 'ENUM':
         lineContent = lineContent + ` "${value.defaultValue}";`;
         break;
       default:
