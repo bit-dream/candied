@@ -310,6 +310,9 @@ class Writer {
       case 'STRING':
         lineContent = lineContent + ` "${value.defaultValue}";`;
         break;
+      case 'ENUM':
+        lineContent = lineContent + ` "${value.defaultValue}";`;
+        break;
       default:
         lineContent = lineContent + ` ${value.defaultValue};`;
         break;
