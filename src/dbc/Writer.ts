@@ -2,7 +2,8 @@ import * as fs from 'fs';
 import {
   Attribute,
   AttributeDataType,
-  DbcData, EnvironmentVariable,
+  DbcData,
+  EnvironmentVariable,
   Message,
   NetworkBridges,
   Signal,
@@ -230,13 +231,13 @@ class Writer {
   }
 
   writeEnvVarTables(environmentVariables: Map<string, EnvironmentVariable>) {
-    environmentVariables.forEach((ev: EnvironmentVariable)=>{
+    environmentVariables.forEach((ev: EnvironmentVariable) => {
       if (ev.valueTable) {
         const members = this.generateEnumTable(ev.valueTable);
         const lineContent = `VAL_ ${ev.name} ${members};`;
         this.writeLine(lineContent);
       }
-    })
+    });
   }
 
   private enumListToString(enumList: string[]) {
