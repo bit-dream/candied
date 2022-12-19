@@ -43,12 +43,11 @@ class Writer {
       this.writeBaseComment(data.description);
     }
     this.writeMessageAndSignalComments(data.messages);
-
-    this.writeSignalTables(data.messages);
     this.writeAttributeDefinitions(data);
     this.writeAttributeDefaults(data);
     this.writeAttributeValues(data);
     this.writeSignalGroups(data.messages);
+    this.writeSignalTables(data.messages);
   }
 
   /**
