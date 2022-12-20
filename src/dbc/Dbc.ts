@@ -53,18 +53,7 @@ class Dbc {
   errors: Map<number, SyntaxError[]> = new Map();
 
   constructor() {
-    this.data = {
-      version: null,
-      messages: new Map(),
-      description: null,
-      busSpeed: null,
-      nodes: new Map(),
-      valueTables: null,
-      attributes: new Map(),
-      newSymbols: new Array(),
-      environmentVariables: new Map(),
-      networkBridges: new Map(),
-    };
+    this.data = this.initDbcDataObj();
   }
 
   /**
@@ -286,18 +275,7 @@ class Dbc {
       crlfDelay: Infinity,
     });
 
-    let data: DbcData = {
-      version: null,
-      messages: new Map(),
-      description: null,
-      busSpeed: null,
-      nodes: new Map(),
-      valueTables: new Map(),
-      attributes: new Map(),
-      newSymbols: new Array(),
-      environmentVariables: new Map(),
-      networkBridges: new Map(),
-    };
+    let data = this.initDbcDataObj();
 
     let lineNum = 1;
     const errMap = new Map();
@@ -334,18 +312,7 @@ class Dbc {
   loadSync(file: string, throwOnError: boolean = false): DbcData {
     this.validateFileExtension(file, '.dbc');
 
-    let data: DbcData = {
-      version: null,
-      messages: new Map(),
-      description: null,
-      busSpeed: null,
-      nodes: new Map(),
-      valueTables: new Map(),
-      attributes: new Map(),
-      newSymbols: new Array(),
-      environmentVariables: new Map(),
-      networkBridges: new Map(),
-    };
+    let data = this.initDbcDataObj();
 
     const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
@@ -427,6 +394,22 @@ class Dbc {
     const json = JSON.stringify(this.data, replacer, indent);
     return json;
   }
+
+  initDbcDataObj(): DbcData {
+    return {
+      version: null,
+      messages: new Map(),
+      description: null,
+      busSpeed: null,
+      nodes: new Map(),
+      valueTables: new Map(),
+      attributes: new Map(),
+      newSymbols: [],
+      environmentVariables: new Map(),
+      networkBridges: new Map(),
+    };
+  }
+
 }
 
 export default Dbc;
