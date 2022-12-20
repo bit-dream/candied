@@ -1,4 +1,4 @@
-import {EndianType} from "../shared/DataTypes";
+import { EndianType } from '../shared/DataTypes';
 
 class BitUtils {
   protected bitGet(num: number, idx: number) {

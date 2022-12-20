@@ -26,19 +26,22 @@ import {
   MessageTransmitter,
   EnvironmentAttribute,
   EnvironmentVal,
-  CanSignalGroup, SigValType,
+  CanSignalGroup,
+  SigValType,
 } from '../parser/parser';
-import {EndianType} from "../shared/DataTypes";
+import { EndianType } from '../shared/DataTypes';
 import {
   AccessType,
   Attribute,
   AttributeDataType,
   DbcData,
   EnvironmentVariable,
-  EnvType, Message,
-  Node, Signal,
-  ValueTable
-} from "../dbc/Dbc";
+  EnvType,
+  Message,
+  Node,
+  Signal,
+  ValueTable,
+} from '../dbc/Dbc';
 
 export default class DbcParser extends Parser {
   parseResult: ParseResult;
@@ -474,9 +477,7 @@ export default class DbcParser extends Parser {
     }
   }
 
-  private addSignalValType(dbc: DbcData, data: SigValType) {
-
-  }
+  private addSignalValType(dbc: DbcData, data: SigValType) {}
 
   private convert2EnvType(type: string): EnvType {
     switch (type) {

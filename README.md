@@ -205,20 +205,14 @@ const dbc = new Dbc();
 const msg1 = dbc.createMessage('MyMessageName', 100, 8);
 
 // You can optionally define a message comment and define a node for the message
-const msg2 = dbc.createMessage(
-    'MyMessageName', // name
-    103, // id
-    8, // dlc
-    'MyNode', // node
-    'This is just a test comment' // comment
-);
+const msg2 = dbc.createMessage('MyMessageName', 103, 8);
 
 // To add the messages to the class data, you can simply call addMessage() with the Message object
 dbc.addMessage(msg1);
 dbc.addMessage(msg2);
 
 // Alternatively, you can pass addMessage() an array of messages for easier adding
-dbc.addMessage([msg1,msg2]);
+dbc.addMessage([msg1, msg2]);
 
 /* Note that when creating a message that what is being returned is a simple object.
  * If you don't want to pass the additional arguments to createMessage() you can
@@ -274,7 +268,7 @@ const signal2 = dbc.createSignal(
     8 // signal length
 );
 
-dbc.addSignal('MyMessageName', [signal,signal2]);
+dbc.addSignal('MyMessageName', [signal, signal2]);
 
 /* Note that when creating a signal that what is being returned is a simple object.
  * If you don't want to pass the additional arguments to createSignal() you can
@@ -283,7 +277,7 @@ dbc.addSignal('MyMessageName', [signal,signal2]);
 */
 signal.signed = true
 signal.endianness = 'Motorola'
-dbc.addSignal('MyMessageName',signal);
+dbc.addSignal('MyMessageName', signal);
 
 ```
 ### Writing DBC Files
@@ -310,6 +304,7 @@ dbc.write('path/to/file.dbc');
 Below is an example of how you can create a fairly large DBC file with relative ease. For this particular
 example, we will create a DBC file that contains over 700 individual CAN messages and a few signals contained
 in each message.
+
 ```js
 const dbc = new Dbc();
 
@@ -328,7 +323,7 @@ for (const key of range.keys()) {
     // Create and add the signals to the newly created message
     let signal1 = dbc.createSignal('Signal1', 0, 16);
     let signal2 = dbc.createSignal('Signal2', 28, 16);
-    dbc.addSignal(msgName,[signal1,signal2]);
+    dbc.addSignal(msgName, [signal1, signal2]);
 }
 
 // Write the data to a file

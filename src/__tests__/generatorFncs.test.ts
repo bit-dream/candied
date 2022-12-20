@@ -4,32 +4,39 @@ test('Create Simple Message Object', () => {
   const dbc = new Dbc();
   const msg = dbc.createMessage('TestMessage', 100, 8);
 
-  expect(msg).toEqual({
-    name: 'TestMessage',
-    id: 100,
-    dlc: 8,
-    sendingNode: null,
-    signals: new Map(),
-    description: null,
-    attributes: new Map(),
-    signalGroups: new Map(),
-  });
+  expect(msg).toEqual(
+    expect.objectContaining({
+      name: 'TestMessage',
+      id: 100,
+      dlc: 8,
+      sendingNode: null,
+      signals: new Map(),
+      description: null,
+      attributes: new Map(),
+      signalGroups: new Map(),
+    }),
+  );
 });
 
 test('Create Complex Message Object', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8, 'Node1', 'Test Description');
-
-  expect(msg).toEqual({
-    name: 'TestMessage',
-    id: 100,
-    dlc: 8,
-    sendingNode: 'Node1',
-    signals: new Map(),
+  const msg = dbc.createMessage('TestMessage', 100, 8, {
     description: 'Test Description',
-    attributes: new Map(),
-    signalGroups: new Map(),
+    sendingNode: 'Node1',
   });
+
+  expect(msg).toEqual(
+    expect.objectContaining({
+      name: 'TestMessage',
+      id: 100,
+      dlc: 8,
+      sendingNode: 'Node1',
+      signals: new Map(),
+      description: 'Test Description',
+      attributes: new Map(),
+      signalGroups: new Map(),
+    }),
+  );
 });
 
 test('Create Simple Signal Object', () => {

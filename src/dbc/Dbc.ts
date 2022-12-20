@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
 import Writer from './Writer';
-import {IncorrectFileExtension, MessageDoesNotExist, SignalDoesNotExist} from './Errors';
-import {computeDataType, DataType, EndianType} from "../shared/DataTypes";
-import {validateFileExtension} from "../shared/FileHandlers";
+import { IncorrectFileExtension, MessageDoesNotExist, SignalDoesNotExist } from './Errors';
+import { computeDataType, DataType, EndianType } from '../shared/DataTypes';
+import { validateFileExtension } from '../shared/FileHandlers';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -55,30 +55,67 @@ class Dbc {
   /**
    *
    * Creates a Message instance that can later be added using addMessage()
+   * or using the attached method .add()
+   *
+   * Ex.
+   * let msg = dbc.createMessage('MessageName',100,8);
+   * msg.add(); or dbc.addMessage(msg);
    *
    * @param name Name of CAN message
    * @param id ID of CAN message
    * @param dlc Data Length Code (data length) of CAN message
-   * @param sendingNode Name of node that sends this message
-   * @param description Short description of what the message is/does
+   * @param options Optional attributes that can be used when creating a message: signals, attributes, signalGroups,
+   * sendingNode, and description
    * @returns Message
    */
   createMessage(
     name: string,
     id: number,
     dlc: number,
-    sendingNode: null | string = null,
-    description: null | string = null,
+    options?: {
+      signals?: Signals;
+      attributes?: Attributes;
+      signalGroups?: SignalGroups;
+      sendingNode?: string;
+      description?: string;
+    },
   ): Message {
+    if (dlc > 8) {
+      throw new Error(`DLC can not be larger than 8 bytes, received ${dlc}`);
+    }
+
+    let [sendingNode, description]: [string | null, string | null] = [null, null];
+    let [signals, attributes, signalGroups]: [Signals, Attributes, SignalGroups] = [new Map(), new Map(), new Map()];
+    if (options) {
+      if (options.signals) {
+        signals = options.signals;
+      }
+      if (options.attributes) {
+        attributes = options.attributes;
+      }
+      if (options.signalGroups) {
+        signalGroups = options.signalGroups;
+      }
+      if (options.sendingNode) {
+        sendingNode = options.sendingNode;
+      }
+      if (options.description) {
+        description = options.description;
+      }
+    }
+
     const message: Message = {
       name,
       id,
       dlc,
       sendingNode,
-      signals: new Map(),
+      signals,
       description,
-      attributes: new Map(),
-      signalGroups: new Map(),
+      attributes,
+      signalGroups,
+      add: () => {
+        this.addMessage(message);
+      },
     };
     return message;
   }
@@ -90,15 +127,21 @@ class Dbc {
    * @param message Message object to be added
    */
   addMessage(message: Message | Message[]) {
+    const errorOnDuplicate = (name: string) => {
+      if (this.data.messages.has(name)) {
+        throw new Error(`Can not add message ${name} as ${name} already exists. Unique message names are required.`);
+      }
+    };
+
     if (Array.isArray(message)) {
       message.forEach((msg) => {
+        errorOnDuplicate(msg.name);
         this.data.messages.set(msg.name, msg);
       });
     } else {
+      errorOnDuplicate(message.name);
       this.data.messages.set(message.name, message);
     }
-    // TODO Validate that message ID does not conflict
-    // with other IDs. If it does, throw error
   }
 
   removeMessage(messageName: string) {
@@ -110,7 +153,6 @@ class Dbc {
     startBit: number,
     length: number,
     signed: boolean = false,
-    isFloat: boolean = false,
     endianness: EndianType = 'Intel',
     min: number = 0,
     max: number = 0,
@@ -120,7 +162,7 @@ class Dbc {
     description: string | null = null,
     multiplex: string | null = null,
     receivingNodes: string[] = new Array(),
-    valueTable: ValueTable | null = null
+    valueTable: ValueTable | null = null,
   ) {
     if (!unit) {
       unit = '';
@@ -141,7 +183,7 @@ class Dbc {
       description,
       valueTable,
       attributes: new Map(),
-      dataType: computeDataType(length,signed, isFloat)
+      dataType: undefined,
     };
     return signal;
   }
@@ -371,17 +413,10 @@ class Dbc {
       networkBridges: new Map(),
     };
   }
-
 }
 export default Dbc;
 
-export type AttributeOptions = {
-  value?: string;
-  defaultValue?: string;
-  options?: string[];
-  min?: number;
-  max?: number;
-};
+export type Signals = Map<string, Signal>;
 
 export type Signal = {
   name: string;
@@ -401,12 +436,15 @@ export type Signal = {
   attributes: Attributes;
   dataType: DataType | undefined;
 };
+
+export type SignalGroups = Map<string, SignalGroup>;
 export type SignalGroup = {
   name: string;
   id: number;
   groupId: number;
   signals: string[];
 };
+
 export type Message = {
   name: string;
   id: number;
@@ -415,10 +453,14 @@ export type Message = {
   signals: Map<string, Signal>;
   description: string | null;
   attributes: Attributes;
-  signalGroups: Map<string, SignalGroup>;
+  signalGroups: SignalGroups;
+  add: () => void;
 };
+
 export type EnvType = 'Integer' | 'Float' | 'String';
+
 export type AccessType = 'Unrestricted' | 'Read' | 'Write' | 'ReadWrite';
+
 export type EnvironmentVariable = {
   name: string;
   type: EnvType;
@@ -434,14 +476,19 @@ export type EnvironmentVariable = {
   dataBytesLength: number | null;
   unit: string;
 };
+
 export type Node = {
   name: string;
   description: string | null;
   attributes: Attributes;
 };
+
 export type TxMessages = string[];
+
 export type CanId = number;
+
 export type NetworkBridges = Map<CanId, TxMessages>;
+
 export type DbcData = {
   version: string | null;
   messages: Map<string, Message>;
@@ -455,9 +502,20 @@ export type DbcData = {
   networkBridges: NetworkBridges;
 };
 export type ValueTable = Map<number, string>;
+
+export type AttributeOptions = {
+  value?: string;
+  defaultValue?: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+};
 export type Attributes = Map<string, Attribute>;
+
 export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';
+
 export type AttributeDataType = 'FLOAT' | 'STRING' | 'ENUM' | 'INT' | 'HEX';
+
 export type Attribute = {
   name: string;
   type: AttributeType;
