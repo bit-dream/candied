@@ -1,16 +1,13 @@
 import * as fs from 'fs';
 import {
-  Attribute,
-  AttributeDataType,
-  DbcData,
-  EnvironmentVariable,
-  Message,
-  NetworkBridges,
-  Signal,
-  SignalGroup,
-  TxMessages,
-  ValueTable,
-} from './DbcTypes';
+    Attribute,
+    AttributeDataType,
+    DbcData,
+    EnvironmentVariable, Message,
+    NetworkBridges, Signal, SignalGroup,
+    TxMessages,
+    ValueTable
+} from "./Dbc";
 
 class Writer {
   file: string;

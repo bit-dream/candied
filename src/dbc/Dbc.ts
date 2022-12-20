@@ -2,28 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
-import {
-  Message,
-  Signal,
-  DbcData,
-  CanFrame,
-  EndianType,
-  ValueTable,
-  Node,
-  AttributeType,
-  AttributeDataType,
-  Attribute,
-} from './DbcTypes';
 import Writer from './Writer';
-import { MessageDoesNotExist, SignalDoesNotExist, IncorrectFileExtension } from './Errors';
-
-export type AttributeOptions = {
-  value?: string;
-  defaultValue?: string;
-  options?: string[];
-  min?: number;
-  max?: number;
-};
+import {IncorrectFileExtension, MessageDoesNotExist, SignalDoesNotExist} from './Errors';
+import {computeDataType, DataType, EndianType} from "../shared/DataTypes";
+import {validateFileExtension} from "../shared/FileHandlers";
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -37,7 +19,7 @@ export type AttributeOptions = {
  * you will either need to wrap the call in an async function or call .then(data)
  * ex. dbc.load('path/to/my/dbcFile.dbc').then( data => DO SOMETHING WITH DATA HERE )
  *
- * By default when a new Dbc() instance is created, the encapulsated data will be empty.
+ * By default, when a new Dbc() instance is created, the encapulsated data will be empty.
  * If you are wanting to create fresh data you can call createMessage or createSignal to
  * create messages and signals, respectively.
  * Calls to createMessage and createSignal do not by default add the messages to the data,
@@ -61,15 +43,6 @@ class Dbc {
    */
   set version(version: string) {
     this.data.version = version;
-  }
-
-  /**
-   * Adds a bus speed configuration
-   */
-  set busConfiguration(speed: number) {
-    // TODO: Might need to do some input validation to ensure we are not writing bad
-    // data to a dbc file
-    this.data.busSpeed = speed;
   }
 
   /**
@@ -137,6 +110,7 @@ class Dbc {
     startBit: number,
     length: number,
     signed: boolean = false,
+    isFloat: boolean = false,
     endianness: EndianType = 'Intel',
     min: number = 0,
     max: number = 0,
@@ -146,7 +120,7 @@ class Dbc {
     description: string | null = null,
     multiplex: string | null = null,
     receivingNodes: string[] = new Array(),
-    valueTable: ValueTable | null = null,
+    valueTable: ValueTable | null = null
   ) {
     if (!unit) {
       unit = '';
@@ -167,6 +141,7 @@ class Dbc {
       description,
       valueTable,
       attributes: new Map(),
+      dataType: computeDataType(length,signed, isFloat)
     };
     return signal;
   }
@@ -265,7 +240,7 @@ class Dbc {
    * @returns Promise<DbcData>
    */
   async load(file: string, throwOnError: boolean = false): Promise<DbcData> {
-    this.validateFileExtension(file, '.dbc');
+    validateFileExtension(file, '.dbc');
     const fileStream = fs.createReadStream(file);
 
     // Note: we use the crlfDelay option to recognize all instances of CR LF
@@ -310,7 +285,7 @@ class Dbc {
    * @returns DbcData Data contained in the dbc file
    */
   loadSync(file: string, throwOnError: boolean = false): DbcData {
-    this.validateFileExtension(file, '.dbc');
+    validateFileExtension(file, '.dbc');
 
     let data = this.initDbcDataObj();
 
@@ -343,19 +318,6 @@ class Dbc {
   }
 
   /**
-   * Determines if the containing filepath has the correct extension
-   *
-   * @param file Filepath
-   * @param ext File extension to check against
-   */
-  private validateFileExtension(file: string, ext: string): void {
-    const fileExt = path.extname(file);
-    if (fileExt !== ext) {
-      throw new IncorrectFileExtension(`Function expected a file extension of '.dbc', got ${fileExt}`);
-    }
-  }
-
-  /**
    *
    * Writes the encapsulated data of a Dbc class instance to a dbc file
    *
@@ -363,7 +325,7 @@ class Dbc {
    * will automatically be created.
    */
   write(filePath: string) {
-    this.validateFileExtension(filePath, '.dbc');
+    validateFileExtension(filePath, '.dbc');
     const writer = new Writer(filePath);
     writer.constructFile(this.data);
   }
@@ -411,5 +373,98 @@ class Dbc {
   }
 
 }
-
 export default Dbc;
+
+export type AttributeOptions = {
+  value?: string;
+  defaultValue?: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+};
+
+export type Signal = {
+  name: string;
+  multiplex: string | null;
+  startBit: number;
+  length: number;
+  endianness: EndianType;
+  signed: boolean;
+  factor: number;
+  offset: number;
+  min: number;
+  max: number;
+  unit: string;
+  receivingNodes: string[];
+  description: string | null;
+  valueTable: ValueTable | null;
+  attributes: Attributes;
+  dataType: DataType | undefined;
+};
+export type SignalGroup = {
+  name: string;
+  id: number;
+  groupId: number;
+  signals: string[];
+};
+export type Message = {
+  name: string;
+  id: number;
+  dlc: number;
+  sendingNode: string | null;
+  signals: Map<string, Signal>;
+  description: string | null;
+  attributes: Attributes;
+  signalGroups: Map<string, SignalGroup>;
+};
+export type EnvType = 'Integer' | 'Float' | 'String';
+export type AccessType = 'Unrestricted' | 'Read' | 'Write' | 'ReadWrite';
+export type EnvironmentVariable = {
+  name: string;
+  type: EnvType;
+  min: number;
+  max: number;
+  initalValue: number;
+  evId: number;
+  accessType: AccessType;
+  accessNode: string;
+  attributes: Attributes;
+  valueTable: ValueTable | null;
+  description: string | null;
+  dataBytesLength: number | null;
+  unit: string;
+};
+export type Node = {
+  name: string;
+  description: string | null;
+  attributes: Attributes;
+};
+export type TxMessages = string[];
+export type CanId = number;
+export type NetworkBridges = Map<CanId, TxMessages>;
+export type DbcData = {
+  version: string | null;
+  messages: Map<string, Message>;
+  description: string | null;
+  busSpeed: number | null;
+  nodes: Map<string, Node>;
+  valueTables: Map<string, ValueTable> | null;
+  attributes: Attributes;
+  newSymbols: string[];
+  environmentVariables: Map<string, EnvironmentVariable>;
+  networkBridges: NetworkBridges;
+};
+export type ValueTable = Map<number, string>;
+export type Attributes = Map<string, Attribute>;
+export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';
+export type AttributeDataType = 'FLOAT' | 'STRING' | 'ENUM' | 'INT' | 'HEX';
+export type Attribute = {
+  name: string;
+  type: AttributeType;
+  dataType: AttributeDataType;
+  value: string | null;
+  defaultValue: string | null;
+  options: string[] | null;
+  min: number | null;
+  max: number | null;
+};

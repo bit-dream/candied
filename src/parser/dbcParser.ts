@@ -1,17 +1,4 @@
 import {
-  DbcData,
-  Message,
-  Signal,
-  EndianType,
-  ValueTable,
-  Node,
-  Attribute,
-  AttributeDataType,
-  EnvironmentVariable,
-  EnvType,
-  AccessType,
-} from '../dbc/DbcTypes';
-import {
   ASTKinds,
   ASTNodeIntf,
   Parser,
@@ -39,8 +26,19 @@ import {
   MessageTransmitter,
   EnvironmentAttribute,
   EnvironmentVal,
-  CanSignalGroup,
+  CanSignalGroup, SigValType,
 } from '../parser/parser';
+import {EndianType} from "../shared/DataTypes";
+import {
+  AccessType,
+  Attribute,
+  AttributeDataType,
+  DbcData,
+  EnvironmentVariable,
+  EnvType, Message,
+  Node, Signal,
+  ValueTable
+} from "../dbc/Dbc";
 
 export default class DbcParser extends Parser {
   parseResult: ParseResult;
@@ -125,6 +123,9 @@ export default class DbcParser extends Parser {
           break;
         case ASTKinds.CanSignalGroup:
           this.addSignalGroup(data, this.parseResult.ast);
+          break;
+        case ASTKinds.SigValType:
+          this.addSignalValType(data, this.parseResult.ast);
           break;
       }
     }
@@ -471,6 +472,10 @@ export default class DbcParser extends Parser {
         msg.signalGroups.set(data.name, groupData);
       }
     }
+  }
+
+  private addSignalValType(dbc: DbcData, data: SigValType) {
+
   }
 
   private convert2EnvType(type: string): EnvType {
