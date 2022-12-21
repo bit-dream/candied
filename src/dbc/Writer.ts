@@ -466,7 +466,7 @@ class Writer {
           if (signal.dataType === 'double') {
             type = '2';
           } else {
-            type = '1'
+            type = '1';
           }
           const lineContent = `SIG_VALTYPE_ ${msg.id.toString()} ${signal.name} : ${type};`;
           this.writeLine(lineContent);

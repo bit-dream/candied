@@ -81,7 +81,7 @@ class Dbc {
     options && options.sendingNode ? (sendingNode = options.sendingNode) : (sendingNode = null);
 
     if (sendingNode) {
-      this.data.nodes.set(sendingNode, {name: sendingNode, attributes: new Map(), description: null})
+      this.data.nodes.set(sendingNode, { name: sendingNode, attributes: new Map(), description: null });
     }
 
     const message: Message = {
@@ -102,12 +102,15 @@ class Dbc {
         this.addSignal(message.name, signal);
         return message;
       },
-      updateDescription: (content: string) => {message.description = content; return message;},
+      updateDescription: (content: string) => {
+        message.description = content;
+        return message;
+      },
       updateNode: (node: string) => {
         message.sendingNode = node;
-        this.data.nodes.set(node, {name: node, attributes: new Map(), description: null})
+        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
         return message;
-      }
+      },
     };
     return message;
   }
@@ -173,8 +176,8 @@ class Dbc {
 
     if (receivingNodes.length) {
       receivingNodes.forEach((node: string) => {
-        this.data.nodes.set(node, {name: node, attributes: new Map(), description: null})
-      })
+        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
+      });
     }
 
     const signal: Signal = {
@@ -389,7 +392,7 @@ class Dbc {
    * @param pretty Determines if JSON output should be formatted. Defaults to true.
    * @returns JSON representation of loaded DBC data
    */
-  toJson( options?: {pretty: boolean;}) {
+  toJson(options?: { pretty: boolean }) {
     const replacer = (key: any, value: any) => {
       if (value instanceof Map) {
         if (key === 'valueTable' || key === 'valueTables') {
@@ -401,8 +404,9 @@ class Dbc {
       }
     };
 
-    let indent = 0; let pretty: boolean;
-    options && options.pretty ? pretty = options.pretty : pretty = true;
+    let indent = 0;
+    let pretty: boolean;
+    options && options.pretty ? (pretty = options.pretty) : (pretty = true);
     if (pretty) {
       indent = 2;
     }
@@ -489,8 +493,8 @@ export type Message = {
   signalGroups: SignalGroups;
   add: () => Message;
   addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
-  updateDescription: (content: string) => Message,
-  updateNode: (node: string) => Message
+  updateDescription: (content: string) => Message;
+  updateNode: (node: string) => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';

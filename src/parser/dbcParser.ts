@@ -29,7 +29,7 @@ import {
   CanSignalGroup,
   SigValType,
 } from '../parser/parser';
-import {computeDataType, EndianType} from '../shared/DataTypes';
+import { computeDataType, EndianType } from '../shared/DataTypes';
 import {
   AccessType,
   Attribute,

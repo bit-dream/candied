@@ -145,9 +145,9 @@ test('Add and Remove Signals', () => {
 
 test('Float and Double Creation', () => {
   const dbc = new Dbc();
-  const signal1 = dbc.createSignal('TestSignal', 0, 32, {isFloat: true});
-  const signal2 = dbc.createSignal('TestSignal', 0, 64, {isFloat: true});
+  const signal1 = dbc.createSignal('TestSignal', 0, 32, { isFloat: true });
+  const signal2 = dbc.createSignal('TestSignal', 0, 64, { isFloat: true });
 
-  expect(signal1).toEqual(expect.objectContaining({dataType: 'float'}));
-  expect(signal2).toEqual(expect.objectContaining({dataType: 'double',}));
+  expect(signal1).toEqual(expect.objectContaining({ dataType: 'float' }));
+  expect(signal2).toEqual(expect.objectContaining({ dataType: 'double' }));
 });
