@@ -194,7 +194,7 @@ export default class DbcParser extends Parser {
   private addSignal(dbc: DbcData, data: CanSignal) {
     const signal = {} as Signal;
     signal.name = data.name;
-    signal.endianness = data.endian === 'Motorola' ? 'Motorola' : 'Intel';
+    signal.endian = data.endian === 'Motorola' ? 'Motorola' : 'Intel';
     signal.startBit = data.start_bit;
     signal.length = data.length;
     signal.signed = data.signed;

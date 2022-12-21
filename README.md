@@ -248,11 +248,7 @@ At minimum name, start bit, and length need to be supplied
 const dbc = new Dbc();
 
 // Create message expects at minimum a name, ID, and DLC.
-const signal = dbc.createSignal(
-    'MySignalName', // signal name
-    3, // start bit
-    8 // signal length
-)
+const signal = dbc.createSignal('MySignalName', 3, 8)
 
 const msg1 = dbc.createMessage('MyMessageName', 100, 8);
 dbc.addMessage(msg1);
@@ -262,11 +258,7 @@ dbc.addMessage(msg1);
 dbc.addSignal('MyMessageName', signal);
 
 // Just like addMessage(), addSignal() can optionally take an array of signals
-const signal2 = dbc.createSignal(
-    'MySignalName2', // signal name
-    16, // start bit
-    8 // signal length
-);
+const signal2 = dbc.createSignal('MySignalName2', 16, 8);
 
 dbc.addSignal('MyMessageName', [signal, signal2]);
 

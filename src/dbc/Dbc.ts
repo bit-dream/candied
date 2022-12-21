@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
 import Writer from './Writer';
@@ -72,18 +71,9 @@ class Dbc {
     name: string,
     id: number,
     dlc: number,
-    options?: {
-      signals?: Signals;
-      attributes?: Attributes;
-      signalGroups?: SignalGroups;
-      sendingNode?: string;
-      description?: string;
-    },
+    options?: AdditionalMessageOptions,
   ): Message {
-    if (dlc > 8) {
-      throw new Error(`DLC can not be larger than 8 bytes, received ${dlc}`);
-    }
-
+    // TODO: Check that ID does not exceed max range
     let [sendingNode, description]: [string | null, string | null] = [null, null];
     let [signals, attributes, signalGroups]: [Signals, Attributes, SignalGroups] = [new Map(), new Map(), new Map()];
     if (options) {
@@ -115,7 +105,17 @@ class Dbc {
       signalGroups,
       add: () => {
         this.addMessage(message);
+        return message;
       },
+      addSignal: (signalName, startBit, length: number, additionalOptions?: AdditionalMessageOptions) => {
+          const signal = this.createSignal(
+              signalName,
+              startBit,
+              length,
+              additionalOptions);
+          this.addSignal(message.name, signal);
+          return message;
+      }
     };
     return message;
   }
@@ -149,30 +149,38 @@ class Dbc {
   }
 
   createSignal(
-    name: string,
-    startBit: number,
-    length: number,
-    signed: boolean = false,
-    endianness: EndianType = 'Intel',
-    min: number = 0,
-    max: number = 0,
-    factor: number = 1,
-    offset: number = 0,
-    unit: string | null = null,
-    description: string | null = null,
-    multiplex: string | null = null,
-    receivingNodes: string[] = new Array(),
-    valueTable: ValueTable | null = null,
+      name: string,
+      startBit: number,
+      length: number,
+      options?: AdditionalSignalOptions
   ) {
-    if (!unit) {
-      unit = '';
-    }
+
+    let min: number; let max: number; let factor: number; let offset: number;
+    let isFloat: boolean; let signed: boolean; let endian: EndianType; let dataType: DataType;
+    let unit: string; let description: string|null; let multiplex: string|null;
+    let receivingNodes: string[]; let valueTable: ValueTable; let attributes: Attributes;
+
+    options && options.signed ? signed = options.signed : signed = false;
+    options && options.endian ? endian = options.endian : endian = 'Intel';
+    options && options.min ? min = options.min : min = 0;
+    options && options.max ? max = options.max : max = 0;
+    options && options.offset ? offset = options.offset : offset = 0;
+    options && options.factor ? factor = options.factor : factor = 1;
+    options && options.isFloat ? isFloat = options.isFloat : isFloat = false;
+    options && options.unit ? unit = options.unit :unit = '';
+    options && options.description ? description = options.description : description = null;
+    options && options.multiplex ? multiplex = options.multiplex : multiplex = null;
+    options && options.receivingNodes ? receivingNodes = options.receivingNodes : receivingNodes = [];
+    options && options.valueTable ? valueTable = options.valueTable : valueTable = new Map();
+    options && options.attributes ? attributes = options.attributes : attributes = new Map();
+    dataType = computeDataType(length,signed,isFloat);
+
     const signal: Signal = {
       name,
       multiplex,
       startBit,
       length,
-      endianness,
+      endian,
       signed,
       factor,
       offset,
@@ -182,8 +190,8 @@ class Dbc {
       receivingNodes,
       description,
       valueTable,
-      attributes: new Map(),
-      dataType: undefined,
+      attributes,
+      dataType,
     };
     return signal;
   }
@@ -418,12 +426,27 @@ export default Dbc;
 
 export type Signals = Map<string, Signal>;
 
+export type AdditionalSignalOptions = {
+  signed?: boolean;
+  endian?: EndianType;
+  min?: number;
+  max?: number;
+  factor?: number;
+  offset?: number;
+  isFloat?: boolean;
+  unit?: string;
+  description?: string;
+  multiplex?: string;
+  receivingNodes?: string[];
+  valueTable?: ValueTable;
+  attributes?: Attributes;
+}
 export type Signal = {
   name: string;
   multiplex: string | null;
   startBit: number;
   length: number;
-  endianness: EndianType;
+  endian: EndianType;
   signed: boolean;
   factor: number;
   offset: number;
@@ -445,6 +468,13 @@ export type SignalGroup = {
   signals: string[];
 };
 
+export type AdditionalMessageOptions = {
+  signals?: Signals;
+  attributes?: Attributes;
+  signalGroups?: SignalGroups;
+  sendingNode?: string;
+  description?: string;
+}
 export type Message = {
   name: string;
   id: number;
@@ -454,7 +484,8 @@ export type Message = {
   description: string | null;
   attributes: Attributes;
   signalGroups: SignalGroups;
-  add: () => void;
+  add: () => Message;
+  addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';

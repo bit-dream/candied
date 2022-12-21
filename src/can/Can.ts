@@ -166,7 +166,7 @@ class Can extends BitUtils {
       payload,
       signal.startBit,
       signal.length,
-      signal.endianness,
+      signal.endian,
       signal.signed,
     );
 

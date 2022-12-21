@@ -14,10 +14,12 @@ export { Can };
 
 const dbc = new Dbc();
 
-const msg1 = dbc.createMessage('TestMessage', 100, 8);
-console.log(dbc.data);
-msg1.add();
-console.log(dbc.data);
+dbc.createMessage('TestMessage', 100, 8)
+    .add()
+    .addSignal('TestSignal1',0,8, {signed: true})
+    .addSignal('TestSignal2',10,10)
+    .addSignal('TestSignal3',20,32,{isFloat: true, max: 100})
+    .addSignal('TestSignal4',20,10,{unit: '%', max: 20})
 
-const msg2 = dbc.createMessage('TestMessage2', 200, 10).add();
-console.log(dbc.data);
+console.log(dbc.data.messages.get('TestMessage')?.signals)
+

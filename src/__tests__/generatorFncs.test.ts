@@ -64,22 +64,7 @@ test('Create Simple Signal Object', () => {
 
 test('Create Complex Signal Object', () => {
   const dbc = new Dbc();
-  const signal = dbc.createSignal(
-    'TestSignal',
-    0,
-    32,
-    true,
-    'Motorola',
-    0,
-    1000,
-    2,
-    0,
-    'mV',
-    'Test Signal',
-    null,
-    ['Node1'],
-    null,
-  );
+  const signal = dbc.createSignal('TestSignal', 0, 32);
 
   expect(signal).toEqual({
     name: 'TestSignal',

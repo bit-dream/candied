@@ -157,7 +157,7 @@ class Writer {
    * @param signal Signal to be writen to dbc file
    */
   writeSignal(signal: Signal) {
-    const endian = signal.endianness === 'Motorola' ? '0' : '1';
+    const endian = signal.endian === 'Motorola' ? '0' : '1';
     const sign = signal.signed ? '-' : '+';
     const nodes = signal.receivingNodes.length === 0 ? 'Vector___XXXX' : signal.receivingNodes.join(',');
     const name = signal.multiplex ? signal.name + ' ' + signal.multiplex : signal.name;
