@@ -373,7 +373,7 @@ class Dbc {
    * @param pretty Determines if JSON output should be formatted. Defaults to true.
    * @returns JSON representation of loaded DBC data
    */
-  toJson(pretty = true) {
+  toJson( options?: {pretty: boolean;}) {
     const replacer = (key: any, value: any) => {
       if (value instanceof Map) {
         if (key === 'valueTable' || key === 'valueTables') {
@@ -385,7 +385,8 @@ class Dbc {
       }
     };
 
-    let indent = 0;
+    let indent = 0; let pretty: boolean;
+    options && options.pretty ? pretty = options.pretty : pretty = true;
     if (pretty) {
       indent = 2;
     }

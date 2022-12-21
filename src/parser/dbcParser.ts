@@ -477,7 +477,16 @@ export default class DbcParser extends Parser {
     }
   }
 
-  private addSignalValType(dbc: DbcData, data: SigValType) {}
+  private addSignalValType(dbc: DbcData, data: SigValType) {
+    switch (data.type) {
+      case 1:
+        break;
+      case 2:
+        break;
+      default:
+        break;
+    }
+  }
 
   private convert2EnvType(type: string): EnvType {
     switch (type) {
