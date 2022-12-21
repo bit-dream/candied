@@ -1,37 +1,7 @@
-import { DbcData, EndianType, Message, Signal } from '../dbc/DbcTypes';
 import { InvalidPayloadLength } from './Errors';
 import BitUtils from './BitUtils';
-
-export type Frame = {
-  id: number;
-  dlc: number;
-  isExtended: boolean;
-  payload: Payload;
-};
-
-export type BoundMessage = {
-  boundData: {
-    message: Message;
-    frame: Frame;
-  };
-  boundSignals: Map<string, BoundSignal>;
-  id: number;
-  name: string;
-  setSignalValue: (signal: string, value: number) => {};
-};
-
-export type BoundSignal = {
-  boundData: {
-    signal: Signal;
-    payload: Payload;
-  };
-  value: number;
-  rawValue: number;
-  physValue: string;
-  setValue: (value: number) => {};
-};
-
-export type Payload = number[];
+import { EndianType } from '../shared/DataTypes';
+import { DbcData, Message, Signal } from '../dbc/Dbc';
 
 /**
  * The Can class offers utility functions that aid in the processing of general CAN data/information
@@ -192,13 +162,7 @@ class Can extends BitUtils {
    * @param signal Signal
    */
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
-    const rawValue = this.extractValFromPayload(
-      payload,
-      signal.startBit,
-      signal.length,
-      signal.endianness,
-      signal.signed,
-    );
+    const rawValue = this.extractValFromPayload(payload, signal.startBit, signal.length, signal.endian, signal.signed);
 
     const signalValues = this.applyPropsToSignalValue(signal, rawValue);
     return {
@@ -330,3 +294,34 @@ class Can extends BitUtils {
   }
 }
 export default Can;
+
+export type Frame = {
+  id: number;
+  dlc: number;
+  isExtended: boolean;
+  payload: Payload;
+};
+
+export type BoundMessage = {
+  boundData: {
+    message: Message;
+    frame: Frame;
+  };
+  boundSignals: Map<string, BoundSignal>;
+  id: number;
+  name: string;
+  setSignalValue: (signal: string, value: number) => {};
+};
+
+export type BoundSignal = {
+  boundData: {
+    signal: Signal;
+    payload: Payload;
+  };
+  value: number;
+  rawValue: number;
+  physValue: string;
+  setValue: (value: number) => {};
+};
+
+export type Payload = number[];

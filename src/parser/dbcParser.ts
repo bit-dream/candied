@@ -1,17 +1,4 @@
 import {
-  DbcData,
-  Message,
-  Signal,
-  EndianType,
-  ValueTable,
-  Node,
-  Attribute,
-  AttributeDataType,
-  EnvironmentVariable,
-  EnvType,
-  AccessType,
-} from '../dbc/DbcTypes';
-import {
   ASTKinds,
   ASTNodeIntf,
   Parser,
@@ -40,7 +27,21 @@ import {
   EnvironmentAttribute,
   EnvironmentVal,
   CanSignalGroup,
+  SigValType,
 } from '../parser/parser';
+import { computeDataType, EndianType } from '../shared/DataTypes';
+import {
+  AccessType,
+  Attribute,
+  AttributeDataType,
+  DbcData,
+  EnvironmentVariable,
+  EnvType,
+  Message,
+  Node,
+  Signal,
+  ValueTable,
+} from '../dbc/Dbc';
 
 export default class DbcParser extends Parser {
   parseResult: ParseResult;
@@ -126,6 +127,9 @@ export default class DbcParser extends Parser {
         case ASTKinds.CanSignalGroup:
           this.addSignalGroup(data, this.parseResult.ast);
           break;
+        case ASTKinds.SigValType:
+          this.addSignalValType(data, this.parseResult.ast);
+          break;
       }
     }
     return data;
@@ -190,7 +194,7 @@ export default class DbcParser extends Parser {
   private addSignal(dbc: DbcData, data: CanSignal) {
     const signal = {} as Signal;
     signal.name = data.name;
-    signal.endianness = data.endian === 'Motorola' ? 'Motorola' : 'Intel';
+    signal.endian = data.endian === 'Motorola' ? 'Motorola' : 'Intel';
     signal.startBit = data.start_bit;
     signal.length = data.length;
     signal.signed = data.signed;
@@ -204,6 +208,7 @@ export default class DbcParser extends Parser {
     signal.valueTable = null;
     signal.description = null;
     signal.attributes = new Map();
+    signal.dataType = computeDataType(signal.length, signal.signed);
     /* Signals come directly after a message tag, so we can just append
             the current signal instance to the last message found in the array */
     const messageList = Array.from(dbc.messages.keys());
@@ -469,6 +474,27 @@ export default class DbcParser extends Parser {
           signals: data.signals,
         };
         msg.signalGroups.set(data.name, groupData);
+      }
+    }
+  }
+
+  private addSignalValType(dbc: DbcData, data: SigValType) {
+    const msgName = this.getMessageNameFromId(dbc, data.id);
+    if (msgName) {
+      const msg = dbc.messages.get(msgName);
+      if (msg) {
+        const signal = msg.signals.get(data.name);
+        if (signal) {
+          switch (data.type) {
+            // TODO: Should we enforce that the data type is float/double even if bits dont match?
+            case 1:
+              signal.dataType = computeDataType(signal.length, signal.signed, true);
+              break;
+            case 2:
+              signal.dataType = computeDataType(signal.length, signal.signed, true);
+              break;
+          }
+        }
       }
     }
   }

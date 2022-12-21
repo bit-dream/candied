@@ -8,7 +8,7 @@
  * Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
  * GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
  * Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
- * EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
+ * EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup | SigValType
  * BlankLine := ''$
  * CanSignalGroup := 'SIG_GROUP_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s+' raw_group_number={'[0-9]+'} '\s+:\s*' raw_signal_string={'[a-zA-Z0-9_\s]*'} '\s*'
  *     .signals = string[] { return raw_signal_string.replace(';', '').split(' '); }
@@ -93,6 +93,9 @@
  *     .id = number {return parseInt(extractAttrId(this.type,raw),10);}
  *     .signal = string {return extractAttrSignalName(this.type,raw);}
  *     .value = string {return extractAttrVal(this.type,raw);}
+ * SigValType := 'SIG_VALTYPE_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' raw_type={'1|2'}
+ *     .id = number {return parseInt(raw_id,10);}
+ *     .type = number {return parseInt(raw_type,10);}
  */
 
 import {
@@ -141,6 +144,7 @@ export enum ASTKinds {
   Choice_25 = 'Choice_25',
   Choice_26 = 'Choice_26',
   Choice_27 = 'Choice_27',
+  Choice_28 = 'Choice_28',
   BlankLine = 'BlankLine',
   CanSignalGroup = 'CanSignalGroup',
   CanSignalGroup_$0 = 'CanSignalGroup_$0',
@@ -240,6 +244,10 @@ export enum ASTKinds {
   AttributeValue = 'AttributeValue',
   AttributeValue_$0 = 'AttributeValue_$0',
   AttributeValue_$1 = 'AttributeValue_$1',
+  SigValType = 'SigValType',
+  SigValType_$0 = 'SigValType_$0',
+  SigValType_$1 = 'SigValType_$1',
+  SigValType_$2 = 'SigValType_$2',
   $EOF = '$EOF',
 }
 export type Choice =
@@ -269,7 +277,8 @@ export type Choice =
   | Choice_24
   | Choice_25
   | Choice_26
-  | Choice_27;
+  | Choice_27
+  | Choice_28;
 export type Choice_1 = CanNode;
 export type Choice_2 = CanMessage;
 export type Choice_3 = CanSignal;
@@ -297,6 +306,7 @@ export type Choice_24 = MessageTransmitter;
 export type Choice_25 = EnvironmentAttribute;
 export type Choice_26 = EnvironmentVal;
 export type Choice_27 = CanSignalGroup;
+export type Choice_28 = SigValType;
 export interface BlankLine {
   kind: ASTKinds.BlankLine;
 }
@@ -891,6 +901,28 @@ export class AttributeValue {
 }
 export type AttributeValue_$0 = string;
 export type AttributeValue_$1 = string;
+export class SigValType {
+  public kind: ASTKinds.SigValType = ASTKinds.SigValType;
+  public raw_id: SigValType_$0;
+  public name: SigValType_$1;
+  public raw_type: SigValType_$2;
+  public id: number;
+  public type: number;
+  constructor(raw_id: SigValType_$0, name: SigValType_$1, raw_type: SigValType_$2) {
+    this.raw_id = raw_id;
+    this.name = name;
+    this.raw_type = raw_type;
+    this.id = ((): number => {
+      return parseInt(raw_id, 10);
+    })();
+    this.type = ((): number => {
+      return parseInt(raw_type, 10);
+    })();
+  }
+}
+export type SigValType_$0 = string;
+export type SigValType_$1 = string;
+export type SigValType_$2 = string;
 export class Parser {
   private readonly input: string;
   private pos: PosInfo;
@@ -936,6 +968,7 @@ export class Parser {
       () => this.matchChoice_25($$dpth + 1, $$cr),
       () => this.matchChoice_26($$dpth + 1, $$cr),
       () => this.matchChoice_27($$dpth + 1, $$cr),
+      () => this.matchChoice_28($$dpth + 1, $$cr),
     ]);
   }
   public matchChoice_1($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_1> {
@@ -1018,6 +1051,9 @@ export class Parser {
   }
   public matchChoice_27($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_27> {
     return this.matchCanSignalGroup($$dpth + 1, $$cr);
+  }
+  public matchChoice_28($$dpth: number, $$cr?: ErrorTracker): Nullable<Choice_28> {
+    return this.matchSigValType($$dpth + 1, $$cr);
   }
   public matchBlankLine($$dpth: number, $$cr?: ErrorTracker): Nullable<BlankLine> {
     return this.run<BlankLine>($$dpth, () => {
@@ -1778,6 +1814,35 @@ export class Parser {
   }
   public matchAttributeValue_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<AttributeValue_$1> {
     return this.regexAccept(String.raw`(?:.*)`, $$dpth + 1, $$cr);
+  }
+  public matchSigValType($$dpth: number, $$cr?: ErrorTracker): Nullable<SigValType> {
+    return this.run<SigValType>($$dpth, () => {
+      let $scope$raw_id: Nullable<SigValType_$0>;
+      let $scope$name: Nullable<SigValType_$1>;
+      let $scope$raw_type: Nullable<SigValType_$2>;
+      let $$res: Nullable<SigValType> = null;
+      if (
+        true &&
+        this.regexAccept(String.raw`(?:SIG_VALTYPE_\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_id = this.matchSigValType_$0($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s+)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$name = this.matchSigValType_$1($$dpth + 1, $$cr)) !== null &&
+        this.regexAccept(String.raw`(?:\s*:\s*)`, $$dpth + 1, $$cr) !== null &&
+        ($scope$raw_type = this.matchSigValType_$2($$dpth + 1, $$cr)) !== null
+      ) {
+        $$res = new SigValType($scope$raw_id, $scope$name, $scope$raw_type);
+      }
+      return $$res;
+    });
+  }
+  public matchSigValType_$0($$dpth: number, $$cr?: ErrorTracker): Nullable<SigValType_$0> {
+    return this.regexAccept(String.raw`(?:[0-9]+)`, $$dpth + 1, $$cr);
+  }
+  public matchSigValType_$1($$dpth: number, $$cr?: ErrorTracker): Nullable<SigValType_$1> {
+    return this.regexAccept(String.raw`(?:[a-zA-Z0-9_]+)`, $$dpth + 1, $$cr);
+  }
+  public matchSigValType_$2($$dpth: number, $$cr?: ErrorTracker): Nullable<SigValType_$2> {
+    return this.regexAccept(String.raw`(?:1|2)`, $$dpth + 1, $$cr);
   }
   public test(): boolean {
     const mrk = this.mark();

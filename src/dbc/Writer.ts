@@ -10,7 +10,7 @@ import {
   SignalGroup,
   TxMessages,
   ValueTable,
-} from './DbcTypes';
+} from './Dbc';
 
 class Writer {
   file: string;
@@ -50,6 +50,7 @@ class Writer {
     this.writeSignalGroups(data.messages);
     this.writeSignalTables(data.messages);
     this.writeEnvVarTables(data.environmentVariables);
+    this.writeSignalDataType(data.messages);
   }
 
   /**
@@ -157,7 +158,7 @@ class Writer {
    * @param signal Signal to be writen to dbc file
    */
   writeSignal(signal: Signal) {
-    const endian = signal.endianness === 'Motorola' ? '0' : '1';
+    const endian = signal.endian === 'Motorola' ? '0' : '1';
     const sign = signal.signed ? '-' : '+';
     const nodes = signal.receivingNodes.length === 0 ? 'Vector___XXXX' : signal.receivingNodes.join(',');
     const name = signal.multiplex ? signal.name + ' ' + signal.multiplex : signal.name;
@@ -454,6 +455,24 @@ class Writer {
         });
       }
     });
+    this.writeLine('');
+  }
+
+  writeSignalDataType(messages: Map<string, Message>) {
+    for (const [name, msg] of messages) {
+      for (const [signalName, signal] of msg.signals) {
+        if (signal.dataType && (signal.dataType === 'float' || signal.dataType === 'double')) {
+          let type: string;
+          if (signal.dataType === 'double') {
+            type = '2';
+          } else {
+            type = '1';
+          }
+          const lineContent = `SIG_VALTYPE_ ${msg.id.toString()} ${signal.name} : ${type};`;
+          this.writeLine(lineContent);
+        }
+      }
+    }
     this.writeLine('');
   }
 }

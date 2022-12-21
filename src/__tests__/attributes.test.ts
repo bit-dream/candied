@@ -1,5 +1,4 @@
-import Dbc from '../dbc/Dbc';
-import { Attribute, Attributes } from '../dbc/DbcTypes';
+import Dbc, { Attribute, Attributes } from '../dbc/Dbc';
 
 test('DBC_template.dbc: Global attributes', (done) => {
   const dbc = new Dbc();
@@ -24,7 +23,7 @@ test('DBC_template.dbc: Global attributes', (done) => {
 test('DBC_template.dbc: Message attributes', (done) => {
   const dbc = new Dbc();
   dbc.load('src/__tests__/testFiles/DBC_template.dbc').then((data) => {
-    let attributes: Attributes = new Map();
+    const attributes: Attributes = new Map();
     const attribute: Attribute = {
       name: 'BOStringAttribute',
       type: 'Message',
@@ -44,7 +43,7 @@ test('DBC_template.dbc: Message attributes', (done) => {
 test('DBC_template.dbc: Signal attributes', (done) => {
   const dbc = new Dbc();
   dbc.load('src/__tests__/testFiles/DBC_template.dbc').then((data) => {
-    let attributes: Attributes = new Map();
+    const attributes: Attributes = new Map();
     const attribute: Attribute = {
       name: 'SGEnumAttribute',
       type: 'Signal',

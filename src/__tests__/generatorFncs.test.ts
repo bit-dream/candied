@@ -4,32 +4,39 @@ test('Create Simple Message Object', () => {
   const dbc = new Dbc();
   const msg = dbc.createMessage('TestMessage', 100, 8);
 
-  expect(msg).toEqual({
-    name: 'TestMessage',
-    id: 100,
-    dlc: 8,
-    sendingNode: null,
-    signals: new Map(),
-    description: null,
-    attributes: new Map(),
-    signalGroups: new Map(),
-  });
+  expect(msg).toEqual(
+    expect.objectContaining({
+      name: 'TestMessage',
+      id: 100,
+      dlc: 8,
+      sendingNode: null,
+      signals: new Map(),
+      description: null,
+      attributes: new Map(),
+      signalGroups: new Map(),
+    }),
+  );
 });
 
 test('Create Complex Message Object', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8, 'Node1', 'Test Description');
-
-  expect(msg).toEqual({
-    name: 'TestMessage',
-    id: 100,
-    dlc: 8,
-    sendingNode: 'Node1',
-    signals: new Map(),
+  const msg = dbc.createMessage('TestMessage', 100, 8, {
     description: 'Test Description',
-    attributes: new Map(),
-    signalGroups: new Map(),
+    sendingNode: 'Node1',
   });
+
+  expect(msg).toEqual(
+    expect.objectContaining({
+      name: 'TestMessage',
+      id: 100,
+      dlc: 8,
+      sendingNode: 'Node1',
+      signals: new Map(),
+      description: 'Test Description',
+      attributes: new Map(),
+      signalGroups: new Map(),
+    }),
+  );
 });
 
 test('Create Simple Signal Object', () => {
@@ -41,7 +48,7 @@ test('Create Simple Signal Object', () => {
     startBit: 0,
     length: 32,
     signed: false,
-    endianness: 'Intel',
+    endian: 'Intel',
     min: 0,
     max: 0,
     factor: 1,
@@ -52,34 +59,28 @@ test('Create Simple Signal Object', () => {
     receivingNodes: new Array(),
     valueTable: null,
     attributes: new Map(),
+    dataType: 'uint32',
   });
 });
 
 test('Create Complex Signal Object', () => {
   const dbc = new Dbc();
-  const signal = dbc.createSignal(
-    'TestSignal',
-    0,
-    32,
-    true,
-    'Motorola',
-    0,
-    1000,
-    2,
-    0,
-    'mV',
-    'Test Signal',
-    null,
-    ['Node1'],
-    null,
-  );
+  const signal = dbc.createSignal('TestSignal', 0, 32, {
+    signed: true,
+    endian: 'Motorola',
+    max: 1000,
+    factor: 2,
+    unit: 'mV',
+    description: 'Test Signal',
+    receivingNodes: ['Node1'],
+  });
 
   expect(signal).toEqual({
     name: 'TestSignal',
     startBit: 0,
     length: 32,
     signed: true,
-    endianness: 'Motorola',
+    endian: 'Motorola',
     min: 0,
     max: 1000,
     factor: 2,
@@ -90,6 +91,7 @@ test('Create Complex Signal Object', () => {
     receivingNodes: ['Node1'],
     valueTable: null,
     attributes: new Map(),
+    dataType: 'int32',
   });
 });
 
@@ -139,4 +141,13 @@ test('Add and Remove Signals', () => {
 
   dbc.removeSignal('TestSignal3', 'TestMessage');
   expect(testMsg?.signals.size).toBe(2);
+});
+
+test('Float and Double Creation', () => {
+  const dbc = new Dbc();
+  const signal1 = dbc.createSignal('TestSignal', 0, 32, { isFloat: true });
+  const signal2 = dbc.createSignal('TestSignal', 0, 64, { isFloat: true });
+
+  expect(signal1).toEqual(expect.objectContaining({ dataType: 'float' }));
+  expect(signal2).toEqual(expect.objectContaining({ dataType: 'double' }));
 });

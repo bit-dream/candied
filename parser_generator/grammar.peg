@@ -7,7 +7,7 @@ extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
-EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup
+EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup | SigValType
 
 BlankLine := ''$
 
@@ -120,3 +120,6 @@ AttributeValue := 'BA_\s+' '"'name={'[a-zA-Z0-9_]+'}'"' '\s' raw={'.*'}
     .signal = string {return extractAttrSignalName(this.type,raw);}
     .value = string {return extractAttrVal(this.type,raw);}
 
+SigValType := 'SIG_VALTYPE_\s+' raw_id={'[0-9]+'} '\s+' name={'[a-zA-Z0-9_]+'} '\s*:\s*' raw_type={'1|2'}
+    .id = number {return parseInt(raw_id,10);}
+    .type = number {return parseInt(raw_type,10);}
