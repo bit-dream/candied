@@ -80,6 +80,10 @@ class Dbc {
     options && options.description ? (description = options.description) : (description = null);
     options && options.sendingNode ? (sendingNode = options.sendingNode) : (sendingNode = null);
 
+    if (sendingNode) {
+      this.data.nodes.set(sendingNode, {name: sendingNode, attributes: new Map(), description: null})
+    }
+
     const message: Message = {
       name,
       id,
@@ -98,6 +102,12 @@ class Dbc {
         this.addSignal(message.name, signal);
         return message;
       },
+      updateDescription: (content: string) => {message.description = content; return message;},
+      updateNode: (node: string) => {
+        message.sendingNode = node;
+        this.data.nodes.set(node, {name: node, attributes: new Map(), description: null})
+        return message;
+      }
     };
     return message;
   }
@@ -160,6 +170,12 @@ class Dbc {
     options && options.valueTable ? (valueTable = options.valueTable) : (valueTable = null);
     options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
     dataType = computeDataType(length, signed, isFloat);
+
+    if (receivingNodes.length) {
+      receivingNodes.forEach((node: string) => {
+        this.data.nodes.set(node, {name: node, attributes: new Map(), description: null})
+      })
+    }
 
     const signal: Signal = {
       name,
@@ -473,6 +489,8 @@ export type Message = {
   signalGroups: SignalGroups;
   add: () => Message;
   addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
+  updateDescription: (content: string) => Message,
+  updateNode: (node: string) => Message
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';

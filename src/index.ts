@@ -11,9 +11,3 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
   module.exports = Object.assign(module.exports.default, module.exports);
 }
 export { Can };
-
-const dbc = new Dbc();
-
-dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/Floats.dbc');
-
-dbc.write('/Users/headquarters/Documents/Code/can-dbc/test.dbc')
