@@ -14,12 +14,6 @@ export { Can };
 
 const dbc = new Dbc();
 
-dbc
-  .createMessage('TestMessage', 100, 8)
-  .add()
-  .addSignal('TestSignal1', 0, 8, { signed: true })
-  .addSignal('TestSignal2', 10, 10)
-  .addSignal('TestSignal3', 20, 32, { isFloat: true, max: 100 })
-  .addSignal('TestSignal4', 20, 10, { unit: '%', max: 20 });
+dbc.loadSync('/Users/headquarters/Documents/Code/can-dbc/src/__tests__/testFiles/Floats.dbc');
 
-console.log(dbc.data.messages.get('TestMessage')?.signals);
+dbc.write('/Users/headquarters/Documents/Code/can-dbc/test.dbc')

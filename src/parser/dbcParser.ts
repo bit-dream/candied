@@ -29,7 +29,7 @@ import {
   CanSignalGroup,
   SigValType,
 } from '../parser/parser';
-import { EndianType } from '../shared/DataTypes';
+import {computeDataType, EndianType} from '../shared/DataTypes';
 import {
   AccessType,
   Attribute,
@@ -208,6 +208,7 @@ export default class DbcParser extends Parser {
     signal.valueTable = null;
     signal.description = null;
     signal.attributes = new Map();
+    signal.dataType = computeDataType(signal.length, signal.signed);
     /* Signals come directly after a message tag, so we can just append
             the current signal instance to the last message found in the array */
     const messageList = Array.from(dbc.messages.keys());
@@ -478,13 +479,23 @@ export default class DbcParser extends Parser {
   }
 
   private addSignalValType(dbc: DbcData, data: SigValType) {
-    switch (data.type) {
-      case 1:
-        break;
-      case 2:
-        break;
-      default:
-        break;
+    const msgName = this.getMessageNameFromId(dbc, data.id);
+    if (msgName) {
+      const msg = dbc.messages.get(msgName);
+      if (msg) {
+        const signal = msg.signals.get(data.name);
+        if (signal) {
+          switch (data.type) {
+            // TODO: Should we enforce that the data type is float/double even if bits dont match?
+            case 1:
+              signal.dataType = computeDataType(signal.length, signal.signed, true);
+              break;
+            case 2:
+              signal.dataType = computeDataType(signal.length, signal.signed, true);
+              break;
+          }
+        }
+      }
     }
   }
 

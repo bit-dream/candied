@@ -50,6 +50,7 @@ class Writer {
     this.writeSignalGroups(data.messages);
     this.writeSignalTables(data.messages);
     this.writeEnvVarTables(data.environmentVariables);
+    this.writeSignalDataType(data.messages);
   }
 
   /**
@@ -454,6 +455,24 @@ class Writer {
         });
       }
     });
+    this.writeLine('');
+  }
+
+  writeSignalDataType(messages: Map<string, Message>) {
+    for (const [name, msg] of messages) {
+      for (const [signalName, signal] of msg.signals) {
+        if (signal.dataType && (signal.dataType === 'float' || signal.dataType === 'double')) {
+          let type: string;
+          if (signal.dataType === 'double') {
+            type = '2';
+          } else {
+            type = '1'
+          }
+          const lineContent = `SIG_VALTYPE_ ${msg.id.toString()} ${signal.name} : ${type};`;
+          this.writeLine(lineContent);
+        }
+      }
+    }
     this.writeLine('');
   }
 }
