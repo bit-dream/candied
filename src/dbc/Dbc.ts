@@ -74,25 +74,13 @@ class Dbc {
     options?: AdditionalMessageOptions,
   ): Message {
     // TODO: Check that ID does not exceed max range
-    let [sendingNode, description]: [string | null, string | null] = [null, null];
-    let [signals, attributes, signalGroups]: [Signals, Attributes, SignalGroups] = [new Map(), new Map(), new Map()];
-    if (options) {
-      if (options.signals) {
-        signals = options.signals;
-      }
-      if (options.attributes) {
-        attributes = options.attributes;
-      }
-      if (options.signalGroups) {
-        signalGroups = options.signalGroups;
-      }
-      if (options.sendingNode) {
-        sendingNode = options.sendingNode;
-      }
-      if (options.description) {
-        description = options.description;
-      }
-    }
+    let signals: Signals; let attributes: Attributes; let signalGroups: SignalGroups;
+    let sendingNode: string|null; let description: string|null;
+    options && options.signals ? signals = options.signals : signals = new Map();
+    options && options.attributes ? attributes = options.attributes : attributes = new Map();
+    options && options.signalGroups ? signalGroups = options.signalGroups : signalGroups = new Map();
+    options && options.description ? description = options.description : description = null;
+    options && options.sendingNode ? sendingNode = options.sendingNode : sendingNode = null;
 
     const message: Message = {
       name,
