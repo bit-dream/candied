@@ -67,20 +67,18 @@ class Dbc {
    * sendingNode, and description
    * @returns Message
    */
-  createMessage(
-    name: string,
-    id: number,
-    dlc: number,
-    options?: AdditionalMessageOptions,
-  ): Message {
+  createMessage(name: string, id: number, dlc: number, options?: AdditionalMessageOptions): Message {
     // TODO: Check that ID does not exceed max range
-    let signals: Signals; let attributes: Attributes; let signalGroups: SignalGroups;
-    let sendingNode: string|null; let description: string|null;
-    options && options.signals ? signals = options.signals : signals = new Map();
-    options && options.attributes ? attributes = options.attributes : attributes = new Map();
-    options && options.signalGroups ? signalGroups = options.signalGroups : signalGroups = new Map();
-    options && options.description ? description = options.description : description = null;
-    options && options.sendingNode ? sendingNode = options.sendingNode : sendingNode = null;
+    let signals: Signals;
+    let attributes: Attributes;
+    let signalGroups: SignalGroups;
+    let sendingNode: string | null;
+    let description: string | null;
+    options && options.signals ? (signals = options.signals) : (signals = new Map());
+    options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
+    options && options.signalGroups ? (signalGroups = options.signalGroups) : (signalGroups = new Map());
+    options && options.description ? (description = options.description) : (description = null);
+    options && options.sendingNode ? (sendingNode = options.sendingNode) : (sendingNode = null);
 
     const message: Message = {
       name,
@@ -96,14 +94,10 @@ class Dbc {
         return message;
       },
       addSignal: (signalName, startBit, length: number, additionalOptions?: AdditionalMessageOptions) => {
-          const signal = this.createSignal(
-              signalName,
-              startBit,
-              length,
-              additionalOptions);
-          this.addSignal(message.name, signal);
-          return message;
-      }
+        const signal = this.createSignal(signalName, startBit, length, additionalOptions);
+        this.addSignal(message.name, signal);
+        return message;
+      },
     };
     return message;
   }
@@ -136,32 +130,36 @@ class Dbc {
     this.data.messages.delete(messageName);
   }
 
-  createSignal(
-      name: string,
-      startBit: number,
-      length: number,
-      options?: AdditionalSignalOptions
-  ) {
+  createSignal(name: string, startBit: number, length: number, options?: AdditionalSignalOptions) {
+    let min: number;
+    let max: number;
+    let factor: number;
+    let offset: number;
+    let isFloat: boolean;
+    let signed: boolean;
+    let endian: EndianType;
+    let dataType: DataType;
+    let unit: string;
+    let description: string | null;
+    let multiplex: string | null;
+    let receivingNodes: string[];
+    let valueTable: ValueTable | null;
+    let attributes: Attributes;
 
-    let min: number; let max: number; let factor: number; let offset: number;
-    let isFloat: boolean; let signed: boolean; let endian: EndianType; let dataType: DataType;
-    let unit: string; let description: string|null; let multiplex: string|null;
-    let receivingNodes: string[]; let valueTable: ValueTable; let attributes: Attributes;
-
-    options && options.signed ? signed = options.signed : signed = false;
-    options && options.endian ? endian = options.endian : endian = 'Intel';
-    options && options.min ? min = options.min : min = 0;
-    options && options.max ? max = options.max : max = 0;
-    options && options.offset ? offset = options.offset : offset = 0;
-    options && options.factor ? factor = options.factor : factor = 1;
-    options && options.isFloat ? isFloat = options.isFloat : isFloat = false;
-    options && options.unit ? unit = options.unit :unit = '';
-    options && options.description ? description = options.description : description = null;
-    options && options.multiplex ? multiplex = options.multiplex : multiplex = null;
-    options && options.receivingNodes ? receivingNodes = options.receivingNodes : receivingNodes = [];
-    options && options.valueTable ? valueTable = options.valueTable : valueTable = new Map();
-    options && options.attributes ? attributes = options.attributes : attributes = new Map();
-    dataType = computeDataType(length,signed,isFloat);
+    options && options.signed ? (signed = options.signed) : (signed = false);
+    options && options.endian ? (endian = options.endian) : (endian = 'Intel');
+    options && options.min ? (min = options.min) : (min = 0);
+    options && options.max ? (max = options.max) : (max = 0);
+    options && options.offset ? (offset = options.offset) : (offset = 0);
+    options && options.factor ? (factor = options.factor) : (factor = 1);
+    options && options.isFloat ? (isFloat = options.isFloat) : (isFloat = false);
+    options && options.unit ? (unit = options.unit) : (unit = '');
+    options && options.description ? (description = options.description) : (description = null);
+    options && options.multiplex ? (multiplex = options.multiplex) : (multiplex = null);
+    options && options.receivingNodes ? (receivingNodes = options.receivingNodes) : (receivingNodes = []);
+    options && options.valueTable ? (valueTable = options.valueTable) : (valueTable = null);
+    options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
+    dataType = computeDataType(length, signed, isFloat);
 
     const signal: Signal = {
       name,
@@ -428,7 +426,7 @@ export type AdditionalSignalOptions = {
   receivingNodes?: string[];
   valueTable?: ValueTable;
   attributes?: Attributes;
-}
+};
 export type Signal = {
   name: string;
   multiplex: string | null;
@@ -462,7 +460,7 @@ export type AdditionalMessageOptions = {
   signalGroups?: SignalGroups;
   sendingNode?: string;
   description?: string;
-}
+};
 export type Message = {
   name: string;
   id: number;

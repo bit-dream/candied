@@ -162,13 +162,7 @@ class Can extends BitUtils {
    * @param signal Signal
    */
   decodeSignal(payload: Payload, signal: Signal): BoundSignal {
-    const rawValue = this.extractValFromPayload(
-      payload,
-      signal.startBit,
-      signal.length,
-      signal.endian,
-      signal.signed,
-    );
+    const rawValue = this.extractValFromPayload(payload, signal.startBit, signal.length, signal.endian, signal.signed);
 
     const signalValues = this.applyPropsToSignalValue(signal, rawValue);
     return {

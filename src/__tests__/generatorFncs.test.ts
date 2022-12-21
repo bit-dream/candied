@@ -48,7 +48,7 @@ test('Create Simple Signal Object', () => {
     startBit: 0,
     length: 32,
     signed: false,
-    endianness: 'Intel',
+    endian: 'Intel',
     min: 0,
     max: 0,
     factor: 1,
@@ -59,19 +59,28 @@ test('Create Simple Signal Object', () => {
     receivingNodes: new Array(),
     valueTable: null,
     attributes: new Map(),
+    dataType: 'uint32',
   });
 });
 
 test('Create Complex Signal Object', () => {
   const dbc = new Dbc();
-  const signal = dbc.createSignal('TestSignal', 0, 32);
+  const signal = dbc.createSignal('TestSignal', 0, 32, {
+    signed: true,
+    endian: 'Motorola',
+    max: 1000,
+    factor: 2,
+    unit: 'mV',
+    description: 'Test Signal',
+    receivingNodes: ['Node1'],
+  });
 
   expect(signal).toEqual({
     name: 'TestSignal',
     startBit: 0,
     length: 32,
     signed: true,
-    endianness: 'Motorola',
+    endian: 'Motorola',
     min: 0,
     max: 1000,
     factor: 2,
@@ -82,6 +91,7 @@ test('Create Complex Signal Object', () => {
     receivingNodes: ['Node1'],
     valueTable: null,
     attributes: new Map(),
+    dataType: 'int32',
   });
 });
 
