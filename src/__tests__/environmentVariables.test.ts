@@ -1,5 +1,5 @@
 import Dbc from '../dbc/Dbc';
-import dbcReader from "../filesystem/DbcReader";
+import dbcReader from '../filesystem/DbcReader';
 
 test('DBC_template_v2.dbc: Environmental Variables Exist', () => {
   const dbc = new Dbc();

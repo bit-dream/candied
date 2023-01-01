@@ -1,5 +1,5 @@
 import Dbc from '../dbc/Dbc';
-import dbcReader from "../filesystem/DbcReader";
+import dbcReader from '../filesystem/DbcReader';
 
 // Async loading tests
 test('DBC_template.dbc: Correct Message Count', () => {

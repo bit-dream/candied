@@ -1,5 +1,5 @@
 import Dbc from '../dbc/Dbc';
-import dbcReader from "../filesystem/DbcReader";
+import dbcReader from '../filesystem/DbcReader';
 
 test('Floats.dbc: Float (single) caught in data', () => {
   const dbc = new Dbc();

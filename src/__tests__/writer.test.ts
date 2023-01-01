@@ -1,8 +1,8 @@
 import Dbc from '../dbc/Dbc';
 import Writer from '../dbc/Writer';
 import * as fs from 'fs';
-import dbcWriter from "../filesystem/DbcWriter";
-import dbcReader from "../filesystem/DbcReader";
+import dbcWriter from '../filesystem/DbcWriter';
+import dbcReader from '../filesystem/DbcReader';
 
 test('DBC_template.dbc: Correct Messages Written to File', (done) => {
   const testFile = 'src/__tests__/testFiles/test.dbc';
@@ -12,7 +12,7 @@ test('DBC_template.dbc: Correct Messages Written to File', (done) => {
   const data = dbc.load(content);
   const writer = new Writer();
   const dbcString = writer.constructFile(data);
-  dbcWriter(testFile,dbcString);
+  dbcWriter(testFile, dbcString);
 
   // Actual
   const writerDbc = new Dbc();
@@ -34,7 +34,7 @@ test('DBC_template.dbc: Correct Signals Written to File', (done) => {
   const data = dbc.load(content);
   const writer = new Writer();
   const dbcString = writer.constructFile(data);
-  dbcWriter(testFile,dbcString);
+  dbcWriter(testFile, dbcString);
 
   // Actual
   const writerDbc = new Dbc();
@@ -58,7 +58,7 @@ test('DBC_template.dbc: Correct Table Values Written to File', (done) => {
   const data = dbc.load(content);
   const writer = new Writer();
   const dbcString = writer.constructFile(data);
-  dbcWriter(testFile,dbcString);
+  dbcWriter(testFile, dbcString);
 
   // Actual
   const writerDbc = new Dbc();
@@ -80,7 +80,7 @@ test('DBC_template.dbc: Correct Signals Tables Written to File', (done) => {
   const data = dbc.load(content);
   const writer = new Writer();
   const dbcString = writer.constructFile(data);
-  dbcWriter(testFile,dbcString);
+  dbcWriter(testFile, dbcString);
 
   // Actual
   const writerDbc = new Dbc();

@@ -1,5 +1,5 @@
 import Dbc from '../dbc/Dbc';
-import dbcReader from "../filesystem/DbcReader";
+import dbcReader from '../filesystem/DbcReader';
 
 test('DBC_template.dbc: Has Signal Groups', () => {
   const dbc = new Dbc();

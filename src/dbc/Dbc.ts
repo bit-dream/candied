@@ -295,7 +295,6 @@ class Dbc {
    * @returns DbcData Data contained in the dbc file
    */
   load(fileContent: string, throwOnError: boolean = false): DbcData {
-
     let data = this.initDbcDataObj();
 
     let lineNum = 1;
@@ -336,7 +335,6 @@ class Dbc {
     writer.constructFile(this.data);
     return writer.dbcString;
   }
-
 
   /**
    *
