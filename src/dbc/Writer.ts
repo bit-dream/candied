@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import {
   Attribute,
   AttributeDataType,
@@ -13,9 +12,9 @@ import {
 } from './Dbc';
 
 class Writer {
-  file: string;
-  constructor(file: string, overwrite = false) {
-    this.file = file;
+  dbcString: string;
+  constructor() {
+    this.dbcString = '';
   }
 
   /**
@@ -24,8 +23,7 @@ class Writer {
    * @param data dbc data loaded or created using main DBC class
    */
   constructFile(data: DbcData) {
-    // This will clear out the file before writing to it
-    fs.writeFileSync(this.file, '', { flag: 'w+' });
+    this.dbcString = '';
     // Main file attributes
     this.writeVersion(data.version ? data.version : '');
     this.writeNamespace(data.newSymbols);
@@ -51,6 +49,8 @@ class Writer {
     this.writeSignalTables(data.messages);
     this.writeEnvVarTables(data.environmentVariables);
     this.writeSignalDataType(data.messages);
+
+    return this.dbcString;
   }
 
   /**
@@ -170,18 +170,6 @@ class Writer {
       ` (${signal.factor.toString()},${signal.offset.toString()}) [${signal.min.toString()}|${signal.max.toString()}] ` +
       `"${signal.unit}" ${nodes}`;
     this.writeLine(lineContent);
-  }
-
-  /**
-   * Main writer function for class. New line character will be added automatically
-   * to each line, so subsquent calls to this function
-   * will automatically start on the next line.
-   *
-   * @param line Line content to write to file
-   * @param skipNextLine If next line should be a blank line
-   */
-  private writeLine(line: string) {
-    fs.writeFileSync(this.file, `${line}\n`, { flag: 'a+' });
   }
 
   writeBaseComment(comment: string) {
@@ -474,6 +462,17 @@ class Writer {
       }
     }
     this.writeLine('');
+  }
+
+  /**
+   * Main writer function for class. New line character will be added automatically
+   * to each line, so subsquent calls to this function
+   * will automatically start on the next line.
+   *
+   * @param line Line content to write to file
+   */
+  private writeLine(line: string) {
+    this.dbcString += `${line}\n`;
   }
 }
 
