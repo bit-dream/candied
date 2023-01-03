@@ -4,11 +4,5 @@
  */
 import Dbc from './dbc/Dbc';
 import Can from './can/Can';
-import dbcReader from './filesystem/DbcReader';
 
-export default Dbc;
-
-if (typeof module === 'object' && typeof module.exports === 'object') {
-  module.exports = Object.assign(module.exports.default, module.exports);
-}
-export { Can };
+export { Dbc, Can };
