@@ -1,7 +1,7 @@
 {
   "name": "candied",
   "version": "1.0.0",
-  "description": "A general purpose tooling library for CAN (Controller Area Network)",
+  "description": "A general purpose CAN (Controller Area Network) toolbox with support for .dbc file parsing, CAN message decoding, and more",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {

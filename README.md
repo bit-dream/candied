@@ -1,4 +1,4 @@
-# **DBC-CAN**
+# **CANDIED**
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/bit-dream/can-dbc)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/dbc-can)
 ![GitHub issues](https://img.shields.io/github/issues-raw/bit-dream/can-dbc)
@@ -10,7 +10,7 @@
 ## A general purpose CAN (Controller Area Network) toolbox with support for .dbc file parsing, CAN message decoding, and more
 <br/>
 
-### What are the goals of DBC-CAN
+### What are the goals of Candied
 The goal of this library is simple - to create useful utilities
 for _Controller Area Networks_ that will allow you to be successful in:
 - Reading and editing common industry CAN file types, such as .dbc, .eds, .a2l, etc.
@@ -27,17 +27,17 @@ if you are interested expanding and developing for this project.
 
 ### Installing the Library
 
-dbc-can is freely available on NPM and can be installed directly using the command
+Candied is freely available on NPM and can be installed directly using the command
 
 
-`npm install dbc-can`
+`npm install candied`
 
 
 ### Importing the Library
 ```js
-    import Dbc from 'dbc-can';
+    import {Dbc} from 'candied';
     // OR
-    const Dbc = require('dbc-can');
+    const Dbc = require('candied');
 ```
 Note that if you are using Node, you may need to include:
 `"type": "module"` in your parent package.json file so that the package can be imported correctly if using ```import```.
@@ -74,7 +74,7 @@ Creating DBC files are a breeze too. This library offers multiple ways of
 creating DBC files from scratch, including structured typing (method chaining).
 
 ```ts
-import Dbc from 'dbc-can';
+import {Dbc} from 'candied';
 
 const dbc = new Dbc();
 dbc.version = '1.0';
@@ -96,7 +96,7 @@ dbc.write();
 
 For an alternative approach we can:
 ```ts
-import Dbc from 'dbc-can';
+import {Dbc} from 'candied';
 
 const dbc = new Dbc();
 dbc.version = '1.0';
@@ -117,40 +117,53 @@ dbc.write();
 #### Loading DBC files
 
 This library offers two ways main ways of loading a DBC file into human-readable content
-- An Asynchronous/Non-blocking method
-- A Synchronous/Blocking Method
+- Web/Browser based loading
+- Node based loading
+
+Candied comes with a sub-folder called `filesystem` that includes
+utility functions that can help with unloading the content of a DBC file.
+The returned content can then be passed to the main `.load()` function
+of the Dbc class instance.
+
+Note: Only import ONE type of utility from the library for your
+target platform. If you try to import the Node based file, and you
+are using tools like webpack, you may encounter build errors because
+of select Node dependencies! The below example shows importing both
+for conciseness.
 
 ```ts
-import Dbc from 'dbc-can';
-
-async function loadData(dbc, file) {
-    const data = await dbc.load(file)
-}
+import {Dbc} from 'candied';
 
 const dbc = new Dbc();
-const file = 'my_file.dbc'
-loadData(dbc, file);
 
-/* OR */
+// Node based file loading
+import dbcReader from "dbc-can/lib/filesystem/DbcReader"
+const fileContent = dbcReader('example.dbc');
+const data = dbc.load(fileContent);
 
-const data = dbc.loadSync(file);
+// Browser based file loading
+import {dbcReader} from "dbc-can/lib/filesystem/DbcWebFs";
+// dbcReader expects a file based/blob based input
+// interface File extends Blob
+const fileContent = dbcReader(file);
+const data = dbc.load(fileContent);
 
 
 ```
 
 #### Decoding CAN Messages
-DBC-CAN has the ability to decode CAN frames to its real world values.
+Candied has the ability to decode CAN frames to its real world values.
 
 ```ts
-import Dbc from 'dbc-can';
-import { CAN } from 'dbc-can';
+import {Dbc, Can} from 'candied';
 
 const dbc = new Dbc();
 
 dbc.load('tesla_can.dbc').then(data=>{
 
     // Can() class allows for creation of CAN frames as well as message decoding
-    const can = new Can(data);
+    const can = new Can();
+    can.database = data;
     const canFrame = can.createFrame(264, [40, 200, 100, 140, 23, 255, 66, 12]);
     // decode takes in type Frame. Returns a bound message type
     /*
@@ -186,10 +199,10 @@ Map(7) {
 ```
 
 ### Exporting to JSON
-DBC-CAN allows you to export loaded or created DBC data directly from the class instance
+Candied allows you to export loaded or created DBC data directly from the class instance
 
 ```ts
-import Dbc from 'dbc-can';
+import {Dbc} from 'candied';
 
 const dbc = new Dbc();
 dbc.loadSync('tesla_can.dbc');
@@ -265,22 +278,11 @@ if you think something else will fit the bill. Use it.
 Suggestions for new tooling are more than welcome.
 <br/>
 
-**package.json**
-
-| Name          | Type          |
-| ------------- |:-------------:|
-| test          | Run all unit test suites       |
-| coverage          | Code coverage report      |
-| build          | Build the typescript files    |
-| format          | Code Formatting      |
-| lint          | Linting      |
-| go          | Quick utility function that will build and run index.ts      |
-| buildparser          | Builds the DBC parser class      |
-| test:debug          | Debug jest test files      |
 
 This project uses TSPeg for its parser generator. As such, a PEG style grammar file is defined
 in the parser_generator folder of this project. If you are making edits to the parsing 
 grammar, `npm run build`  will both build the parser and typescript files for you.
 The parser output gets automatically migrated to the src/parser folder.
+`npm run build` will also create a web based bundle using rollup.
 
 
