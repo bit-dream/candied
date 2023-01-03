@@ -1,7 +1,7 @@
 {
-  "name": "dbc-can",
-  "version": "1.6.0",
-  "description": "A CAN DBC parsing library for javascript/typescript",
+  "name": "candied",
+  "version": "1.0.0",
+  "description": "A general purpose tooling library for CAN (Controller Area Network)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -32,7 +32,11 @@
     "can",
     "can-dbc",
     "parser",
-    "vector"
+    "vector",
+    "controller area network",
+    "dbc parser",
+    "decode",
+    "can decode"
   ],
   "author": "Derek Black",
   "license": "ISC",
