@@ -21,7 +21,8 @@
     "bundle": "rollup --config --bundleConfigAsCjs"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "dist-bundle/**/*"
   ],
   "repository": {
     "type": "git",
