@@ -1,10 +1,12 @@
 import Can, { BoundSignal } from '../can/Can';
 import Dbc from '../dbc/Dbc';
+import dbcReader from '../filesystem/DbcReader';
 
 // All return values validated using Kvaser CANKing
 test('SimpleDBC: Decode TestMessageStandard', (done) => {
   const dbc = new Dbc();
-  const data = dbc.loadSync('src/__tests__/testFiles/SimpleDBC.dbc');
+  const fileContent = dbcReader('src/__tests__/testFiles/SimpleDBC.dbc');
+  const data = dbc.load(fileContent);
   const can = new Can();
   can.database = data;
   const frame = can.createFrame(256, [100, 100, 255, 55, 30, 50, 80, 50]);

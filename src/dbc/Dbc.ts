@@ -1,10 +1,7 @@
-import * as fs from 'fs';
-import * as readline from 'readline';
 import DbcParser from '../parser/dbcParser';
 import Writer from './Writer';
-import { IncorrectFileExtension, MessageDoesNotExist, SignalDoesNotExist } from './Errors';
+import { MessageDoesNotExist, SignalDoesNotExist } from './Errors';
 import { computeDataType, DataType, EndianType } from '../shared/DataTypes';
-import { validateFileExtension } from '../shared/FileHandlers';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -290,66 +287,20 @@ class Dbc {
   }
 
   /**
-   *
-   * @param file string
-   * @returns Promise<DbcData>
-   */
-  async load(file: string, throwOnError: boolean = false): Promise<DbcData> {
-    validateFileExtension(file, '.dbc');
-    const fileStream = fs.createReadStream(file);
-
-    // Note: we use the crlfDelay option to recognize all instances of CR LF
-    // ('\r\n') in input.txt as a single line break.
-    const rl = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
-
-    let data = this.initDbcDataObj();
-
-    let lineNum = 1;
-    const errMap = new Map();
-
-    for await (const line of rl) {
-      const parser = new DbcParser(line);
-      const parseErrors = parser.parseResult.errs;
-      if (parseErrors.length === 0) {
-        data = parser.updateData(data);
-      } else {
-        if (throwOnError) {
-          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
-        }
-        errMap.set(lineNum, parseErrors);
-      }
-      lineNum++;
-    }
-
-    // Set parsing errors
-    this.errors = errMap;
-
-    // Add table data to class instance for future referencing
-    this.data = data;
-    return data;
-  }
-
-  /**
-   * Loads a DBC file syncrhonously, as opposed to the default method 'load', which is
+   * Loads a DBC file, as opposed to the default method 'load', which is
    * a non-blocking/async call whos promise must be caught for the return data to be used.
    *
-   * @param file Full file path to the dbc file, including extension
+   * @param fileContent Full file path to the dbc file, including extension
+   * @param throwOnError
    * @returns DbcData Data contained in the dbc file
    */
-  loadSync(file: string, throwOnError: boolean = false): DbcData {
-    validateFileExtension(file, '.dbc');
-
+  load(fileContent: string, throwOnError: boolean = false): DbcData {
     let data = this.initDbcDataObj();
-
-    const fileContents = fs.readFileSync(file, { encoding: 'ascii' });
 
     let lineNum = 1;
     const errMap = new Map();
 
-    const lines = fileContents.split('\n');
+    const lines = fileContent.split('\n');
     lines.forEach((line) => {
       const parser = new DbcParser(line);
       const parseErrors = parser.parseResult.errs;
@@ -379,10 +330,10 @@ class Dbc {
    * @param filePath Path to the file/dbc to be written to. If it does not exist at the path, the file
    * will automatically be created.
    */
-  write(filePath: string) {
-    validateFileExtension(filePath, '.dbc');
-    const writer = new Writer(filePath);
+  write() {
+    const writer = new Writer();
     writer.constructFile(this.data);
+    return writer.dbcString;
   }
 
   /**

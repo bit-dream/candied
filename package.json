@@ -1,13 +1,13 @@
 {
-  "name": "dbc-can",
-  "version": "1.6.0",
-  "description": "A CAN DBC parsing library for javascript/typescript",
+  "name": "candied",
+  "version": "1.0.0",
+  "description": "A general purpose CAN (Controller Area Network) toolbox with support for .dbc file parsing, CAN message decoding, and more",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json --collectCoverage=true",
     "coverage": "jest --config jestconfig.json --coverage",
-    "build": "npm run buildparser && tsc",
+    "build": "npm run buildparser && tsc && npm run bundle",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
@@ -17,33 +17,47 @@
     "postversion": "git push && git push --tags",
     "go": "npm run build && node lib/index.js",
     "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts",
-    "test:debug": "jest --runInBand"
+    "test:debug": "jest --runInBand",
+    "bundle": "rollup --config --bundleConfigAsCjs"
   },
   "files": [
     "lib/**/*"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bit-dream/can-dbc.git"
+    "url": "git+https://github.com/bit-dream/candied.git"
   },
   "keywords": [
     "dbc",
     "can",
     "can-dbc",
+    "dbc-can",
     "parser",
-    "vector"
+    "vector",
+    "controller area network",
+    "dbc parser",
+    "vector parser",
+    "decode",
+    "can decode",
+    "can reader"
   ],
   "author": "Derek Black",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bit-dream/can-dbc/issues"
+    "url": "https://github.com/bit-dream/candied/issues"
   },
-  "homepage": "https://github.com/bit-dream/can-dbc#readme",
+  "homepage": "https://github.com/bit-dream/candied#readme",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-terser": "^0.2.1",
+    "@rollup/plugin-typescript": "^10.0.1",
     "@types/jest": "^28.1.6",
     "jest": "^28.1.3",
     "prettier": "^2.7.1",
+    "rollup": "^3.9.1",
+    "rollup-plugin-commonjs": "^10.1.0",
     "ts-jest": "^28.0.7",
+    "tslib": "^2.4.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "tspeg": "^3.2.1",

@@ -10,6 +10,6 @@ import { IncorrectFileExtension } from '../dbc/Errors';
 export const validateFileExtension = (file: string, ext: string): void => {
   const fileExt = path.extname(file);
   if (fileExt !== ext) {
-    throw new IncorrectFileExtension(`Function expected a file extension of '.dbc', got ${fileExt}`);
+    throw new Error(`Function expected a file extension of '.dbc', got ${fileExt}`);
   }
 };
