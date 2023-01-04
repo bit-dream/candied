@@ -1,9 +1,9 @@
 # **CANDIED**
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/bit-dream/can-dbc)
-![npm bundle size](https://img.shields.io/bundlephobia/min/dbc-can)
-![GitHub issues](https://img.shields.io/github/issues-raw/bit-dream/can-dbc)
-![npm](https://img.shields.io/npm/dw/dbc-can)
-![license](https://img.shields.io/github/license/bit-dream/can-dbc)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/bit-dream/candied)
+![npm bundle size](https://img.shields.io/bundlephobia/min/candied)
+![GitHub issues](https://img.shields.io/github/issues-raw/bit-dream/candied)
+![npm](https://img.shields.io/npm/dw/candied)
+![license](https://img.shields.io/github/license/bit-dream/candied)
 <br/>
 ![Heading Image](/assets/CAN_NETWORK.png)
 
