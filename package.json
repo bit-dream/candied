@@ -25,25 +25,28 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bit-dream/can-dbc.git"
+    "url": "git+https://github.com/bit-dream/candied.git"
   },
   "keywords": [
     "dbc",
     "can",
     "can-dbc",
+    "dbc-can",
     "parser",
     "vector",
     "controller area network",
     "dbc parser",
+    "vector parser",
     "decode",
-    "can decode"
+    "can decode",
+    "can reader"
   ],
   "author": "Derek Black",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bit-dream/can-dbc/issues"
+    "url": "https://github.com/bit-dream/candied/issues"
   },
-  "homepage": "https://github.com/bit-dream/can-dbc#readme",
+  "homepage": "https://github.com/bit-dream/candied#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-terser": "^0.2.1",
