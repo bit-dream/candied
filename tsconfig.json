@@ -1,15 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "umd",
-      "esModuleInterop": true,
-      "sourceMap": true,
-      "declaration": true,
-      "outDir": "./lib",
-      "strict": true,
-      "downlevelIteration": true,
-      "moduleResolution": "node"
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "**/__tests__/*"]
-  }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true,
+    "downlevelIteration": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
+}
