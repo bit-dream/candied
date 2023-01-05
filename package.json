@@ -2,7 +2,8 @@
   "name": "candied",
   "version": "2.0.1",
   "description": "A general purpose CAN (Controller Area Network) toolbox with support for .dbc file parsing, CAN message decoding, and more",
-  "main": "lib/index.js",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json --collectCoverage=true",
@@ -22,7 +23,8 @@
   },
   "files": [
     "lib/**/*",
-    "dist-bundle/**/*"
+    "dist-bundle/**/*",
+    "dist/**/*"
   ],
   "repository": {
     "type": "git",
