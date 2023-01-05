@@ -1,4 +1,3 @@
-import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 
@@ -8,15 +7,15 @@ export default [
         output: [
             {
                 file: 'dist-bundle/candied.js',
-                format: 'cjs',
-                sourcemap: false
+                format: 'umd',
+                sourcemap: false,
+                name: 'candied'
             }
         ],
         plugins: [
             typescript({
                 module: "ESNext"
             }),
-            commonjs(),
             terser({sourceMap: false})
         ]
     },
@@ -25,7 +24,7 @@ export default [
         output: [
             {
                 file: 'dist-bundle/candied-fs.js',
-                format: 'cjs',
+                format: 'es',
                 sourcemap: false
             }
         ],
@@ -33,7 +32,6 @@ export default [
             typescript({
                 module: "ESNext"
             }),
-            commonjs(),
             terser({sourceMap: false})
         ]
     }

@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
       "target": "es6",
-      "module": "CommonJS",
+      "module": "umd",
       "esModuleInterop": true,
       "sourceMap": true,
       "declaration": true,
       "outDir": "./lib",
       "strict": true,
-      "downlevelIteration": true
+      "downlevelIteration": true,
+      "moduleResolution": "node"
     },
     "include": ["src"],
     "exclude": ["node_modules", "**/__tests__/*"]
