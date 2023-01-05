@@ -33,9 +33,11 @@ Candied is freely available on NPM and can be installed directly using the comma
 `npm install candied`
 
 You can also use a CDN if using the library in the browser:
+```html
+https://cdn.jsdelivr.net/npm/candied@2.0.1/dist-bundle/candied.js
 ```
-https://cdn.jsdelivr.net/npm/candied@2.0.0/dist-bundle/candied.js
-https://cdn.jsdelivr.net/npm/candied@2.0.0/dist-bundle/candied-fs.js
+```html
+https://cdn.jsdelivr.net/npm/candied@2.0.1/dist-bundle/candied-fs.js
 ```
 
 candied-fs houses utility functions, such as `dbcReader()`, that will
