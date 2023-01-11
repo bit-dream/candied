@@ -315,6 +315,11 @@ class Dbc {
       lineNum++;
     });
 
+    // Clean up attributes that are not global/scoped
+    Array.from(data.attributes.entries()).forEach(([key, attribute]) => {
+      if (attribute.type !== 'Global') data.attributes.delete(key);
+    });
+
     // Set parsing errors
     this.errors = errMap;
 

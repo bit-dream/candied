@@ -14,11 +14,11 @@ import { DbcData, Message, Signal } from '../dbc/Dbc';
  */
 class Can extends BitUtils {
   _database: DbcData | undefined;
-  #idMap: Map<number, Message>;
+  idMap: Map<number, Message>;
 
   constructor() {
     super();
-    this.#idMap = new Map();
+    this.idMap = new Map();
   }
 
   /**
@@ -28,7 +28,7 @@ class Can extends BitUtils {
    */
   set database(dbc: DbcData) {
     this._database = dbc;
-    this.#idMap = this.messageMapTransform(this._database.messages);
+    this.idMap = this.messageMapTransform(this._database.messages);
   }
 
   private messageMapTransform(messages: Map<string, Message>): Map<number, Message> {
@@ -109,7 +109,7 @@ class Can extends BitUtils {
   }
 
   private getMessageById(id: number): Message | undefined {
-    return this.#idMap.get(id);
+    return this.idMap.get(id);
   }
 
   private applyPropsToSignalValue(
