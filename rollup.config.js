@@ -1,5 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+
 export default [
     // Default exports for commonjs, es, and umd
     {
@@ -18,6 +20,16 @@ export default [
                 name: 'candied',
                 format: 'umd',
             },
+        ],
+        plugins: [typescript()],
+    },
+    {
+        input: './lib/filesystem/index.js',
+        output: [
+            {
+                file: './dist/filesystem/index.cjs.js',
+                format: 'cjs',
+            }
         ],
         plugins: [typescript()],
     },
