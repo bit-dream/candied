@@ -1,6 +1,6 @@
 {
   "name": "candied",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "A general purpose CAN (Controller Area Network) toolbox with support for .dbc file parsing, CAN message decoding, and more",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
