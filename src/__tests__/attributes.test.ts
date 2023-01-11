@@ -1,4 +1,4 @@
-import Dbc, { Attribute, Attributes } from '../dbc/Dbc';
+import Dbc, { Attribute, Attributes, Message } from '../dbc/Dbc';
 import dbcReader from '../filesystem/DbcReader';
 
 test('DBC_template.dbc: Global attributes', (done) => {
@@ -58,5 +58,20 @@ test('DBC_template.dbc: Signal attributes', (done) => {
   };
   attributes.set('SGEnumAttribute', attribute);
   expect(data.messages.get('CANMessage')?.signals.get('Signal0')?.attributes).toEqual(attributes);
+  done();
+});
+
+test('attributes.dbc: Complex attribute parsing', (done) => {
+  const dbc = new Dbc();
+  const fileContent = dbcReader('src/__tests__/testFiles/attributes.dbc');
+  const data = dbc.load(fileContent);
+  expect(data.messages.size).toBe(16);
+
+  // There should be a total of 14*2 total attributes for messages
+  const totalMsgAttr = Array.from(data.messages.values()).reduce((prev: number, curr: Message): number => {
+    return prev + curr.attributes.size;
+  }, 0);
+  expect(totalMsgAttr).toBe(14 * 2);
+
   done();
 });

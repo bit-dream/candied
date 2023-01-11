@@ -16,7 +16,7 @@
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
-    "go": "npm run build && node lib/index.js",
+    "go": "npm run buildparser && tsc && node lib/index.js",
     "buildparser": "npx tspeg parser_generator/grammar.peg src/parser/parser.ts",
     "test:debug": "jest --runInBand",
     "bundle": "rollup --config --bundleConfigAsCjs"
@@ -52,6 +52,7 @@
   "homepage": "https://github.com/bit-dream/candied#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.2.1",
     "@rollup/plugin-typescript": "^10.0.1",
     "@types/jest": "^28.1.6",

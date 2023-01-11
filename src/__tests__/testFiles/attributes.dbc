@@ -1,0 +1,504 @@
+VERSION ""
+
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: HID_Node3 MainControlModule HID_Node2 HID_Node1 HID_Node0
+
+
+BO_ 2163147540 HIDNode3OutputStatus: 4 HID_Node3
+ SG_ Output8Status : 28|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output7Status : 24|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output6Status : 20|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output5Status : 16|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output4Status : 12|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output3Status : 8|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output2Status : 4|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output1Status : 0|4@1- (1,0) [0|0] ""  MainControlModule
+
+BO_ 2163147538 HIDNode3OutputConfiguration: 8 MainControlModule
+ SG_ Output8Configuration : 63|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output7Configuration : 62|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output6Configuration : 61|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output5Configuration : 60|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output4Configuration : 59|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output3Configuration : 58|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output2Configuration : 57|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ Output1Configuration : 56|1@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ CurrentControlOffset : 48|8@1+ (1,0) [0|0] "mA"  HID_Node3
+ SG_ GainK1 : 40|8@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ GainK0 : 32|8@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ SlewRateOff : 24|8@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ SlewRateOn : 16|8@1+ (1,0) [0|0] ""  HID_Node3
+ SG_ PWMFrequency : 0|16@1+ (1,0) [0|0] "Hz"  HID_Node3
+
+BO_ 2163147537 HIDNode3OutputCommand: 8 MainControlModule
+ SG_ ChannelSelector_7_8 : 60|4@1+ (1,0) [0|2] "ChSel"  HID_Node3
+ SG_ OutputCommand_7_8 : 48|12@1+ (1,0) [0|4000] "mA"  HID_Node3
+ SG_ ChannelSelector_5_6 : 44|4@1+ (1,0) [0|2] "ChSel"  HID_Node3
+ SG_ OutputCommand_5_6 : 32|12@1+ (1,0) [0|4000] "mA"  HID_Node3
+ SG_ ChannelSelector_3_4 : 28|4@1+ (1,0) [0|2] "ChSel"  HID_Node3
+ SG_ OutputCommand_3_4 : 16|12@1+ (1,0) [0|4000] "mA"  HID_Node3
+ SG_ ChannelSelector_1_2 : 12|4@1+ (1,0) [0|2] "ChSel"  HID_Node3
+ SG_ OutputCommand_1_2 : 0|12@1+ (1,0) [0|4000] "mA"  HID_Node3
+
+BO_ 2163147539 HIDNode3InputStatus: 6 HID_Node3
+ SG_ AN3 : 32|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN2 : 16|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN1 : 0|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+
+BO_ 2163147284 HIDNode2OutputStatus: 4 HID_Node2
+ SG_ Output8Status : 28|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output7Status : 24|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output6Status : 20|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output5Status : 16|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output4Status : 12|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output3Status : 8|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output2Status : 4|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output1Status : 0|4@1- (1,0) [0|0] ""  MainControlModule
+
+BO_ 2163147282 HIDNode2OutputConfiguration: 8 MainControlModule
+ SG_ Output8Configuration : 63|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output7Configuration : 62|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output6Configuration : 61|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output5Configuration : 60|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output4Configuration : 59|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output3Configuration : 58|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output2Configuration : 57|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ Output1Configuration : 56|1@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ CurrentControlOffset : 48|8@1+ (1,0) [0|0] "mA"  HID_Node2
+ SG_ GainK1 : 40|8@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ GainK0 : 32|8@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ SlewRateOff : 24|8@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ SlewRateOn : 16|8@1+ (1,0) [0|0] ""  HID_Node2
+ SG_ PWMFrequency : 0|16@1+ (1,0) [0|0] "Hz"  HID_Node2
+
+BO_ 2163147281 HIDNode2OutputCommand: 8 MainControlModule
+ SG_ ChannelSelector_7_8 : 60|4@1+ (1,0) [0|2] "ChSel"  HID_Node2
+ SG_ OutputCommand_7_8 : 48|12@1+ (1,0) [0|4000] "mA"  HID_Node2
+ SG_ ChannelSelector_5_6 : 44|4@1+ (1,0) [0|2] "ChSel"  HID_Node2
+ SG_ OutputCommand_5_6 : 32|12@1+ (1,0) [0|4000] "mA"  HID_Node2
+ SG_ ChannelSelector_3_4 : 28|4@1+ (1,0) [0|2] "ChSel"  HID_Node2
+ SG_ OutputCommand_3_4 : 16|12@1+ (1,0) [0|4000] "mA"  HID_Node2
+ SG_ ChannelSelector_1_2 : 12|4@1+ (1,0) [0|2] "ChSel"  HID_Node2
+ SG_ OutputCommand_1_2 : 0|12@1+ (1,0) [0|4000] "mA"  HID_Node2
+
+BO_ 2163147283 HIDNode2InputStatus: 6 HID_Node2
+ SG_ AN3 : 32|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN2 : 16|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN1 : 0|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+
+BO_ 2163147028 HIDNode1OutputStatus: 4 HID_Node1
+ SG_ Output8Status : 28|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output7Status : 24|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output6Status : 20|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output5Status : 16|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output4Status : 12|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output3Status : 8|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output2Status : 4|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output1Status : 0|4@1- (1,0) [0|0] ""  MainControlModule
+
+BO_ 2163147026 HIDNode1OutputConfiguration: 8 MainControlModule
+ SG_ Output8Configuration : 63|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output7Configuration : 62|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output6Configuration : 61|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output5Configuration : 60|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output4Configuration : 59|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output3Configuration : 58|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output2Configuration : 57|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ Output1Configuration : 56|1@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ CurrentControlOffset : 48|8@1+ (1,0) [0|0] "mA"  HID_Node1
+ SG_ GainK1 : 40|8@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ GainK0 : 32|8@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ SlewRateOff : 24|8@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ SlewRateOn : 16|8@1+ (1,0) [0|0] ""  HID_Node1
+ SG_ PWMFrequency : 0|16@1+ (1,0) [0|0] "Hz"  HID_Node1
+
+BO_ 2163147025 HIDNode1OutputCommand: 8 MainControlModule
+ SG_ ChannelSelector_7_8 : 60|4@1+ (1,0) [0|2] "ChSel"  HID_Node1
+ SG_ OutputCommand_7_8 : 48|12@1+ (1,0) [0|4000] "mA"  HID_Node1
+ SG_ ChannelSelector_5_6 : 44|4@1+ (1,0) [0|2] "ChSel"  HID_Node1
+ SG_ OutputCommand_5_6 : 32|12@1+ (1,0) [0|4000] "mA"  HID_Node1
+ SG_ ChannelSelector_3_4 : 28|4@1+ (1,0) [0|2] "ChSel"  HID_Node1
+ SG_ OutputCommand_3_4 : 16|12@1+ (1,0) [0|4000] "mA"  HID_Node1
+ SG_ ChannelSelector_1_2 : 12|4@1+ (1,0) [0|2] "ChSel"  HID_Node1
+ SG_ OutputCommand_1_2 : 0|12@1+ (1,0) [0|4000] "mA"  HID_Node1
+
+BO_ 2163147027 HIDNode1InputStatus: 6 HID_Node1
+ SG_ AN3 : 32|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN2 : 16|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN1 : 0|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+
+BO_ 2163146770 HIDNode0OutputConfiguration: 8 MainControlModule
+ SG_ Output8Configuration : 63|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output7Configuration : 62|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output6Configuration : 61|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output5Configuration : 60|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output4Configuration : 59|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output3Configuration : 58|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output2Configuration : 57|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ Output1Configuration : 56|1@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ CurrentControlOffset : 48|8@1+ (1,0) [0|0] "mA"  HID_Node0
+ SG_ GainK1 : 40|8@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ GainK0 : 32|8@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ SlewRateOff : 24|8@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ SlewRateOn : 16|8@1+ (1,0) [0|0] ""  HID_Node0
+ SG_ PWMFrequency : 0|16@1+ (1,0) [0|0] "Hz"  HID_Node0
+
+BO_ 2163146769 HIDNode0OutputCommand: 8 MainControlModule
+ SG_ ChannelSelector_7_8 : 60|4@1+ (1,0) [0|2] "ChSel"  HID_Node0
+ SG_ OutputCommand_7_8 : 48|12@1+ (1,0) [0|4000] "mA"  HID_Node0
+ SG_ ChannelSelector_5_6 : 44|4@1+ (1,0) [0|2] "ChSel"  HID_Node0
+ SG_ OutputCommand_5_6 : 32|12@1+ (1,0) [0|4000] "mA"  HID_Node0
+ SG_ ChannelSelector_3_4 : 28|4@1+ (1,0) [0|2] "ChSel"  HID_Node0
+ SG_ OutputCommand_3_4 : 16|12@1+ (1,0) [0|4000] "mA"  HID_Node0
+ SG_ ChannelSelector_1_2 : 12|4@1+ (1,0) [0|2] "ChSel"  HID_Node0
+ SG_ OutputCommand_1_2 : 0|12@1+ (1,0) [0|4000] "mA"  HID_Node0
+
+BO_ 2163146772 HIDNode0OutputStatus: 4 HID_Node0
+ SG_ Output8Status : 28|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output7Status : 24|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output6Status : 20|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output5Status : 16|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output4Status : 12|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output3Status : 8|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output2Status : 4|4@1- (1,0) [0|0] ""  MainControlModule
+ SG_ Output1Status : 0|4@1- (1,0) [0|0] ""  MainControlModule
+
+BO_ 2163146771 HIDNode0InputStatus: 6 HID_Node0
+ SG_ AN3 : 32|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN2 : 16|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+ SG_ AN1 : 0|16@1+ (1,0) [0|65535] "mV"  MainControlModule
+
+
+
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 0;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","not_used","not_used","not_used","not_used","Cyclic","not_used","IfActive","NoMsgSendType";
+BA_DEF_ BU_  "D12" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D11" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D10" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D09" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D08" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D07" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D06" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D05" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D04" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D03" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D02" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "D01" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C12" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C11" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C10" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C09" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C08" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C07" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C06" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C05" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C04" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C03" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C02" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "C01" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B12" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B11" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B10" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B09" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B08" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B07" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B06" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B05" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B04" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B03" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B02" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "B01" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A12" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A11" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A10" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A09" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A08" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A07" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A06" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A05" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A04" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A03" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A02" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "A01" ENUM  "UNDEFINED","STB","STG","VTD","PWM","ECC","Freq","CAN","PWR","GND","RUNTIME_CONFIGURABLE","OTHER";
+BA_DEF_ BU_  "Connector4" STRING ;
+BA_DEF_ BU_  "Connector3" STRING ;
+BA_DEF_ BU_  "Connector2" STRING ;
+BA_DEF_ BU_  "Connector1" STRING ;
+BA_DEF_ BU_  "ECC" INT 0 100;
+BA_DEF_ BU_  "PWM" INT 0 100;
+BA_DEF_ BU_  "Digital" INT 0 100;
+BA_DEF_ BU_  "Freq" INT 0 100;
+BA_DEF_ BU_  "VTD" INT 0 100;
+BA_DEF_ BU_  "STG" INT 0 100;
+BA_DEF_ BU_  "STB" INT 0 100;
+BA_DEF_ BU_  "CANBuses" INT 0 20;
+BA_DEF_ BU_  "Pins" INT 0 100;
+BA_DEF_ BU_  "Manufacturer" STRING ;
+BA_DEF_ BU_  "DeviceDescription" STRING ;
+BA_DEF_ BU_  "PartNumber" INT 0 1000000000;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "GenSigSendType" "";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "";
+BA_DEF_DEF_  "D12" "UNDEFINED";
+BA_DEF_DEF_  "D11" "UNDEFINED";
+BA_DEF_DEF_  "D10" "UNDEFINED";
+BA_DEF_DEF_  "D09" "UNDEFINED";
+BA_DEF_DEF_  "D08" "UNDEFINED";
+BA_DEF_DEF_  "D07" "UNDEFINED";
+BA_DEF_DEF_  "D06" "UNDEFINED";
+BA_DEF_DEF_  "D05" "UNDEFINED";
+BA_DEF_DEF_  "D04" "UNDEFINED";
+BA_DEF_DEF_  "D03" "UNDEFINED";
+BA_DEF_DEF_  "D02" "UNDEFINED";
+BA_DEF_DEF_  "D01" "UNDEFINED";
+BA_DEF_DEF_  "C12" "UNDEFINED";
+BA_DEF_DEF_  "C11" "UNDEFINED";
+BA_DEF_DEF_  "C10" "UNDEFINED";
+BA_DEF_DEF_  "C09" "UNDEFINED";
+BA_DEF_DEF_  "C08" "UNDEFINED";
+BA_DEF_DEF_  "C07" "UNDEFINED";
+BA_DEF_DEF_  "C06" "UNDEFINED";
+BA_DEF_DEF_  "C05" "UNDEFINED";
+BA_DEF_DEF_  "C04" "UNDEFINED";
+BA_DEF_DEF_  "C03" "UNDEFINED";
+BA_DEF_DEF_  "C02" "UNDEFINED";
+BA_DEF_DEF_  "C01" "UNDEFINED";
+BA_DEF_DEF_  "B12" "UNDEFINED";
+BA_DEF_DEF_  "B11" "UNDEFINED";
+BA_DEF_DEF_  "B10" "UNDEFINED";
+BA_DEF_DEF_  "B09" "UNDEFINED";
+BA_DEF_DEF_  "B08" "UNDEFINED";
+BA_DEF_DEF_  "B07" "UNDEFINED";
+BA_DEF_DEF_  "B06" "UNDEFINED";
+BA_DEF_DEF_  "B05" "UNDEFINED";
+BA_DEF_DEF_  "B04" "UNDEFINED";
+BA_DEF_DEF_  "B03" "UNDEFINED";
+BA_DEF_DEF_  "B02" "UNDEFINED";
+BA_DEF_DEF_  "B01" "UNDEFINED";
+BA_DEF_DEF_  "A12" "UNDEFINED";
+BA_DEF_DEF_  "A11" "UNDEFINED";
+BA_DEF_DEF_  "A10" "UNDEFINED";
+BA_DEF_DEF_  "A09" "UNDEFINED";
+BA_DEF_DEF_  "A08" "UNDEFINED";
+BA_DEF_DEF_  "A07" "UNDEFINED";
+BA_DEF_DEF_  "A06" "UNDEFINED";
+BA_DEF_DEF_  "A05" "UNDEFINED";
+BA_DEF_DEF_  "A04" "UNDEFINED";
+BA_DEF_DEF_  "A03" "UNDEFINED";
+BA_DEF_DEF_  "A02" "UNDEFINED";
+BA_DEF_DEF_  "A01" "UNDEFINED";
+BA_DEF_DEF_  "Connector4" "Undefined";
+BA_DEF_DEF_  "Connector3" "Undefined";
+BA_DEF_DEF_  "Connector2" "Undefined";
+BA_DEF_DEF_  "Connector1" "Undefined";
+BA_DEF_DEF_  "ECC" 0;
+BA_DEF_DEF_  "PWM" 0;
+BA_DEF_DEF_  "Digital" 0;
+BA_DEF_DEF_  "Freq" 0;
+BA_DEF_DEF_  "VTD" 0;
+BA_DEF_DEF_  "STG" 0;
+BA_DEF_DEF_  "STB" 0;
+BA_DEF_DEF_  "CANBuses" 1;
+BA_DEF_DEF_  "Pins" 0;
+BA_DEF_DEF_  "Manufacturer" "Undefined";
+BA_DEF_DEF_  "DeviceDescription" "No Description Assigned";
+BA_DEF_DEF_  "PartNumber" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_ "BusType" "CAN";
+BA_ "DBName" "CanNetwork";
+BA_ "B12" BU_ HID_Node3 11;
+BA_ "B11" BU_ HID_Node3 11;
+BA_ "B10" BU_ HID_Node3 3;
+BA_ "B09" BU_ HID_Node3 3;
+BA_ "B08" BU_ HID_Node3 3;
+BA_ "B07" BU_ HID_Node3 8;
+BA_ "B06" BU_ HID_Node3 5;
+BA_ "B05" BU_ HID_Node3 5;
+BA_ "B04" BU_ HID_Node3 5;
+BA_ "B03" BU_ HID_Node3 5;
+BA_ "B02" BU_ HID_Node3 11;
+BA_ "B01" BU_ HID_Node3 11;
+BA_ "VTD" BU_ HID_Node3 3;
+BA_ "PWM" BU_ HID_Node3 8;
+BA_ "ECC" BU_ HID_Node3 8;
+BA_ "PartNumber" BU_ HID_Node3 970324946;
+BA_ "DeviceDescription" BU_ HID_Node3 "Secondary Current Control/Valve Driver Module";
+BA_ "Manufacturer" BU_ HID_Node3 "HED";
+BA_ "Pins" BU_ HID_Node3 24;
+BA_ "A01" BU_ HID_Node3 1;
+BA_ "A02" BU_ HID_Node3 1;
+BA_ "A03" BU_ HID_Node3 2;
+BA_ "A04" BU_ HID_Node3 4;
+BA_ "A05" BU_ HID_Node3 4;
+BA_ "A06" BU_ HID_Node3 8;
+BA_ "A07" BU_ HID_Node3 9;
+BA_ "A08" BU_ HID_Node3 7;
+BA_ "A09" BU_ HID_Node3 7;
+BA_ "A10" BU_ HID_Node3 3;
+BA_ "A11" BU_ HID_Node3 3;
+BA_ "A12" BU_ HID_Node3 5;
+BA_ "CANBuses" BU_ MainControlModule 3;
+BA_ "VTD" BU_ MainControlModule 0;
+BA_ "DeviceDescription" BU_ MainControlModule "Primary Control Module";
+BA_ "Manufacturer" BU_ MainControlModule "HED";
+BA_ "Pins" BU_ MainControlModule 24;
+BA_ "B12" BU_ HID_Node2 11;
+BA_ "B11" BU_ HID_Node2 11;
+BA_ "B10" BU_ HID_Node2 3;
+BA_ "B09" BU_ HID_Node2 3;
+BA_ "B08" BU_ HID_Node2 3;
+BA_ "B07" BU_ HID_Node2 8;
+BA_ "B06" BU_ HID_Node2 5;
+BA_ "B05" BU_ HID_Node2 5;
+BA_ "B04" BU_ HID_Node2 5;
+BA_ "B03" BU_ HID_Node2 5;
+BA_ "B02" BU_ HID_Node2 11;
+BA_ "B01" BU_ HID_Node2 11;
+BA_ "VTD" BU_ HID_Node2 3;
+BA_ "PWM" BU_ HID_Node2 8;
+BA_ "ECC" BU_ HID_Node2 8;
+BA_ "PartNumber" BU_ HID_Node2 970324946;
+BA_ "DeviceDescription" BU_ HID_Node2 "Secondary Current Control/Valve Driver Module";
+BA_ "Manufacturer" BU_ HID_Node2 "HED";
+BA_ "Pins" BU_ HID_Node2 24;
+BA_ "A01" BU_ HID_Node2 1;
+BA_ "A02" BU_ HID_Node2 1;
+BA_ "A03" BU_ HID_Node2 2;
+BA_ "A04" BU_ HID_Node2 4;
+BA_ "A05" BU_ HID_Node2 4;
+BA_ "A06" BU_ HID_Node2 8;
+BA_ "A07" BU_ HID_Node2 9;
+BA_ "A08" BU_ HID_Node2 7;
+BA_ "A09" BU_ HID_Node2 7;
+BA_ "A10" BU_ HID_Node2 3;
+BA_ "A11" BU_ HID_Node2 3;
+BA_ "A12" BU_ HID_Node2 5;
+BA_ "VTD" BU_ HID_Node1 3;
+BA_ "PWM" BU_ HID_Node1 8;
+BA_ "ECC" BU_ HID_Node1 8;
+BA_ "PartNumber" BU_ HID_Node1 970324946;
+BA_ "DeviceDescription" BU_ HID_Node1 "Secondary Current Control/Valve Driver Module";
+BA_ "Manufacturer" BU_ HID_Node1 "HED";
+BA_ "Pins" BU_ HID_Node1 24;
+BA_ "B12" BU_ HID_Node1 11;
+BA_ "B11" BU_ HID_Node1 11;
+BA_ "B10" BU_ HID_Node1 3;
+BA_ "B09" BU_ HID_Node1 3;
+BA_ "B08" BU_ HID_Node1 3;
+BA_ "B07" BU_ HID_Node1 8;
+BA_ "B06" BU_ HID_Node1 5;
+BA_ "B05" BU_ HID_Node1 5;
+BA_ "B04" BU_ HID_Node1 5;
+BA_ "B03" BU_ HID_Node1 5;
+BA_ "B02" BU_ HID_Node1 11;
+BA_ "B01" BU_ HID_Node1 11;
+BA_ "A01" BU_ HID_Node1 1;
+BA_ "A02" BU_ HID_Node1 1;
+BA_ "A03" BU_ HID_Node1 2;
+BA_ "A04" BU_ HID_Node1 4;
+BA_ "A05" BU_ HID_Node1 4;
+BA_ "A06" BU_ HID_Node1 8;
+BA_ "A07" BU_ HID_Node1 9;
+BA_ "A08" BU_ HID_Node1 7;
+BA_ "A09" BU_ HID_Node1 7;
+BA_ "A10" BU_ HID_Node1 3;
+BA_ "A11" BU_ HID_Node1 3;
+BA_ "A12" BU_ HID_Node1 5;
+BA_ "A12" BU_ HID_Node0 11;
+BA_ "A11" BU_ HID_Node0 11;
+BA_ "A10" BU_ HID_Node0 5;
+BA_ "A09" BU_ HID_Node0 5;
+BA_ "A08" BU_ HID_Node0 5;
+BA_ "A07" BU_ HID_Node0 5;
+BA_ "A06" BU_ HID_Node0 8;
+BA_ "A05" BU_ HID_Node0 8;
+BA_ "A04" BU_ HID_Node0 7;
+BA_ "A03" BU_ HID_Node0 7;
+BA_ "A02" BU_ HID_Node0 9;
+BA_ "A01" BU_ HID_Node0 9;
+BA_ "D12" BU_ HID_Node0 0;
+BA_ "B12" BU_ HID_Node0 11;
+BA_ "B11" BU_ HID_Node0 11;
+BA_ "B10" BU_ HID_Node0 3;
+BA_ "B09" BU_ HID_Node0 3;
+BA_ "B08" BU_ HID_Node0 3;
+BA_ "B07" BU_ HID_Node0 8;
+BA_ "B06" BU_ HID_Node0 5;
+BA_ "B05" BU_ HID_Node0 5;
+BA_ "B04" BU_ HID_Node0 5;
+BA_ "B03" BU_ HID_Node0 5;
+BA_ "B02" BU_ HID_Node0 11;
+BA_ "B01" BU_ HID_Node0 11;
+BA_ "ECC" BU_ HID_Node0 8;
+BA_ "PWM" BU_ HID_Node0 8;
+BA_ "VTD" BU_ HID_Node0 3;
+BA_ "Pins" BU_ HID_Node0 24;
+BA_ "Manufacturer" BU_ HID_Node0 "HED";
+BA_ "DeviceDescription" BU_ HID_Node0 "Secondary Current Control/Valve Driver Module";
+BA_ "PartNumber" BU_ HID_Node0 970324946;
+BA_ "GenMsgSendType" BO_ 2163147540 0;
+BA_ "GenMsgCycleTime" BO_ 2163147540 100;
+BA_ "GenMsgSendType" BO_ 2163147538 8;
+BA_ "GenMsgSendType" BO_ 2163147537 0;
+BA_ "GenMsgCycleTime" BO_ 2163147537 50;
+BA_ "GenMsgSendType" BO_ 2163147539 0;
+BA_ "GenMsgCycleTime" BO_ 2163147539 100;
+BA_ "GenMsgSendType" BO_ 2163147284 0;
+BA_ "GenMsgCycleTime" BO_ 2163147284 100;
+BA_ "GenMsgSendType" BO_ 2163147282 8;
+BA_ "GenMsgSendType" BO_ 2163147281 0;
+BA_ "GenMsgCycleTime" BO_ 2163147281 50;
+BA_ "GenMsgSendType" BO_ 2163147283 0;
+BA_ "GenMsgCycleTime" BO_ 2163147283 100;
+BA_ "GenMsgSendType" BO_ 2163147028 0;
+BA_ "GenMsgCycleTime" BO_ 2163147028 100;
+BA_ "GenMsgSendType" BO_ 2163147026 8;
+BA_ "GenMsgSendType" BO_ 2163147025 0;
+BA_ "GenMsgCycleTime" BO_ 2163147025 50;
+BA_ "GenMsgSendType" BO_ 2163147027 0;
+BA_ "GenMsgCycleTime" BO_ 2163147027 100;
+BA_ "GenMsgSendType" BO_ 2163146770 8;
+BA_ "GenMsgSendType" BO_ 2163146769 0;
+BA_ "GenMsgCycleTime" BO_ 2163146769 50;
+BA_ "GenMsgCycleTime" BO_ 2163146772 100;
+BA_ "GenMsgSendType" BO_ 2163146772 0;
+BA_ "GenMsgCycleTime" BO_ 2163146771 100;
+BA_ "GenMsgSendType" BO_ 2163146771 0;

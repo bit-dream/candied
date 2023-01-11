@@ -422,7 +422,6 @@ export default class DbcParser extends Parser {
               const signal = msg.signals.get(data.signal);
               if (signal) {
                 signal.attributes.set(attr.name, attr);
-                dbc.attributes.delete(attr.name);
               }
             }
           }
@@ -432,7 +431,6 @@ export default class DbcParser extends Parser {
             const msg = dbc.messages.get(msgName);
             if (msg) {
               msg.attributes.set(attr.name, attr);
-              dbc.attributes.delete(attr.name);
             }
           }
           break;
@@ -440,7 +438,6 @@ export default class DbcParser extends Parser {
           const node = dbc.nodes.get(data.node);
           if (node) {
             node.attributes.set(attr.name, attr);
-            dbc.attributes.delete(attr.name);
           }
           break;
         case 'Global':
@@ -449,7 +446,6 @@ export default class DbcParser extends Parser {
           const ev = dbc.environmentVariables.get(data.node);
           if (ev) {
             ev.attributes.set(attr.name, attr);
-            dbc.attributes.delete(attr.name);
           }
           break;
         default:
