@@ -354,7 +354,93 @@ class Dbc {
     return attribute;
   }
 
+  addAttribute(attribute: Attribute, options?: {node?: string, id?: number, signalName?: string, evName?: string}) {
+    switch(attribute.type) {
+      case 'Message':
+        if (options && !options.id) {
+          throw new Error('ID is a required option for adding a Message attribute')
+        }
+        if (options?.id) {
+          const msg = this.getMessageById(options.id);
+          msg.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Signal':
+        if (options && !options.id || !options?.signalName) {
+          throw new Error('Signal name/and message ID are required options for adding a Signal attribute')
+        }
+        if (options?.id && options?.signalName) {
+          const signal = this.getSignalByName(
+              options.signalName,
+              this.messageIdToName(options.id)
+          )
+          signal.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Node':
+        if (options && !options.node) {
+          throw new Error('Node name is a required option for adding a Node attribute')
+        }
+        if (options?.node) {
+          const node = this.getNode(options.node);
+          node.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'EnvironmentVariable':
+        if (options && !options.evName) {
+          throw new Error('Environmental Variable name is a required option for adding EV Attribute')
+        }
+        if (options?.evName) {
+          const ev = this.getEnvironmentalVariable(options.evName);
+          ev.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Global':
+        this.data.attributes.set(attribute.name,attribute);
+        break;
+    }
+  }
+
   /**
+   * Returns an environmental variable by name
+   * @param name Name of environmental variable
+   * @throws Error if environmental variable does not exist in database
+   */
+  getEnvironmentalVariable(name: string) {
+    const ev = this.data.environmentVariables.get(name);
+    if (!ev) {
+      throw new Error('${name} is not an existing environmental variable in the database')
+    }
+    return ev;
+  }
+  /**
+   * Returns a node if it exists in the database
+   * @param name Name of the node (string)
+   * @throws Error if node does not exist
+   */
+  getNode(name: string) {
+    const node = this.data.nodes.get(name)
+    if (!node) {
+      throw new Error(`${name} is not an existing node in the database`)
+    }
+    return node;
+  }
+
+  /**
+   * Returns the mapped name in the database based on the supplied CAN ID
+   * @param id Message ID (number)
+   * @throws Error if no message with the corresponding ID exists
+   */
+  messageIdToName(id: number) {
+    const name = this.getMessageById(id).name;
+    if (!name) {
+      throw new Error(`Could not find ${id} in the database`)
+    }
+    return name;
+  }
+
+  /**
+   *
    * Loads a DBC file, as opposed to the default method 'load', which is
    * a non-blocking/async call whose promise must be caught for the return data to be used.
    *
