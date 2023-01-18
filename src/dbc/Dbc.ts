@@ -108,6 +108,7 @@ class Dbc {
         this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
         return message;
       },
+      addAttribute: () => {return {} as Message}
     };
     return message;
   }
@@ -287,8 +288,68 @@ class Dbc {
   }
 
   /**
+   * Convenience method that will create an Attribute object that can be appended to DBC data
+   * @param name Name to be assigned to the attribute
+   * @param type Attribute type: FLOAT, HEX, ENUM, INT, STRING
+   * @param props Required properties of the attribute based on the type provided
+   * @param options Additional attribute options that can be added
+   */
+  createAttribute(name: string, type: AttributeDataType, props?: RequiredAttributeProps, options?: AdditionalAttributeObjects) {
+    let attrType: AttributeType = 'Global';
+    let enumMembers: string[] | null = null;
+    let min: number | null = null;
+    let max: number | null = null;
+    let value: string | null = null;
+    let defaultValue: string | null = null;
+
+    if (props) {
+      if (props.type) attrType = props.type
+
+      if (type === 'ENUM' && !props.enumMembers) {
+        throw new Error('enumMembers is a required property when defining an attribute with type ENUM')
+      } else {
+        if (props.enumMembers) {
+          enumMembers = props.enumMembers;
+        }
+      }
+
+      if (type !== 'ENUM' && type !== 'STRING' && !props.min && !props.max) {
+        throw new Error('min and max are required properties when defining anything other than type ENUM and STRING')
+      } else {
+        if (props.min && props.max) {
+          min = props.min;
+          max = props.max;
+        }
+      }
+
+      if (options) {
+        if (options.defaultValue) {
+          defaultValue = options.defaultValue;
+        } else if (options.value && !options.defaultValue) {
+          value = options.value;
+          defaultValue = value;
+        }
+      }
+    } else if (!props && type !== 'STRING') {
+      throw new Error('Additional attribute properties are required for any type other than STRING')
+    }
+
+    const attribute: Attribute = {
+      name,
+      type: attrType,
+      dataType: type,
+      min,
+      max,
+      options: enumMembers,
+      value,
+      defaultValue
+    }
+    return attribute;
+  }
+
+  /**
    * Loads a DBC file, as opposed to the default method 'load', which is
-   * a non-blocking/async call whos promise must be caught for the return data to be used.
+   * a non-blocking/async call whose promise must be caught for the return data to be used.
    *
    * @param fileContent Full file path to the dbc file, including extension
    * @param throwOnError
@@ -451,6 +512,7 @@ export type Message = {
   addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
   updateDescription: (content: string) => Message;
   updateNode: (node: string) => Message;
+  addAttribute: () => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';
@@ -499,13 +561,18 @@ export type DbcData = {
 };
 export type ValueTable = Map<number, string>;
 
-export type AttributeOptions = {
-  value?: string;
-  defaultValue?: string;
-  options?: string[];
+export type RequiredAttributeProps = {
+  type?: AttributeType
   min?: number;
   max?: number;
-};
+  enumMembers?: string[];
+}
+
+export type AdditionalAttributeObjects = {
+  value?: string;
+  defaultValue?: string;
+}
+
 export type Attributes = Map<string, Attribute>;
 
 export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';
