@@ -108,7 +108,9 @@ class Dbc {
         this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
         return message;
       },
-      addAttribute: () => {return {} as Message}
+      addAttribute: () => {
+        return {} as Message;
+      },
     };
     return message;
   }
@@ -294,7 +296,12 @@ class Dbc {
    * @param props Required properties of the attribute based on the type provided
    * @param options Additional attribute options that can be added
    */
-  createAttribute(name: string, type: AttributeDataType, props?: RequiredAttributeProps, options?: AdditionalAttributeObjects) {
+  createAttribute(
+    name: string,
+    type: AttributeDataType,
+    props?: RequiredAttributeProps,
+    options?: AdditionalAttributeObjects,
+  ) {
     let attrType: AttributeType = 'Global';
     let enumMembers: string[] | null = null;
     let min: number | null = null;
@@ -303,10 +310,10 @@ class Dbc {
     let defaultValue: string | null = null;
 
     if (props) {
-      if (props.type) attrType = props.type
+      if (props.type) attrType = props.type;
 
       if (type === 'ENUM' && !props.enumMembers) {
-        throw new Error('enumMembers is a required property when defining an attribute with type ENUM')
+        throw new Error('enumMembers is a required property when defining an attribute with type ENUM');
       } else {
         if (props.enumMembers) {
           enumMembers = props.enumMembers;
@@ -314,7 +321,7 @@ class Dbc {
       }
 
       if (type !== 'ENUM' && type !== 'STRING' && !props.min && !props.max) {
-        throw new Error('min and max are required properties when defining anything other than type ENUM and STRING')
+        throw new Error('min and max are required properties when defining anything other than type ENUM and STRING');
       } else {
         if (props.min && props.max) {
           min = props.min;
@@ -331,7 +338,7 @@ class Dbc {
         }
       }
     } else if (!props && type !== 'STRING') {
-      throw new Error('Additional attribute properties are required for any type other than STRING')
+      throw new Error('Additional attribute properties are required for any type other than STRING');
     }
 
     const attribute: Attribute = {
@@ -342,8 +349,8 @@ class Dbc {
       max,
       options: enumMembers,
       value,
-      defaultValue
-    }
+      defaultValue,
+    };
     return attribute;
   }
 
@@ -562,16 +569,16 @@ export type DbcData = {
 export type ValueTable = Map<number, string>;
 
 export type RequiredAttributeProps = {
-  type?: AttributeType
+  type?: AttributeType;
   min?: number;
   max?: number;
   enumMembers?: string[];
-}
+};
 
 export type AdditionalAttributeObjects = {
   value?: string;
   defaultValue?: string;
-}
+};
 
 export type Attributes = Map<string, Attribute>;
 

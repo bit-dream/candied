@@ -75,3 +75,20 @@ test('attributes.dbc: Complex attribute parsing', (done) => {
 
   done();
 });
+
+test('DBC_template.dbc: Min option attribute creation', (done) => {
+  const dbc = new Dbc();
+  const attr = dbc.createAttribute('TestAttribute', 'STRING');
+
+  expect(attr).toEqual({
+    name: 'TestAttribute',
+    type: 'Global',
+    dataType: 'STRING',
+    value: null,
+    defaultValue: null,
+    options: null,
+    min: null,
+    max: null,
+  });
+  done();
+});
