@@ -314,7 +314,7 @@ class Dbc {
 
       if (type === 'ENUM' && !props.enumMembers) {
         throw new Error('enumMembers is a required property when defining an attribute with type ENUM');
-      } else {
+      } else if (type === 'ENUM') {
         if (props.enumMembers) {
           enumMembers = props.enumMembers;
         }
@@ -323,16 +323,14 @@ class Dbc {
       if (type !== 'ENUM' && type !== 'STRING' && !props.min && !props.max) {
         throw new Error('min and max are required properties when defining anything other than type ENUM and STRING');
       } else {
-        if (props.min && props.max) {
-          min = props.min;
-          max = props.max;
-        }
+          if (props.min !== undefined) min = props.min;
+          if (props.max !== undefined) max = props.max;
       }
 
       if (options) {
-        if (options.defaultValue) {
+        if (options.defaultValue !== undefined) {
           defaultValue = options.defaultValue;
-        } else if (options.value && !options.defaultValue) {
+        } else if (options.value !== undefined && options.defaultValue === undefined) {
           value = options.value;
           defaultValue = value;
         }
