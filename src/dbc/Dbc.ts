@@ -139,10 +139,22 @@ class Dbc {
     }
   }
 
+  /**
+   * Removes an existing message from the DBC data
+   * @param messageName Name of the message to remove
+   */
   removeMessage(messageName: string) {
-    this.data.messages.delete(messageName);
+    const ret = this.data.messages.delete(messageName);
+    if (!ret) throw new Error(`${messageName} does not exist in the database`)
   }
 
+  /**
+   * Creates a signal based on characteristics such as start bit and length
+   * @param name Name of the signal
+   * @param startBit Bit position of where the signal is to start in the Message bitfield
+   * @param length Length of the signal
+   * @param options Additional options, such as signed, endian, etc.
+   */
   createSignal(name: string, startBit: number, length: number, options?: AdditionalSignalOptions) {
     let min: number;
     let max: number;
@@ -201,9 +213,17 @@ class Dbc {
     return signal;
   }
 
+  /**
+   * Removes a signal from an existing message
+   * @param signalName Name of the signal
+   * @param messageName Name of the message containing the signal
+   */
   removeSignal(signalName: string, messageName: string) {
     const msg = this.getMessageByName(messageName);
-    msg?.signals.delete(signalName);
+    if (msg) {
+      const ret = msg.signals.delete(signalName)
+      if (!ret) throw new Error(`${signalName} does not exist in message ${messageName}`)
+    }
   }
 
   /**
@@ -352,6 +372,11 @@ class Dbc {
     return attribute;
   }
 
+  /**
+   * Adds an existing attribute to the DBC data based on the supplied type
+   * @param attribute Attribute
+   * @param options node, id, signalName, or evName
+   */
   addAttribute(attribute: Attribute, options?: {node?: string, id?: number, signalName?: string, evName?: string}) {
     switch(attribute.type) {
       case 'Message':
