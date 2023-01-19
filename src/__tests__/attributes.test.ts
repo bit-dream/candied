@@ -156,6 +156,46 @@ test('Signal option attribute creation as ENUM with default', (done) => {
   done();
 });
 
+test('Add Signal attribute', (done) => {
+  const dbc = new Dbc();
+  dbc.createMessage('TestMessage',100,8)
+      .add()
+      .addSignal('TestSignal',0,10)
+
+  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
+    type: 'Signal',
+    enumMembers: ['Enum1','Enum2']
+  }, {
+    value: '1'
+  });
+
+  dbc.addAttribute(attr,{signalName: 'TestSignal', id: 100})
+
+  expect(dbc.getSignalByName('TestSignal','TestMessage').attributes.size)
+      .toEqual(1);
+  done();
+});
+
+test('Add Message attribute', (done) => {
+  const dbc = new Dbc();
+  dbc.createMessage('TestMessage',100,8)
+      .add()
+      .addSignal('TestSignal',0,10)
+
+  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
+    type: 'Message',
+    enumMembers: ['Enum1','Enum2']
+  }, {
+    value: '1'
+  });
+
+  dbc.addAttribute(attr,{id: 100})
+
+  expect(dbc.getMessageById(100).attributes.size)
+      .toEqual(1);
+  done();
+});
+
 test('Signal option attribute creation as ENUM with value', (done) => {
   const dbc = new Dbc();
   const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
