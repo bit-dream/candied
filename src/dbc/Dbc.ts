@@ -109,12 +109,13 @@ class Dbc {
         return message;
       },
       addAttribute: (
-          attrName: string,
-          type: AttributeDataType,
-          attrProps?: RequiredAttributeProps,
-          attrOptions?: AdditionalAttributeObjects) => {
-        const attr = this.createAttribute(attrName,type,attrProps,attrOptions);
-        this.addAttribute(attr,{id: message.id})
+        attrName: string,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { id: message.id });
         return message;
       },
     };
@@ -151,7 +152,7 @@ class Dbc {
    */
   removeMessage(messageName: string) {
     const ret = this.data.messages.delete(messageName);
-    if (!ret) throw new Error(`${messageName} does not exist in the database`)
+    if (!ret) throw new Error(`${messageName} does not exist in the database`);
   }
 
   /**
@@ -216,17 +217,18 @@ class Dbc {
       attributes,
       dataType,
       add: (messageName) => {
-        this.addSignal(messageName,signal);
-        return signal
+        this.addSignal(messageName, signal);
+        return signal;
       },
       addAttribute: (
-          attrName: string,
-          messageId: number,
-          type: AttributeDataType,
-          attrProps?: RequiredAttributeProps,
-          attrOptions?: AdditionalAttributeObjects) => {
-        const attr = this.createAttribute(attrName,type,attrProps,attrOptions);
-        this.addAttribute(attr,{id: messageId, signalName: signal.name});
+        attrName: string,
+        messageId: number,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { id: messageId, signalName: signal.name });
         return signal;
       },
     };
@@ -241,8 +243,8 @@ class Dbc {
   removeSignal(signalName: string, messageName: string) {
     const msg = this.getMessageByName(messageName);
     if (msg) {
-      const ret = msg.signals.delete(signalName)
-      if (!ret) throw new Error(`${signalName} does not exist in message ${messageName}`)
+      const ret = msg.signals.delete(signalName);
+      if (!ret) throw new Error(`${signalName} does not exist in message ${messageName}`);
     }
   }
 
@@ -363,8 +365,8 @@ class Dbc {
       if (type !== 'ENUM' && type !== 'STRING' && !props.min && !props.max) {
         throw new Error('min and max are required properties when defining anything other than type ENUM and STRING');
       } else {
-          if (props.min !== undefined) min = props.min;
-          if (props.max !== undefined) max = props.max;
+        if (props.min !== undefined) min = props.min;
+        if (props.max !== undefined) max = props.max;
       }
 
       if (options) {
@@ -397,11 +399,11 @@ class Dbc {
    * @param attribute Attribute
    * @param options node, id, signalName, or evName
    */
-  addAttribute(attribute: Attribute, options?: {node?: string, id?: number, signalName?: string, evName?: string}) {
-    switch(attribute.type) {
+  addAttribute(attribute: Attribute, options?: { node?: string; id?: number; signalName?: string; evName?: string }) {
+    switch (attribute.type) {
       case 'Message':
         if (options && !options.id) {
-          throw new Error('ID is a required option for adding a Message attribute')
+          throw new Error('ID is a required option for adding a Message attribute');
         }
         if (options?.id) {
           const msg = this.getMessageById(options.id);
@@ -409,20 +411,17 @@ class Dbc {
         }
         break;
       case 'Signal':
-        if (options && !options.id || !options?.signalName) {
-          throw new Error('Signal name/and message ID are required options for adding a Signal attribute')
+        if ((options && !options.id) || !options?.signalName) {
+          throw new Error('Signal name/and message ID are required options for adding a Signal attribute');
         }
         if (options?.id && options?.signalName) {
-          const signal = this.getSignalByName(
-              options.signalName,
-              this.messageIdToName(options.id)
-          )
+          const signal = this.getSignalByName(options.signalName, this.messageIdToName(options.id));
           signal.attributes.set(attribute.name, attribute);
         }
         break;
       case 'Node':
         if (options && !options.node) {
-          throw new Error('Node name is a required option for adding a Node attribute')
+          throw new Error('Node name is a required option for adding a Node attribute');
         }
         if (options?.node) {
           const node = this.getNode(options.node);
@@ -431,7 +430,7 @@ class Dbc {
         break;
       case 'EnvironmentVariable':
         if (options && !options.evName) {
-          throw new Error('Environmental Variable name is a required option for adding EV Attribute')
+          throw new Error('Environmental Variable name is a required option for adding EV Attribute');
         }
         if (options?.evName) {
           const ev = this.getEnvironmentalVariable(options.evName);
@@ -439,7 +438,7 @@ class Dbc {
         }
         break;
       case 'Global':
-        this.data.attributes.set(attribute.name,attribute);
+        this.data.attributes.set(attribute.name, attribute);
         break;
     }
   }
@@ -452,7 +451,7 @@ class Dbc {
   getEnvironmentalVariable(name: string) {
     const ev = this.data.environmentVariables.get(name);
     if (!ev) {
-      throw new Error('${name} is not an existing environmental variable in the database')
+      throw new Error('${name} is not an existing environmental variable in the database');
     }
     return ev;
   }
@@ -462,9 +461,9 @@ class Dbc {
    * @throws Error if node does not exist
    */
   getNode(name: string) {
-    const node = this.data.nodes.get(name)
+    const node = this.data.nodes.get(name);
     if (!node) {
-      throw new Error(`${name} is not an existing node in the database`)
+      throw new Error(`${name} is not an existing node in the database`);
     }
     return node;
   }
@@ -477,7 +476,7 @@ class Dbc {
   messageIdToName(id: number) {
     const name = this.getMessageById(id).name;
     if (!name) {
-      throw new Error(`Could not find ${id} in the database`)
+      throw new Error(`Could not find ${id} in the database`);
     }
     return name;
   }
@@ -620,11 +619,12 @@ export type Signal = {
   dataType: DataType | undefined;
   add: (messageName: string) => Signal;
   addAttribute: (
-      attrName: string,
-      messageId: number,
-      type: AttributeDataType,
-      attrProps?: RequiredAttributeProps,
-      attrOptions?: AdditionalAttributeObjects) => Signal;
+    attrName: string,
+    messageId: number,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Signal;
 };
 
 export type SignalGroups = Map<string, SignalGroup>;
@@ -656,10 +656,11 @@ export type Message = {
   updateDescription: (content: string) => Message;
   updateNode: (node: string) => Message;
   addAttribute: (
-      attrName: string,
-      type: AttributeDataType,
-      attrProps?: RequiredAttributeProps,
-      attrOptions?: AdditionalAttributeObjects) => Message;
+    attrName: string,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';

@@ -98,7 +98,7 @@ test('Message option attribute creation as INT', (done) => {
   const attr = dbc.createAttribute('TestAttribute', 'INT', {
     type: 'Message',
     min: 0,
-    max: 10
+    max: 10,
   });
 
   expect(attr).toEqual({
@@ -118,7 +118,7 @@ test('Signal option attribute creation as ENUM', (done) => {
   const dbc = new Dbc();
   const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
     type: 'Signal',
-    enumMembers: ['Enum1','Enum2']
+    enumMembers: ['Enum1', 'Enum2'],
   });
 
   expect(attr).toEqual({
@@ -127,7 +127,7 @@ test('Signal option attribute creation as ENUM', (done) => {
     dataType: 'ENUM',
     value: null,
     defaultValue: null,
-    options: ['Enum1','Enum2'],
+    options: ['Enum1', 'Enum2'],
     min: null,
     max: null,
   });
@@ -136,12 +136,17 @@ test('Signal option attribute creation as ENUM', (done) => {
 
 test('Signal option attribute creation as ENUM with default', (done) => {
   const dbc = new Dbc();
-  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
-    type: 'Signal',
-    enumMembers: ['Enum1','Enum2']
-  }, {
-    defaultValue: '0'
-  });
+  const attr = dbc.createAttribute(
+    'TestAttribute',
+    'ENUM',
+    {
+      type: 'Signal',
+      enumMembers: ['Enum1', 'Enum2'],
+    },
+    {
+      defaultValue: '0',
+    },
+  );
 
   expect(attr).toEqual({
     name: 'TestAttribute',
@@ -149,7 +154,7 @@ test('Signal option attribute creation as ENUM with default', (done) => {
     dataType: 'ENUM',
     value: null,
     defaultValue: '0',
-    options: ['Enum1','Enum2'],
+    options: ['Enum1', 'Enum2'],
     min: null,
     max: null,
   });
@@ -158,52 +163,61 @@ test('Signal option attribute creation as ENUM with default', (done) => {
 
 test('Add Signal attribute', (done) => {
   const dbc = new Dbc();
-  dbc.createMessage('TestMessage',100,8)
-      .add()
-      .addSignal('TestSignal',0,10)
+  dbc.createMessage('TestMessage', 100, 8).add().addSignal('TestSignal', 0, 10);
 
-  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
-    type: 'Signal',
-    enumMembers: ['Enum1','Enum2']
-  }, {
-    value: '1'
-  });
+  const attr = dbc.createAttribute(
+    'TestAttribute',
+    'ENUM',
+    {
+      type: 'Signal',
+      enumMembers: ['Enum1', 'Enum2'],
+    },
+    {
+      value: '1',
+    },
+  );
 
-  dbc.addAttribute(attr,{signalName: 'TestSignal', id: 100})
+  dbc.addAttribute(attr, { signalName: 'TestSignal', id: 100 });
 
-  expect(dbc.getSignalByName('TestSignal','TestMessage').attributes.size)
-      .toEqual(1);
+  expect(dbc.getSignalByName('TestSignal', 'TestMessage').attributes.size).toEqual(1);
   done();
 });
 
 test('Add Message attribute', (done) => {
   const dbc = new Dbc();
-  dbc.createMessage('TestMessage',100,8)
-      .add()
-      .addSignal('TestSignal',0,10)
+  dbc.createMessage('TestMessage', 100, 8).add().addSignal('TestSignal', 0, 10);
 
-  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
-    type: 'Message',
-    enumMembers: ['Enum1','Enum2']
-  }, {
-    value: '1'
-  });
+  const attr = dbc.createAttribute(
+    'TestAttribute',
+    'ENUM',
+    {
+      type: 'Message',
+      enumMembers: ['Enum1', 'Enum2'],
+    },
+    {
+      value: '1',
+    },
+  );
 
-  dbc.addAttribute(attr,{id: 100})
+  dbc.addAttribute(attr, { id: 100 });
 
-  expect(dbc.getMessageById(100).attributes.size)
-      .toEqual(1);
+  expect(dbc.getMessageById(100).attributes.size).toEqual(1);
   done();
 });
 
 test('Signal option attribute creation as ENUM with value', (done) => {
   const dbc = new Dbc();
-  const attr = dbc.createAttribute('TestAttribute', 'ENUM', {
-    type: 'Signal',
-    enumMembers: ['Enum1','Enum2']
-  }, {
-    value: '1'
-  });
+  const attr = dbc.createAttribute(
+    'TestAttribute',
+    'ENUM',
+    {
+      type: 'Signal',
+      enumMembers: ['Enum1', 'Enum2'],
+    },
+    {
+      value: '1',
+    },
+  );
 
   expect(attr).toEqual({
     name: 'TestAttribute',
@@ -211,7 +225,7 @@ test('Signal option attribute creation as ENUM with value', (done) => {
     dataType: 'ENUM',
     value: '1',
     defaultValue: '1',
-    options: ['Enum1','Enum2'],
+    options: ['Enum1', 'Enum2'],
     min: null,
     max: null,
   });
@@ -221,18 +235,12 @@ test('Signal option attribute creation as ENUM with value', (done) => {
 test('Exercise failure modes', async () => {
   const dbc = new Dbc();
   expect(() => {
-    dbc.createAttribute('TestAttribute', 'INT')
-  }).toThrow(
-      'Additional attribute properties are required for any type other than STRING'
-  );
+    dbc.createAttribute('TestAttribute', 'INT');
+  }).toThrow('Additional attribute properties are required for any type other than STRING');
   expect(() => {
-    dbc.createAttribute('TestAttribute', 'INT', {type: 'Message'})
-  }).toThrow(
-      'min and max are required properties when defining anything other than type ENUM and STRING'
-  );
+    dbc.createAttribute('TestAttribute', 'INT', { type: 'Message' });
+  }).toThrow('min and max are required properties when defining anything other than type ENUM and STRING');
   expect(() => {
-    dbc.createAttribute('TestAttribute', 'ENUM', {type: 'Message', min: 0})
-  }).toThrow(
-      'enumMembers is a required property when defining an attribute with type ENUM'
-  );
+    dbc.createAttribute('TestAttribute', 'ENUM', { type: 'Message', min: 0 });
+  }).toThrow('enumMembers is a required property when defining an attribute with type ENUM');
 });
