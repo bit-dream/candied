@@ -48,6 +48,37 @@ class Dbc {
     this.data.description = description;
   }
 
+  createNode(name: string, options?: { description?: string; attributes?: Attributes }) {
+    let description: string | null;
+    let attributes: Attributes;
+    options && options.description ? (description = options.description) : (description = null);
+    options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
+    const node: Node = {
+      name,
+      description,
+      attributes,
+      add: () => {
+        this.data.nodes.set(node.name, node);
+        return node;
+      },
+      updateDescription: (content: string) => {
+        node.description = content;
+        return node;
+      },
+      addAttribute: (
+        attrName: string,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { node: node.name });
+        return node;
+      },
+    };
+    return node;
+  }
+
   /**
    *
    * Creates a Message instance that can later be added using addMessage()
@@ -78,7 +109,7 @@ class Dbc {
     options && options.sendingNode ? (sendingNode = options.sendingNode) : (sendingNode = null);
 
     if (sendingNode) {
-      this.data.nodes.set(sendingNode, { name: sendingNode, attributes: new Map(), description: null });
+      this.createNode(sendingNode).add();
     }
 
     const message: Message = {
@@ -105,7 +136,7 @@ class Dbc {
       },
       updateNode: (node: string) => {
         message.sendingNode = node;
-        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
+        this.createNode(node).add();
         return message;
       },
       addAttribute: (
@@ -195,7 +226,7 @@ class Dbc {
 
     if (receivingNodes.length) {
       receivingNodes.forEach((node: string) => {
-        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
+        this.createNode(node).add();
       });
     }
 
@@ -218,6 +249,10 @@ class Dbc {
       dataType,
       add: (messageName) => {
         this.addSignal(messageName, signal);
+        return signal;
+      },
+      updateDescription: (content: string) => {
+        signal.description = content;
         return signal;
       },
       addAttribute: (
@@ -618,6 +653,7 @@ export type Signal = {
   attributes: Attributes;
   dataType: DataType | undefined;
   add: (messageName: string) => Signal;
+  updateDescription: (content: string) => Signal;
   addAttribute: (
     attrName: string,
     messageId: number,
@@ -687,6 +723,14 @@ export type Node = {
   name: string;
   description: string | null;
   attributes: Attributes;
+  add: () => Node;
+  updateDescription: (content: string) => Node;
+  addAttribute: (
+    attrName: string,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Node;
 };
 
 export type TxMessages = string[];
