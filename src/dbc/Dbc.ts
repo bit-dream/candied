@@ -108,8 +108,14 @@ class Dbc {
         this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
         return message;
       },
-      addAttribute: () => {
-        return {} as Message;
+      addAttribute: (
+          attrName: string,
+          type: AttributeDataType,
+          attrProps?: RequiredAttributeProps,
+          attrOptions?: AdditionalAttributeObjects) => {
+        const attr = this.createAttribute(attrName,type,attrProps,attrOptions);
+        this.addAttribute(attr,{id: message.id})
+        return message;
       },
     };
     return message;
@@ -209,6 +215,20 @@ class Dbc {
       valueTable,
       attributes,
       dataType,
+      add: (messageName) => {
+        this.addSignal(messageName,signal);
+        return signal
+      },
+      addAttribute: (
+          attrName: string,
+          messageId: number,
+          type: AttributeDataType,
+          attrProps?: RequiredAttributeProps,
+          attrOptions?: AdditionalAttributeObjects) => {
+        const attr = this.createAttribute(attrName,type,attrProps,attrOptions);
+        this.addAttribute(attr,{id: messageId, signalName: signal.name});
+        return signal;
+      },
     };
     return signal;
   }
@@ -598,6 +618,13 @@ export type Signal = {
   valueTable: ValueTable | null;
   attributes: Attributes;
   dataType: DataType | undefined;
+  add: (messageName: string) => Signal;
+  addAttribute: (
+      attrName: string,
+      messageId: number,
+      type: AttributeDataType,
+      attrProps?: RequiredAttributeProps,
+      attrOptions?: AdditionalAttributeObjects) => Signal;
 };
 
 export type SignalGroups = Map<string, SignalGroup>;
@@ -628,7 +655,11 @@ export type Message = {
   addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
   updateDescription: (content: string) => Message;
   updateNode: (node: string) => Message;
-  addAttribute: () => Message;
+  addAttribute: (
+      attrName: string,
+      type: AttributeDataType,
+      attrProps?: RequiredAttributeProps,
+      attrOptions?: AdditionalAttributeObjects) => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';
