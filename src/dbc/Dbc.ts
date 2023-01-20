@@ -9,21 +9,14 @@ import { computeDataType, DataType, EndianType } from '../shared/DataTypes';
  *
  * If loading data from an existing file, simply call:
  * const dbc = new Dbc();
- * dbc.load('path/to/my/dbcFile.dbc')
+ * dbc.load(fileContent)
  *
- * load() loads the dbc data async., so to pull the data from the class instance
- * you will either need to wrap the call in an async function or call .then(data)
- * ex. dbc.load('path/to/my/dbcFile.dbc').then( data => DO SOMETHING WITH DATA HERE )
- *
- * By default, when a new Dbc() instance is created, the encapulsated data will be empty.
+ * By default, when a new Dbc() instance is created, the encapsulated data will be empty.
  * If you are wanting to create fresh data you can call createMessage or createSignal to
  * create messages and signals, respectively.
  * Calls to createMessage and createSignal do not by default add the messages to the data,
  * you will need to make subsequent calls to addMessage or addSignal to add the data
  * to the class.
- *
- * To write data to a dbc file, you can call write() function.
- * write() expects a path to the dbc file
  *
  */
 class Dbc {
@@ -334,8 +327,7 @@ class Dbc {
    */
   getMessageByName(name: string) {
     try {
-      const msg = this.data.messages.get(name);
-      return msg;
+      return this.data.messages.get(name);
     } catch (e) {
       throw new MessageDoesNotExist(`No message with name ${name} exists in the database.`);
     }
@@ -539,7 +531,7 @@ class Dbc {
         data = parser.updateData(data);
       } else {
         if (throwOnError) {
-          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
+          throw new Error(`A syntax error occurred on line ${lineNum} - Reason: ${parseErrors}`);
         }
         errMap.set(lineNum, parseErrors);
       }
@@ -562,9 +554,6 @@ class Dbc {
   /**
    *
    * Writes the encapsulated data of a Dbc class instance to a dbc file
-   *
-   * @param filePath Path to the file/dbc to be written to. If it does not exist at the path, the file
-   * will automatically be created.
    */
   write() {
     const writer = new Writer();
@@ -576,10 +565,10 @@ class Dbc {
    *
    * Transforms the internal DBC data from class instance into a JSON object/string
    *
-   * @param pretty Determines if JSON output should be formatted. Defaults to true.
+   * @param options Additional formatting options, such as pretty print.
    * @returns JSON representation of loaded DBC data
    */
-  toJson(options?: { pretty: boolean }) {
+  toJson(options?: { pretty?: boolean, preserveFormat?: boolean }) {
     const replacer = (key: any, value: any) => {
       if (value instanceof Map) {
         if (key === 'valueTable' || key === 'valueTables') {
@@ -597,7 +586,13 @@ class Dbc {
     if (pretty) {
       indent = 2;
     }
-    const json = JSON.stringify(this.data, replacer, indent);
+
+    let json: string;
+    if (options && options.preserveFormat) {
+      json = JSON.stringify(this.data,undefined, indent);
+    } else {
+      json = JSON.stringify(this.data, replacer, indent);
+    }
     return json;
   }
 
@@ -708,7 +703,7 @@ export type EnvironmentVariable = {
   type: EnvType;
   min: number;
   max: number;
-  initalValue: number;
+  initialValue: number;
   evId: number;
   accessType: AccessType;
   accessNode: string;

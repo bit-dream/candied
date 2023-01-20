@@ -164,7 +164,7 @@ export default class DbcParser extends Parser {
     const envVar = {} as EnvironmentVariable;
     envVar.name = data.name;
     envVar.type = this.convert2EnvType(data.type);
-    envVar.initalValue = data.initial_value;
+    envVar.initialValue = data.initial_value;
     envVar.min = data.min;
     envVar.max = data.max;
     envVar.evId = data.ev_id;
