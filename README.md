@@ -34,10 +34,10 @@ Candied is freely available on NPM and can be installed directly using the comma
 
 You can also use a CDN if using the library in the browser:
 ```html
-https://cdn.jsdelivr.net/npm/candied@2.0.2/dist-bundle/candied.js
+https://cdn.jsdelivr.net/npm/candied@2.1.0/dist-bundle/candied.js
 ```
 ```html
-https://cdn.jsdelivr.net/npm/candied@2.0.2/dist-bundle/candied-fs.js
+https://cdn.jsdelivr.net/npm/candied@2.1.0/dist-bundle/candied-fs.js
 ```
 
 candied-fs houses utility functions, such as `dbcReader()`, that will
@@ -97,8 +97,9 @@ dbc.description = 'DBC file for a cars tranmission message';
 const transStaMsg = dbc.createMessage('TransmissionStatusMsg', 100, 8);
 
 transStaMsg.add()
+    .addAttribute('EngineSpeed','INT',{min: 10, max:100})
     .updateDescription('Indicates the status of a cars transmission')
-    .updateNode('EngineECU') // Where the message is going
+    .updateNode('EngineECU') // Where the message is going, automatically generates the node
     .addSignal('OperatingStatus', 0, 10)
     .addSignal('RotationSpeed', 10, 32, {isFloat: true, signed: true, unit: 'RPM'})
     .addSignal('LimpMode', 45, 2, {endian: 'Motorola', max: 3});
@@ -169,31 +170,31 @@ Candied has the ability to decode CAN frames to its real world values.
 
 ```ts
 import {Dbc, Can} from 'candied';
+import dbcReader from "dbc-can/lib/filesystem/DbcReader"
 
 const dbc = new Dbc();
+const fileContent = dbcReader('tesla_can.dbc');
+const data = dbc.load(fileContent)
 
-dbc.load('tesla_can.dbc').then(data=>{
-
-    // Can() class allows for creation of CAN frames as well as message decoding
-    const can = new Can();
-    can.database = data;
-    const canFrame = can.createFrame(264, [40, 200, 100, 140, 23, 255, 66, 12]);
-    // decode takes in type Frame. Returns a bound message type
-    /*
-        name: string;
-        id: number;
-        signals: Map<string, BoundSignal>;
-    */
-    let boundMsg = can.decode(canFrame);
-    /* Bound signals contain: 
-        **Physical value** - Conditioned value that has any units applied, as well as any scaling, factors, and min/max values
-        if any enumerations are attached the signal, the enumeration member will automatically be returned
-        **Value** - Conditioned value that has scaling, factor, and min/max values applied
-        **Raw Value** - Raw value as extracted according to the DBC file
-    */
-    let boundSignals = boundMsg?.signals;
-    console.log(boundSignals);
-});
+// Can() class allows for creation of CAN frames as well as message decoding
+const can = new Can();
+can.database = data;
+const canFrame = can.createFrame(264, [40, 200, 100, 140, 23, 255, 66, 12]);
+// decode takes in type Frame. Returns a bound message type
+/*
+    name: string;
+    id: number;
+    signals: Map<string, BoundSignal>;
+*/
+let boundMsg = can.decode(canFrame);
+/* Bound signals contain: 
+    **Physical value** - Conditioned value that has any units applied, as well as any scaling, factors, and min/max values
+    if any enumerations are attached the signal, the enumeration member will automatically be returned
+    **Value** - Conditioned value that has scaling, factor, and min/max values applied
+    **Raw Value** - Raw value as extracted according to the DBC file
+*/
+let boundSignals = boundMsg?.signals;
+console.log(boundSignals);
 
 /* RETURNS */
 Map(7) {
@@ -218,8 +219,9 @@ Candied allows you to export loaded or created DBC data directly from the class 
 import {Dbc} from 'candied';
 
 const dbc = new Dbc();
-dbc.loadSync('tesla_can.dbc');
-dbc.toJson();
+const fileContent = dbcReader('tesla_can.dbc');
+const data = dbc.load(fileContent)
+dbc.toJson({pretty: true}); // Pretty will print the returned json on multiple lines
 
 ```
 

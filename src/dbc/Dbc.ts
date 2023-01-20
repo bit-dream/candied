@@ -64,6 +64,11 @@ class Dbc {
         attrProps?: RequiredAttributeProps,
         attrOptions?: AdditionalAttributeObjects,
       ) => {
+        if (attrProps) {
+          attrProps.type = 'Node';
+        } else {
+          attrProps = { type: 'Node' };
+        }
         const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
         this.addAttribute(attr, { node: node.name });
         return node;
@@ -138,6 +143,11 @@ class Dbc {
         attrProps?: RequiredAttributeProps,
         attrOptions?: AdditionalAttributeObjects,
       ) => {
+        if (attrProps) {
+          attrProps.type = 'Message';
+        } else {
+          attrProps = { type: 'Message' };
+        }
         const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
         this.addAttribute(attr, { id: message.id });
         return message;
@@ -255,6 +265,11 @@ class Dbc {
         attrProps?: RequiredAttributeProps,
         attrOptions?: AdditionalAttributeObjects,
       ) => {
+        if (attrProps) {
+          attrProps.type = 'Signal';
+        } else {
+          attrProps = { type: 'Signal' };
+        }
         const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
         this.addAttribute(attr, { id: messageId, signalName: signal.name });
         return signal;
@@ -568,7 +583,7 @@ class Dbc {
    * @param options Additional formatting options, such as pretty print.
    * @returns JSON representation of loaded DBC data
    */
-  toJson(options?: { pretty?: boolean, preserveFormat?: boolean }) {
+  toJson(options?: { pretty?: boolean; preserveFormat?: boolean }) {
     const replacer = (key: any, value: any) => {
       if (value instanceof Map) {
         if (key === 'valueTable' || key === 'valueTables') {
@@ -589,7 +604,7 @@ class Dbc {
 
     let json: string;
     if (options && options.preserveFormat) {
-      json = JSON.stringify(this.data,undefined, indent);
+      json = JSON.stringify(this.data, undefined, indent);
     } else {
       json = JSON.stringify(this.data, replacer, indent);
     }

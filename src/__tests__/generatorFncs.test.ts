@@ -4,18 +4,16 @@ test('Create Simple Message Object', () => {
   const dbc = new Dbc();
   const msg = dbc.createMessage('TestMessage', 100, 8);
 
-  expect(msg).toMatchObject(
-    {
-      name: 'TestMessage',
-      id: 100,
-      dlc: 8,
-      sendingNode: null,
-      signals: new Map(),
-      description: null,
-      attributes: new Map(),
-      signalGroups: new Map(),
-    },
-  );
+  expect(msg).toMatchObject({
+    name: 'TestMessage',
+    id: 100,
+    dlc: 8,
+    sendingNode: null,
+    signals: new Map(),
+    description: null,
+    attributes: new Map(),
+    signalGroups: new Map(),
+  });
 });
 
 test('Create Complex Message Object', () => {
