@@ -9,21 +9,14 @@ import { computeDataType, DataType, EndianType } from '../shared/DataTypes';
  *
  * If loading data from an existing file, simply call:
  * const dbc = new Dbc();
- * dbc.load('path/to/my/dbcFile.dbc')
+ * dbc.load(fileContent)
  *
- * load() loads the dbc data async., so to pull the data from the class instance
- * you will either need to wrap the call in an async function or call .then(data)
- * ex. dbc.load('path/to/my/dbcFile.dbc').then( data => DO SOMETHING WITH DATA HERE )
- *
- * By default, when a new Dbc() instance is created, the encapulsated data will be empty.
+ * By default, when a new Dbc() instance is created, the encapsulated data will be empty.
  * If you are wanting to create fresh data you can call createMessage or createSignal to
  * create messages and signals, respectively.
  * Calls to createMessage and createSignal do not by default add the messages to the data,
  * you will need to make subsequent calls to addMessage or addSignal to add the data
  * to the class.
- *
- * To write data to a dbc file, you can call write() function.
- * write() expects a path to the dbc file
  *
  */
 class Dbc {
@@ -46,6 +39,42 @@ class Dbc {
    */
   set description(description: string) {
     this.data.description = description;
+  }
+
+  createNode(name: string, options?: { description?: string; attributes?: Attributes }) {
+    let description: string | null;
+    let attributes: Attributes;
+    options && options.description ? (description = options.description) : (description = null);
+    options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
+    const node: Node = {
+      name,
+      description,
+      attributes,
+      add: () => {
+        this.data.nodes.set(node.name, node);
+        return node;
+      },
+      updateDescription: (content: string) => {
+        node.description = content;
+        return node;
+      },
+      addAttribute: (
+        attrName: string,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        if (attrProps) {
+          attrProps.type = 'Node';
+        } else {
+          attrProps = { type: 'Node' };
+        }
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { node: node.name });
+        return node;
+      },
+    };
+    return node;
   }
 
   /**
@@ -78,7 +107,7 @@ class Dbc {
     options && options.sendingNode ? (sendingNode = options.sendingNode) : (sendingNode = null);
 
     if (sendingNode) {
-      this.data.nodes.set(sendingNode, { name: sendingNode, attributes: new Map(), description: null });
+      this.createNode(sendingNode).add();
     }
 
     const message: Message = {
@@ -105,7 +134,22 @@ class Dbc {
       },
       updateNode: (node: string) => {
         message.sendingNode = node;
-        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
+        this.createNode(node).add();
+        return message;
+      },
+      addAttribute: (
+        attrName: string,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        if (attrProps) {
+          attrProps.type = 'Message';
+        } else {
+          attrProps = { type: 'Message' };
+        }
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { id: message.id });
         return message;
       },
     };
@@ -136,10 +180,22 @@ class Dbc {
     }
   }
 
+  /**
+   * Removes an existing message from the DBC data
+   * @param messageName Name of the message to remove
+   */
   removeMessage(messageName: string) {
-    this.data.messages.delete(messageName);
+    const ret = this.data.messages.delete(messageName);
+    if (!ret) throw new Error(`${messageName} does not exist in the database`);
   }
 
+  /**
+   * Creates a signal based on characteristics such as start bit and length
+   * @param name Name of the signal
+   * @param startBit Bit position of where the signal is to start in the Message bitfield
+   * @param length Length of the signal
+   * @param options Additional options, such as signed, endian, etc.
+   */
   createSignal(name: string, startBit: number, length: number, options?: AdditionalSignalOptions) {
     let min: number;
     let max: number;
@@ -173,7 +229,7 @@ class Dbc {
 
     if (receivingNodes.length) {
       receivingNodes.forEach((node: string) => {
-        this.data.nodes.set(node, { name: node, attributes: new Map(), description: null });
+        this.createNode(node).add();
       });
     }
 
@@ -194,13 +250,45 @@ class Dbc {
       valueTable,
       attributes,
       dataType,
+      add: (messageName) => {
+        this.addSignal(messageName, signal);
+        return signal;
+      },
+      updateDescription: (content: string) => {
+        signal.description = content;
+        return signal;
+      },
+      addAttribute: (
+        attrName: string,
+        messageId: number,
+        type: AttributeDataType,
+        attrProps?: RequiredAttributeProps,
+        attrOptions?: AdditionalAttributeObjects,
+      ) => {
+        if (attrProps) {
+          attrProps.type = 'Signal';
+        } else {
+          attrProps = { type: 'Signal' };
+        }
+        const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
+        this.addAttribute(attr, { id: messageId, signalName: signal.name });
+        return signal;
+      },
     };
     return signal;
   }
 
+  /**
+   * Removes a signal from an existing message
+   * @param signalName Name of the signal
+   * @param messageName Name of the message containing the signal
+   */
   removeSignal(signalName: string, messageName: string) {
     const msg = this.getMessageByName(messageName);
-    msg?.signals.delete(signalName);
+    if (msg) {
+      const ret = msg.signals.delete(signalName);
+      if (!ret) throw new Error(`${signalName} does not exist in message ${messageName}`);
+    }
   }
 
   /**
@@ -254,8 +342,7 @@ class Dbc {
    */
   getMessageByName(name: string) {
     try {
-      const msg = this.data.messages.get(name);
-      return msg;
+      return this.data.messages.get(name);
     } catch (e) {
       throw new MessageDoesNotExist(`No message with name ${name} exists in the database.`);
     }
@@ -287,8 +374,159 @@ class Dbc {
   }
 
   /**
+   * Convenience method that will create an Attribute object that can be appended to DBC data
+   * @param name Name to be assigned to the attribute
+   * @param type Attribute type: FLOAT, HEX, ENUM, INT, STRING
+   * @param props Required properties of the attribute based on the type provided
+   * @param options Additional attribute options that can be added
+   */
+  createAttribute(
+    name: string,
+    type: AttributeDataType,
+    props?: RequiredAttributeProps,
+    options?: AdditionalAttributeObjects,
+  ) {
+    let attrType: AttributeType = 'Global';
+    let enumMembers: string[] | null = null;
+    let min: number | null = null;
+    let max: number | null = null;
+    let value: string | null = null;
+    let defaultValue: string | null = null;
+
+    if (props) {
+      if (props.type) attrType = props.type;
+
+      if (type === 'ENUM' && !props.enumMembers) {
+        throw new Error('enumMembers is a required property when defining an attribute with type ENUM');
+      } else if (type === 'ENUM') {
+        if (props.enumMembers) {
+          enumMembers = props.enumMembers;
+        }
+      }
+
+      if (type !== 'ENUM' && type !== 'STRING' && !props.min && !props.max) {
+        throw new Error('min and max are required properties when defining anything other than type ENUM and STRING');
+      } else {
+        if (props.min !== undefined) min = props.min;
+        if (props.max !== undefined) max = props.max;
+      }
+
+      if (options) {
+        if (options.defaultValue !== undefined) {
+          defaultValue = options.defaultValue;
+        } else if (options.value !== undefined && options.defaultValue === undefined) {
+          value = options.value;
+          defaultValue = value;
+        }
+      }
+    } else if (!props && type !== 'STRING') {
+      throw new Error('Additional attribute properties are required for any type other than STRING');
+    }
+
+    const attribute: Attribute = {
+      name,
+      type: attrType,
+      dataType: type,
+      min,
+      max,
+      options: enumMembers,
+      value,
+      defaultValue,
+    };
+    return attribute;
+  }
+
+  /**
+   * Adds an existing attribute to the DBC data based on the supplied type
+   * @param attribute Attribute
+   * @param options node, id, signalName, or evName
+   */
+  addAttribute(attribute: Attribute, options?: { node?: string; id?: number; signalName?: string; evName?: string }) {
+    switch (attribute.type) {
+      case 'Message':
+        if (options && !options.id) {
+          throw new Error('ID is a required option for adding a Message attribute');
+        }
+        if (options?.id) {
+          const msg = this.getMessageById(options.id);
+          msg.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Signal':
+        if ((options && !options.id) || !options?.signalName) {
+          throw new Error('Signal name/and message ID are required options for adding a Signal attribute');
+        }
+        if (options?.id && options?.signalName) {
+          const signal = this.getSignalByName(options.signalName, this.messageIdToName(options.id));
+          signal.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Node':
+        if (options && !options.node) {
+          throw new Error('Node name is a required option for adding a Node attribute');
+        }
+        if (options?.node) {
+          const node = this.getNode(options.node);
+          node.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'EnvironmentVariable':
+        if (options && !options.evName) {
+          throw new Error('Environmental Variable name is a required option for adding EV Attribute');
+        }
+        if (options?.evName) {
+          const ev = this.getEnvironmentalVariable(options.evName);
+          ev.attributes.set(attribute.name, attribute);
+        }
+        break;
+      case 'Global':
+        this.data.attributes.set(attribute.name, attribute);
+        break;
+    }
+  }
+
+  /**
+   * Returns an environmental variable by name
+   * @param name Name of environmental variable
+   * @throws Error if environmental variable does not exist in database
+   */
+  getEnvironmentalVariable(name: string) {
+    const ev = this.data.environmentVariables.get(name);
+    if (!ev) {
+      throw new Error('${name} is not an existing environmental variable in the database');
+    }
+    return ev;
+  }
+  /**
+   * Returns a node if it exists in the database
+   * @param name Name of the node (string)
+   * @throws Error if node does not exist
+   */
+  getNode(name: string) {
+    const node = this.data.nodes.get(name);
+    if (!node) {
+      throw new Error(`${name} is not an existing node in the database`);
+    }
+    return node;
+  }
+
+  /**
+   * Returns the mapped name in the database based on the supplied CAN ID
+   * @param id Message ID (number)
+   * @throws Error if no message with the corresponding ID exists
+   */
+  messageIdToName(id: number) {
+    const name = this.getMessageById(id).name;
+    if (!name) {
+      throw new Error(`Could not find ${id} in the database`);
+    }
+    return name;
+  }
+
+  /**
+   *
    * Loads a DBC file, as opposed to the default method 'load', which is
-   * a non-blocking/async call whos promise must be caught for the return data to be used.
+   * a non-blocking/async call whose promise must be caught for the return data to be used.
    *
    * @param fileContent Full file path to the dbc file, including extension
    * @param throwOnError
@@ -308,7 +546,7 @@ class Dbc {
         data = parser.updateData(data);
       } else {
         if (throwOnError) {
-          throw new Error(`A syntax error occured on line ${lineNum} - Reason: ${parseErrors}`);
+          throw new Error(`A syntax error occurred on line ${lineNum} - Reason: ${parseErrors}`);
         }
         errMap.set(lineNum, parseErrors);
       }
@@ -331,9 +569,6 @@ class Dbc {
   /**
    *
    * Writes the encapsulated data of a Dbc class instance to a dbc file
-   *
-   * @param filePath Path to the file/dbc to be written to. If it does not exist at the path, the file
-   * will automatically be created.
    */
   write() {
     const writer = new Writer();
@@ -345,10 +580,10 @@ class Dbc {
    *
    * Transforms the internal DBC data from class instance into a JSON object/string
    *
-   * @param pretty Determines if JSON output should be formatted. Defaults to true.
+   * @param options Additional formatting options, such as pretty print.
    * @returns JSON representation of loaded DBC data
    */
-  toJson(options?: { pretty: boolean }) {
+  toJson(options?: { pretty?: boolean; preserveFormat?: boolean }) {
     const replacer = (key: any, value: any) => {
       if (value instanceof Map) {
         if (key === 'valueTable' || key === 'valueTables') {
@@ -366,7 +601,13 @@ class Dbc {
     if (pretty) {
       indent = 2;
     }
-    const json = JSON.stringify(this.data, replacer, indent);
+
+    let json: string;
+    if (options && options.preserveFormat) {
+      json = JSON.stringify(this.data, undefined, indent);
+    } else {
+      json = JSON.stringify(this.data, replacer, indent);
+    }
     return json;
   }
 
@@ -421,6 +662,15 @@ export type Signal = {
   valueTable: ValueTable | null;
   attributes: Attributes;
   dataType: DataType | undefined;
+  add: (messageName: string) => Signal;
+  updateDescription: (content: string) => Signal;
+  addAttribute: (
+    attrName: string,
+    messageId: number,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Signal;
 };
 
 export type SignalGroups = Map<string, SignalGroup>;
@@ -451,6 +701,12 @@ export type Message = {
   addSignal: (name: string, startBit: number, length: number, options?: AdditionalSignalOptions) => Message;
   updateDescription: (content: string) => Message;
   updateNode: (node: string) => Message;
+  addAttribute: (
+    attrName: string,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Message;
 };
 
 export type EnvType = 'Integer' | 'Float' | 'String';
@@ -462,7 +718,7 @@ export type EnvironmentVariable = {
   type: EnvType;
   min: number;
   max: number;
-  initalValue: number;
+  initialValue: number;
   evId: number;
   accessType: AccessType;
   accessNode: string;
@@ -477,6 +733,14 @@ export type Node = {
   name: string;
   description: string | null;
   attributes: Attributes;
+  add: () => Node;
+  updateDescription: (content: string) => Node;
+  addAttribute: (
+    attrName: string,
+    type: AttributeDataType,
+    attrProps?: RequiredAttributeProps,
+    attrOptions?: AdditionalAttributeObjects,
+  ) => Node;
 };
 
 export type TxMessages = string[];
@@ -499,13 +763,18 @@ export type DbcData = {
 };
 export type ValueTable = Map<number, string>;
 
-export type AttributeOptions = {
-  value?: string;
-  defaultValue?: string;
-  options?: string[];
+export type RequiredAttributeProps = {
+  type?: AttributeType;
   min?: number;
   max?: number;
+  enumMembers?: string[];
 };
+
+export type AdditionalAttributeObjects = {
+  value?: string;
+  defaultValue?: string;
+};
+
 export type Attributes = Map<string, Attribute>;
 
 export type AttributeType = 'Global' | 'Message' | 'Signal' | 'Node' | 'EnvironmentVariable';

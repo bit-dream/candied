@@ -4,18 +4,16 @@ test('Create Simple Message Object', () => {
   const dbc = new Dbc();
   const msg = dbc.createMessage('TestMessage', 100, 8);
 
-  expect(msg).toEqual(
-    expect.objectContaining({
-      name: 'TestMessage',
-      id: 100,
-      dlc: 8,
-      sendingNode: null,
-      signals: new Map(),
-      description: null,
-      attributes: new Map(),
-      signalGroups: new Map(),
-    }),
-  );
+  expect(msg).toMatchObject({
+    name: 'TestMessage',
+    id: 100,
+    dlc: 8,
+    sendingNode: null,
+    signals: new Map(),
+    description: null,
+    attributes: new Map(),
+    signalGroups: new Map(),
+  });
 });
 
 test('Create Complex Message Object', () => {
@@ -43,7 +41,7 @@ test('Create Simple Signal Object', () => {
   const dbc = new Dbc();
   const signal = dbc.createSignal('TestSignal', 0, 32);
 
-  expect(signal).toEqual({
+  expect(signal).toMatchObject({
     name: 'TestSignal',
     startBit: 0,
     length: 32,
@@ -75,7 +73,7 @@ test('Create Complex Signal Object', () => {
     receivingNodes: ['Node1'],
   });
 
-  expect(signal).toEqual({
+  expect(signal).toMatchObject({
     name: 'TestSignal',
     startBit: 0,
     length: 32,
