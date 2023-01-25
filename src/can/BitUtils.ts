@@ -1,6 +1,17 @@
 import { EndianType } from '../shared/DataTypes';
 
 class BitUtils {
+  static bigEndianBitOrder = [
+    7, 6, 5, 4, 3, 2, 1, 0,
+    15, 14, 13, 12, 11, 10, 9, 8,
+    23, 22, 21, 20, 19, 18, 17, 16,
+    31, 30, 29, 28, 27, 26, 25, 24,
+    39, 38, 37, 36, 35, 34, 33, 32,
+    47, 46, 45, 44, 43, 42, 41, 40,
+    55, 54, 53, 52, 51, 50, 49, 48,
+    63, 62, 61, 60, 59, 58, 57, 56
+  ];
+
   protected bitGet(num: number, idx: number) {
     const bitField = this.uint8ToBinary(num).split('');
     // Assumes least significant bit starts at the end of the array
@@ -66,10 +77,7 @@ class BitUtils {
     if (endian === 'Intel') {
       startOfBit = binary.length - startBit - bitRange;
     } else {
-      const endOfBitField = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
-      // Need to account for sawtooth bit numbering in CAN messages
-      startOfBit = endOfBitField - bitRange + 1;
-      // startOfBit = binary.length - (binary.length - startBit + bitRange);
+      startOfBit = BitUtils.bigEndianBitOrder.indexOf(startBit);
     }
     return binary.slice(startOfBit, startOfBit + bitRange);
   }

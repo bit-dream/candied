@@ -1,7 +1,7 @@
 import { InvalidPayloadLength } from './Errors';
 import BitUtils from './BitUtils';
 import { EndianType } from '../shared/DataTypes';
-import { DbcData, Message, Signal } from '../dbc/Dbc';
+import {DbcData, Message, MultiplexSignal, Signal} from '../dbc/Dbc';
 
 /**
  * The Can class offers utility functions that aid in the processing of general CAN data/information
@@ -89,9 +89,18 @@ class Can extends BitUtils {
     }
 
     const signals = new Map();
-    for (const [name, signal] of msg.signals) {
+    for (const [name, signal] of msg.baseSignals) {
       const bndSig = this.decodeSignal(frame.payload, signal);
       signals.set(name, bndSig);
+    }
+
+    const signalArray = [] as Signal[];
+    for (const [name, mulPlexSignal] of msg.multiplexSignals) {
+      this.getMultiplexSignals(frame.payload, mulPlexSignal, signalArray);
+    }
+    for (const signal of signalArray) {
+      const bndSig = this.decodeSignal(frame.payload, signal);
+      signals.set(signal.name, bndSig);
     }
 
     return {
@@ -177,6 +186,27 @@ class Can extends BitUtils {
       rawValue: signalValues.rawValue,
       physValue: signalValues.physValue,
     };
+  }
+
+  private getMultiplexSignals(payload: Payload, mulPlexSig: MultiplexSignal, signals: Signal[]) {
+    const signal = mulPlexSig.signal;
+    const rawValue = this.extractValFromPayload(
+        payload,
+        signal.startBit,
+        signal.length,
+        signal.endian,
+        signal.signed
+    );
+
+    if(mulPlexSig.children.size > 0) {
+      mulPlexSig.children.get(rawValue)?.forEach(value => {
+        this.getMultiplexSignals(payload, value, signals);
+      });
+
+      return;
+    }
+
+    signals.push(signal);
   }
 
   /**
@@ -270,7 +300,15 @@ class Can extends BitUtils {
     const frame = this.createFrame(message.id, boundPayload, extended);
 
     const boundSignals = new Map();
-    message.signals.forEach((signal: Signal) => {
+    message.baseSignals.forEach((signal: Signal) => {
+      boundSignals.set(signal.name, this.createBoundSignal(signal, boundPayload, 0));
+    });
+
+    const signals = [] as Signal[];
+    message.multiplexSignals.forEach((mulPlexSig: MultiplexSignal) => {
+      this.getMultiplexSignals(boundPayload, mulPlexSig, signals);
+    });
+    signals.forEach((signal: Signal) => {
       boundSignals.set(signal.name, this.createBoundSignal(signal, boundPayload, 0));
     });
 

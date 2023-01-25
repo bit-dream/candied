@@ -28,6 +28,7 @@ import {
   EnvironmentVal,
   CanSignalGroup,
   SigValType,
+  SignalMultiplexVal,
 } from '../parser/parser';
 import { computeDataType, EndianType } from '../shared/DataTypes';
 import {
@@ -37,9 +38,9 @@ import {
   DbcData,
   EnvironmentVariable,
   EnvType,
-  Message,
+  Message, MultiplexSignal,
   Node,
-  Signal,
+  Signal, SignalMultiplexValue,
   ValueTable,
 } from '../dbc/Dbc';
 
@@ -57,6 +58,9 @@ export default class DbcParser extends Parser {
       switch (this.parseResult.ast.kind) {
         case ASTKinds.CanMessage:
           this.addMessage(data, this.parseResult.ast);
+          break;
+        case ASTKinds.SignalMultiplexVal:
+          this.addSignalMultiplexValue(data, this.parseResult.ast);
           break;
         case ASTKinds.CanSignal:
           this.addSignal(data, this.parseResult.ast);
@@ -185,10 +189,48 @@ export default class DbcParser extends Parser {
     message.name = data.name;
     message.sendingNode = data.node;
     message.signals = new Map();
+    message.baseSignals = new Map();
+    message.multiplexSignals = new Map();
     message.description = null;
     message.attributes = new Map();
     message.signalGroups = new Map();
     dbc.messages.set(message.name, message);
+  }
+
+  private addSignalMultiplexValue(dbc: DbcData, data: SignalMultiplexVal) {
+    const message = Array.from(dbc.messages.values()).find(value => value.id === data.id);
+    if (message) {
+      const mulPlexSig = message.multiplexSignals.get(data.switch_name);
+      const mulPlexSigBase = message.multiplexSignals.get(data.name);
+      const dataSignal = message.signals.get(data.name);
+      if(mulPlexSig && dataSignal) {
+        let multiplexSignal = {} as MultiplexSignal;
+        if(mulPlexSigBase) {
+          multiplexSignal = mulPlexSigBase;
+          message.multiplexSignals.delete(data.name);
+        } else {
+          multiplexSignal = {} as MultiplexSignal;
+          multiplexSignal.signal = dataSignal;
+          multiplexSignal.children = new Map();
+        }
+
+
+        data.value_ranges.forEach(valRange => {
+          const start = parseInt(valRange[0], 10);
+          const end = parseInt(valRange[1], 10);
+
+          for (let i = start; i <= end; i++) {
+            let children = mulPlexSig.children.get(i);
+            if (!children) {
+              mulPlexSig.children.set(i, []);
+              children = mulPlexSig.children.get(i);
+            }
+
+            children?.push(multiplexSignal);
+          }
+        });
+      }
+    }
   }
 
   private addSignal(dbc: DbcData, data: CanSignal) {
@@ -203,6 +245,7 @@ export default class DbcParser extends Parser {
     signal.factor = data.factor;
     signal.offset = data.offset;
     signal.multiplex = data.multiplex;
+    signal.multiplexer = data.multiplexer;
     signal.receivingNodes = data.nodes;
     signal.unit = data.unit;
     signal.valueTable = null;
@@ -217,6 +260,15 @@ export default class DbcParser extends Parser {
     if (dbc.messages.has(lastKey)) {
       msg = dbc.messages.get(lastKey);
       msg?.signals.set(signal.name, signal);
+
+      if (!signal.multiplexer && (signal.multiplex ?? "").length === 0) {
+        msg?.baseSignals.set(signal.name, signal);
+      } else if (signal.multiplexer) {
+        const multiplexSignal = {} as MultiplexSignal;
+        multiplexSignal.signal = signal;
+        multiplexSignal.children = new Map();
+        msg?.multiplexSignals.set(multiplexSignal.signal.name, multiplexSignal);
+      }
     }
   }
 
