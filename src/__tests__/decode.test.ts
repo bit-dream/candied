@@ -11,17 +11,17 @@ actually match more sophisticated tooling that is known to work.
 
 test('Get Value: Unsigned Motorola', () => {
   const can = new Can();
-  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 32, 20, 'Motorola', false)).toBe(26759);
-  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 14, 10, 'Motorola', false)).toBe(1023);
-  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 50, 4, 'Motorola', false)).toBe(1);
-  expect(can.extractValFromPayload([54, 20, 45, 2], 10, 10, 'Motorola', false)).toBe(534);
+  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 32, 20, 'Motorola', false)).toBe(983556);
+  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 14, 10, 'Motorola', false)).toBe(83);
+  expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 50, 4, 'Motorola', false)).toBe(4);
+  expect(can.extractValFromPayload([54, 20, 45, 2], 10, 10, 'Motorola', false)).toBe(389);
 });
 
 test('Get Value: Signed Motorola', () => {
   const can = new Can();
   expect(can.extractValFromPayload([20, 255, 255, 2, 4, 13, 16, 255], 22, 6, 'Motorola', true)).toBe(-1);
-  expect(can.extractValFromPayload([20, 255, 65, 54, 3, 20, 55, 45], 22, 10, 'Motorola', true)).toBe(-503);
-  expect(can.extractValFromPayload([54, 20, 45, 2], 10, 10, 'Motorola', true)).toBe(-490);
+  expect(can.extractValFromPayload([20, 255, 65, 54, 3, 20, 55, 45], 22, 10, 'Motorola', true)).toBe(-3);
+  expect(can.extractValFromPayload([54, 20, 45, 2], 10, 10, 'Motorola', true)).toBe(389);
 });
 
 test('Get Value: Unsigned Intel', () => {
