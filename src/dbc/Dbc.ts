@@ -96,11 +96,15 @@ class Dbc {
   createMessage(name: string, id: number, dlc: number, options?: AdditionalMessageOptions): Message {
     // TODO: Check that ID does not exceed max range
     let signals: Signals;
+    let baseSignals: Signals;
+    let multiplexSignals: MultiplexSignals;
     let attributes: Attributes;
     let signalGroups: SignalGroups;
     let sendingNode: string | null;
     let description: string | null;
     options && options.signals ? (signals = options.signals) : (signals = new Map());
+    options && options.baseSignals ? (baseSignals = options.baseSignals) : (baseSignals = new Map());
+    options && options.multiplexSignals ? (multiplexSignals = options.multiplexSignals) : (multiplexSignals = new Map());
     options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
     options && options.signalGroups ? (signalGroups = options.signalGroups) : (signalGroups = new Map());
     options && options.description ? (description = options.description) : (description = null);
@@ -116,6 +120,8 @@ class Dbc {
       dlc,
       sendingNode,
       signals,
+      baseSignals,
+      multiplexSignals,
       description,
       attributes,
       signalGroups,
@@ -151,7 +157,7 @@ class Dbc {
         const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
         this.addAttribute(attr, { id: message.id });
         return message;
-      },
+      }
     };
     return message;
   }
@@ -208,6 +214,7 @@ class Dbc {
     let unit: string;
     let description: string | null;
     let multiplex: string | null;
+    let multiplexer: boolean;
     let receivingNodes: string[];
     let valueTable: ValueTable | null;
     let attributes: Attributes;
@@ -222,6 +229,7 @@ class Dbc {
     options && options.unit ? (unit = options.unit) : (unit = '');
     options && options.description ? (description = options.description) : (description = null);
     options && options.multiplex ? (multiplex = options.multiplex) : (multiplex = null);
+    options && options.multiplexer ? (multiplexer = options.multiplexer) : (multiplexer = false);
     options && options.receivingNodes ? (receivingNodes = options.receivingNodes) : (receivingNodes = []);
     options && options.valueTable ? (valueTable = options.valueTable) : (valueTable = null);
     options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
@@ -236,6 +244,7 @@ class Dbc {
     const signal: Signal = {
       name,
       multiplex,
+      multiplexer,
       startBit,
       length,
       endian,
@@ -274,6 +283,9 @@ class Dbc {
         this.addAttribute(attr, { id: messageId, signalName: signal.name });
         return signal;
       },
+      isMultiplex: () => {
+        return signal.multiplexer || (signal.multiplex ?? "").length > 0;
+      }
     };
     return signal;
   }
@@ -641,6 +653,7 @@ export type AdditionalSignalOptions = {
   unit?: string;
   description?: string;
   multiplex?: string;
+  multiplexer?: boolean;
   receivingNodes?: string[];
   valueTable?: ValueTable;
   attributes?: Attributes;
@@ -648,6 +661,7 @@ export type AdditionalSignalOptions = {
 export type Signal = {
   name: string;
   multiplex: string | null;
+  multiplexer: boolean;
   startBit: number;
   length: number;
   endian: EndianType;
@@ -671,6 +685,7 @@ export type Signal = {
     attrProps?: RequiredAttributeProps,
     attrOptions?: AdditionalAttributeObjects,
   ) => Signal;
+  isMultiplex: () => boolean;
 };
 
 export type SignalGroups = Map<string, SignalGroup>;
@@ -681,8 +696,16 @@ export type SignalGroup = {
   signals: string[];
 };
 
+export type MultiplexSignals = Map<string, MultiplexSignal>;
+export type MultiplexSignal = {
+  signal: Signal;
+  children: Map<number, MultiplexSignal[]>
+}
+
 export type AdditionalMessageOptions = {
   signals?: Signals;
+  baseSignals?: Signals;
+  multiplexSignals?: MultiplexSignals;
   attributes?: Attributes;
   signalGroups?: SignalGroups;
   sendingNode?: string;
@@ -694,6 +717,8 @@ export type Message = {
   dlc: number;
   sendingNode: string | null;
   signals: Map<string, Signal>;
+  baseSignals: Map<string, Signal>;
+  multiplexSignals: Map<string, MultiplexSignal>;
   description: string | null;
   attributes: Attributes;
   signalGroups: SignalGroups;
@@ -708,6 +733,13 @@ export type Message = {
     attrOptions?: AdditionalAttributeObjects,
   ) => Message;
 };
+
+export type SignalMultiplexValue = {
+  id: number;
+  name: string;
+  switchName: string;
+  value_ranges: string[][];
+}
 
 export type EnvType = 'Integer' | 'Float' | 'String';
 

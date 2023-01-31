@@ -4,7 +4,7 @@ extractAttrNode, extractAttrVal, extractAttrId, extractMinVal,
 extractMaxVal, extractOptions, extractAttrSignalName } from "./parserHelpers";
 ---
 
-Choice := CanNode | CanMessage | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
+Choice := CanNode | CanMessage | SignalMultiplexVal | CanSignal | ValTable | Val | SignalComment | MessageComment | NodeComment |
 GlobalAttribute | MessageAttribute | SignalAttribute | NodeAttribute | AttributeDefault | AttributeValue |
 Version | NewSymbolValue | BlankLine | NewSymbol | BusSpeed | Comment | CanEnvironmentVariable | EnvironmentVarData |
 EnvironmentVariableComment | MessageTransmitter | EnvironmentAttribute | EnvironmentVal | CanSignalGroup | SigValType
@@ -49,7 +49,8 @@ CanMessage := 'BO_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]*'} ':\s*' raw_
     .id = number {return parseInt(raw_id,10);}
     .dlc = number {return parseInt(raw_dlc,10);}
 
-CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
+CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9M]*|\s'} '\s*:\s' raw_start_bit={'[0-9]+'} '\|' raw_length={'[0-9]+'} '@' raw_endian={'[1|0]'} raw_signed={'[+|-]'} '\s\(' raw_factor={'[\-0-9.]+'} ',' raw_offset={'[\-0-9.]+'} '\)\s\[' raw_min={'[\-0-9.]+'} '\|' raw_max={'[\-0-9.]+'} '\]\s' raw_unit={'".*"'} '\s' raw_node_str={'.*'}
+    .multiplexer = boolean {return multiplex.includes('M');}
     .unit = string {return cleanComment(raw_unit);}
     .nodes = string[] {return raw_node_str.trim().split(',');}
     .start_bit = number {return parseInt(raw_start_bit,10);}
@@ -60,6 +61,10 @@ CanSignal := '\s*SG_\s' name={'[a-zA-Z0-9_]+'} '\s*' multiplex={'M|[m0-9]*|\s'} 
     .offset = number {return parseFloat(raw_offset);}
     .min = number {return parseFloat(raw_min);}
     .max = number {return parseFloat(raw_max);}
+
+SignalMultiplexVal := 'SG_MUL_VAL_\s' raw_id={'[0-9]+'} '\s*' name={'[a-zA-Z0-9_]+'} '\s*' switch_name={'[a-zA-Z0-9_]+'} '\s*' raw_value_ranges={'[0-9-,\s]+;'}
+    .id = number {return parseInt(raw_id,10);}
+    .value_ranges = string[][] {return raw_value_ranges.replace(';','').replace(/\s/g,'').split(',').map((value)=>{return value.split('-');});}
 
 ValTable := 'VAL_TABLE_\s' name={'[a-zA-Z0-9_]+'} '\s' raw_table={'.*'}
     .enum = Map<number,string> {return table2Enum(raw_table.replace(';',''));}

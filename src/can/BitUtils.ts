@@ -1,6 +1,7 @@
 import { EndianType } from '../shared/DataTypes';
 
 class BitUtils {
+
   protected bitGet(num: number, idx: number) {
     const bitField = this.uint8ToBinary(num).split('');
     // Assumes least significant bit starts at the end of the array
