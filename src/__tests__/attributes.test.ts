@@ -41,6 +41,26 @@ test('DBC_template.dbc: Message attributes', (done) => {
   done();
 });
 
+test('DBC_template.dbc: Message attributes 2', (done) => {
+  const dbc = new Dbc();
+  const fileContent = dbcReader('src/__tests__/testFiles/DBC_template.dbc');
+  const data = dbc.load(fileContent);
+  const attributes: Attributes = new Map();
+  const attribute: Attribute = {
+    name: 'BOStringAttribute',
+    type: 'Message',
+    dataType: 'STRING',
+    options: null,
+    defaultValue: 'String',
+    value: 'MessageAttribute2',
+    min: null,
+    max: null,
+  };
+  attributes.set('BOStringAttribute', attribute);
+  expect(data.messages.get('CANMultiplexed')?.attributes).toEqual(attributes);
+  done();
+});
+
 test('DBC_template.dbc: Signal attributes', (done) => {
   const dbc = new Dbc();
   const fileContent = dbcReader('src/__tests__/testFiles/DBC_template.dbc');

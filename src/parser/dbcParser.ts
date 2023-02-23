@@ -461,48 +461,50 @@ export default class DbcParser extends Parser {
   }
 
   private addAttributeValue(dbc: DbcData, data: AttributeValue) {
-    const attr = dbc.attributes.get(data.name);
-    if (attr) {
-      attr.value = data.value;
-      const msgName = this.getMessageNameFromId(dbc, data.id);
-      switch (data.type) {
-        // Add existing attribute to proper type
-        case 'Signal':
-          if (msgName) {
-            const msg = dbc.messages.get(msgName);
-            if (msg) {
-              const signal = msg.signals.get(data.signal);
-              if (signal) {
-                signal.attributes.set(attr.name, attr);
-              }
+    if (!dbc.attributes.has(data.name)) 
+      return;
+    const attr = Object.assign({}, dbc.attributes.get(data.name), {value: data.value});
+    
+    attr.value = data.value;
+    const msgName = this.getMessageNameFromId(dbc, data.id);
+    switch (data.type) {
+      // Add existing attribute to proper type
+      case 'Signal':
+        if (msgName) {
+          const msg = dbc.messages.get(msgName);
+          if (msg) {
+            const signal = msg.signals.get(data.signal);
+            if (signal) {
+              signal.attributes.set(attr.name, attr);
             }
           }
-          break;
-        case 'Message':
-          if (msgName) {
-            const msg = dbc.messages.get(msgName);
-            if (msg) {
-              msg.attributes.set(attr.name, attr);
-            }
+        }
+        break;
+      case 'Message':
+        if (msgName) {
+          const msg = dbc.messages.get(msgName);
+          if (msg) {
+            msg.attributes.set(attr.name, attr);
           }
-          break;
-        case 'Node':
-          const node = dbc.nodes.get(data.node);
-          if (node) {
-            node.attributes.set(attr.name, attr);
-          }
-          break;
-        case 'Global':
-          break;
-        case 'EnvironmentVariable':
-          const ev = dbc.environmentVariables.get(data.node);
-          if (ev) {
-            ev.attributes.set(attr.name, attr);
-          }
-          break;
-        default:
-          break;
-      }
+        }
+        break;
+      case 'Node':
+        const node = dbc.nodes.get(data.node);
+        if (node) {
+          node.attributes.set(attr.name, attr);
+        }
+        break;
+      case 'Global':
+        dbc.attributes.set(data.name, attr);
+        break;
+      case 'EnvironmentVariable':
+        const ev = dbc.environmentVariables.get(data.node);
+        if (ev) {
+          ev.attributes.set(attr.name, attr);
+        }
+        break;
+      default:
+        break;
     }
   }
 

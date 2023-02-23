@@ -43,6 +43,7 @@ BA_ "FloatAttribute" 45.9;
 BA_ "BUIntAttribute" BU_ Node0 100;
 BA_ "BOStringAttribute" BO_ 1234 "MessageAttribute";
 BA_ "SGEnumAttribute" SG_ 1234 Signal0 2;
+BA_ "BOStringAttribute" BO_ 4321 "MessageAttribute2";
 
 VAL_TABLE_ Numbers 3 "Three" 2 "Two" 1 "One" 0 "Zero";
 VAL_ 4321 Value0 2 "Value2" 1 "Value1" 0 "Value0";
