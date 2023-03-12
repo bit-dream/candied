@@ -38,9 +38,11 @@ import {
   DbcData,
   EnvironmentVariable,
   EnvType,
-  Message, MultiplexSignal,
+  Message,
+  MultiplexSignal,
   Node,
-  Signal, SignalMultiplexValue,
+  Signal,
+  SignalMultiplexValue,
   ValueTable,
 } from '../dbc/Dbc';
 
@@ -198,14 +200,14 @@ export default class DbcParser extends Parser {
   }
 
   private addSignalMultiplexValue(dbc: DbcData, data: SignalMultiplexVal) {
-    const message = Array.from(dbc.messages.values()).find(value => value.id === data.id);
+    const message = Array.from(dbc.messages.values()).find((value) => value.id === data.id);
     if (message) {
       const mulPlexSig = message.multiplexSignals.get(data.switch_name);
       const mulPlexSigBase = message.multiplexSignals.get(data.name);
       const dataSignal = message.signals.get(data.name);
-      if(mulPlexSig && dataSignal) {
+      if (mulPlexSig && dataSignal) {
         let multiplexSignal = {} as MultiplexSignal;
-        if(mulPlexSigBase) {
+        if (mulPlexSigBase) {
           multiplexSignal = mulPlexSigBase;
           message.multiplexSignals.delete(data.name);
         } else {
@@ -214,8 +216,7 @@ export default class DbcParser extends Parser {
           multiplexSignal.children = new Map();
         }
 
-
-        data.value_ranges.forEach(valRange => {
+        data.value_ranges.forEach((valRange) => {
           const start = parseInt(valRange[0], 10);
           const end = parseInt(valRange[1], 10);
 
@@ -261,7 +262,7 @@ export default class DbcParser extends Parser {
       msg = dbc.messages.get(lastKey);
       msg?.signals.set(signal.name, signal);
 
-      if (!signal.multiplexer && (signal.multiplex ?? "").length === 0) {
+      if (!signal.multiplexer && (signal.multiplex ?? '').length === 0) {
         msg?.baseSignals.set(signal.name, signal);
       } else if (signal.multiplexer) {
         const multiplexSignal = {} as MultiplexSignal;
@@ -461,10 +462,9 @@ export default class DbcParser extends Parser {
   }
 
   private addAttributeValue(dbc: DbcData, data: AttributeValue) {
-    if (!dbc.attributes.has(data.name)) 
-      return;
-    const attr = Object.assign({}, dbc.attributes.get(data.name), {value: data.value});
-    
+    if (!dbc.attributes.has(data.name)) return;
+    const attr = Object.assign({}, dbc.attributes.get(data.name), { value: data.value });
+
     attr.value = data.value;
     const msgName = this.getMessageNameFromId(dbc, data.id);
     switch (data.type) {

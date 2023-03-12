@@ -104,7 +104,9 @@ class Dbc {
     let description: string | null;
     options && options.signals ? (signals = options.signals) : (signals = new Map());
     options && options.baseSignals ? (baseSignals = options.baseSignals) : (baseSignals = new Map());
-    options && options.multiplexSignals ? (multiplexSignals = options.multiplexSignals) : (multiplexSignals = new Map());
+    options && options.multiplexSignals
+      ? (multiplexSignals = options.multiplexSignals)
+      : (multiplexSignals = new Map());
     options && options.attributes ? (attributes = options.attributes) : (attributes = new Map());
     options && options.signalGroups ? (signalGroups = options.signalGroups) : (signalGroups = new Map());
     options && options.description ? (description = options.description) : (description = null);
@@ -157,7 +159,7 @@ class Dbc {
         const attr = this.createAttribute(attrName, type, attrProps, attrOptions);
         this.addAttribute(attr, { id: message.id });
         return message;
-      }
+      },
     };
     return message;
   }
@@ -284,8 +286,8 @@ class Dbc {
         return signal;
       },
       isMultiplex: () => {
-        return signal.multiplexer || (signal.multiplex ?? "").length > 0;
-      }
+        return signal.multiplexer || (signal.multiplex ?? '').length > 0;
+      },
     };
     return signal;
   }
@@ -699,8 +701,8 @@ export type SignalGroup = {
 export type MultiplexSignals = Map<string, MultiplexSignal>;
 export type MultiplexSignal = {
   signal: Signal;
-  children: Map<number, MultiplexSignal[]>
-}
+  children: Map<number, MultiplexSignal[]>;
+};
 
 export type AdditionalMessageOptions = {
   signals?: Signals;
@@ -739,7 +741,7 @@ export type SignalMultiplexValue = {
   name: string;
   switchName: string;
   value_ranges: string[][];
-}
+};
 
 export type EnvType = 'Integer' | 'Float' | 'String';
 
