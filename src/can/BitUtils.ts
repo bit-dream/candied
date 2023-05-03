@@ -1,6 +1,25 @@
 import { EndianType } from '../shared/DataTypes';
+import { CAN_EFF_FLAG, CAN_EFF_MASK } from "./const";
 
 class BitUtils {
+
+  /**
+   * Returns a boolean value indicating whether the provided CAN id is extended or standard
+   * @param id Number
+   * @protected
+   */
+  public isIdExtended(id: number): boolean {
+    return (id & CAN_EFF_FLAG) >>> 0 === CAN_EFF_FLAG;
+  }
+
+  public convertIdToExtended(id: number): number {
+    return (id | CAN_EFF_FLAG) >>> 0
+  }
+
+  public convertIdToStandard(id: number): number {
+    return (id & CAN_EFF_MASK) >>> 0
+  }
+
   protected bitGet(num: number, idx: number) {
     const bitField = this.uint8ToBinary(num).split('');
     // Assumes least significant bit starts at the end of the array

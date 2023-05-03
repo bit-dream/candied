@@ -1,5 +1,6 @@
-import Dbc, { Attribute, Attributes, Message } from '../dbc/Dbc';
+import Dbc from '../dbc/Dbc';
 import dbcReader from '../filesystem/DbcReader';
+import {Attribute, Attributes, Message} from "../dbc/DbcTypes";
 
 test('DBC_template.dbc: Global attributes', (done) => {
   const dbc = new Dbc();

@@ -32,19 +32,14 @@ import {
 } from '../parser/parser';
 import { computeDataType, EndianType } from '../shared/DataTypes';
 import {
-  AccessType,
-  Attribute,
-  AttributeDataType,
-  DbcData,
+  AccessType, Attribute, AttributeDataType, DbcData,
   EnvironmentVariable,
   EnvType,
   Message,
   MultiplexSignal,
-  Node,
-  Signal,
-  SignalMultiplexValue,
-  ValueTable,
-} from '../dbc/Dbc';
+  Node, Signal,
+  SignalMultiplexValue, ValueTable
+} from "../dbc/DbcTypes";
 
 export default class DbcParser extends Parser {
   parseResult: ParseResult;

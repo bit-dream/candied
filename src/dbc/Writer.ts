@@ -4,12 +4,10 @@ import {
   DbcData,
   EnvironmentVariable,
   Message,
-  NetworkBridges,
-  Signal,
-  SignalGroup,
-  TxMessages,
-  ValueTable,
-} from './Dbc';
+  NetworkBridges, Signal,
+  SignalGroup, TxMessages,
+  ValueTable
+} from "./DbcTypes";
 
 class Writer {
   dbcString: string;
