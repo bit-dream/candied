@@ -111,7 +111,7 @@ class Dbc {
    * sendingNode, and description
    * @returns Message
    */
-  createMessage(name: string, id: number, dlc: number, options?: AdditionalMessageOptions): Message {
+  createMessage(name: string, id: number, dlc: number, extended: boolean, options?: AdditionalMessageOptions): Message {
     // TODO: Check that ID does not exceed max range
     let signals: Signals;
     let baseSignals: Signals;
@@ -137,6 +137,7 @@ class Dbc {
     const message: Message = {
       name,
       id,
+      extended,
       dlc,
       sendingNode,
       signals,

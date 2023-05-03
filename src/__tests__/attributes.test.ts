@@ -184,7 +184,7 @@ test('Signal option attribute creation as ENUM with default', (done) => {
 
 test('Add Signal attribute', (done) => {
   const dbc = new Dbc();
-  dbc.createMessage('TestMessage', 100, 8).add().addSignal('TestSignal', 0, 10);
+  dbc.createMessage('TestMessage', 100, 8, false).add().addSignal('TestSignal', 0, 10);
 
   const attr = dbc.createAttribute(
     'TestAttribute',
@@ -206,7 +206,7 @@ test('Add Signal attribute', (done) => {
 
 test('Add Message attribute', (done) => {
   const dbc = new Dbc();
-  dbc.createMessage('TestMessage', 100, 8).add().addSignal('TestSignal', 0, 10);
+  dbc.createMessage('TestMessage', 100, 8, false).add().addSignal('TestSignal', 0, 10);
 
   const attr = dbc.createAttribute(
     'TestAttribute',

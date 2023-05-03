@@ -109,6 +109,7 @@ export type AdditionalMessageOptions = {
 export type Message = {
     name: string;
     id: number;
+    extended: boolean;
     dlc: number;
     sendingNode: string | null;
     signals: Map<string, Signal>;
