@@ -12,11 +12,19 @@ class BitUtils {
     return (id & CAN_EFF_FLAG) >>> 0 === CAN_EFF_FLAG;
   }
 
-  public convertIdToExtended(id: number): number {
+  /**
+   * Sets the extended flag in the provided ID and returns the new CAN ID
+   * @param id
+   */
+  public setExtendedFlag(id: number): number {
     return (id | CAN_EFF_FLAG) >>> 0
   }
 
-  public convertIdToStandard(id: number): number {
+  /**
+   * Unsets the extended ID flag and returns the normal 29-bit CAN ID
+   * @param id
+   */
+  public unsetExtendedFlag(id: number): number {
     return (id & CAN_EFF_MASK) >>> 0
   }
 

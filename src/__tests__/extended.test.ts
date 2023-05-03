@@ -12,10 +12,10 @@ test('Validate isExtended function', () => {
 
 test('Validate convertIdToStandard function', () => {
     const can = new Can();
-    expect(can.convertIdToStandard(2147487969)).toBe(4321);
+    expect(can.unsetExtendedFlag(2147487969)).toBe(4321);
 });
 
 test('Validate convertIdToStandard function', () => {
     const can = new Can();
-    expect(can.convertIdToExtended(4321)).toBe(2147487969);
+    expect(can.setExtendedFlag(4321)).toBe(2147487969);
 });
