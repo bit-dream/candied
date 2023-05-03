@@ -32,15 +32,20 @@ import {
 } from '../parser/parser';
 import { computeDataType, EndianType } from '../shared/DataTypes';
 import {
-  AccessType, Attribute, AttributeDataType, DbcData,
+  AccessType,
+  Attribute,
+  AttributeDataType,
+  DbcData,
   EnvironmentVariable,
   EnvType,
   Message,
   MultiplexSignal,
-  Node, Signal,
-  SignalMultiplexValue, ValueTable
-} from "../dbc/DbcTypes";
-import Can from "../can/Can";
+  Node,
+  Signal,
+  SignalMultiplexValue,
+  ValueTable,
+} from '../dbc/DbcTypes';
+import Can from '../can/Can';
 
 export default class DbcParser extends Parser {
   parseResult: ParseResult;
@@ -183,7 +188,7 @@ export default class DbcParser extends Parser {
   private addMessage(dbc: DbcData, data: CanMessage) {
     const can = new Can();
     const message = {} as Message;
-    message.id = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    message.id = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     message.extended = can.isIdExtended(data.id);
     message.dlc = data.dlc;
     message.name = data.name;
@@ -199,7 +204,7 @@ export default class DbcParser extends Parser {
 
   private addSignalMultiplexValue(dbc: DbcData, data: SignalMultiplexVal) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const message = Array.from(dbc.messages.values()).find((value) => value.id === canId);
     if (message) {
       const mulPlexSig = message.multiplexSignals.get(data.switch_name);
@@ -275,7 +280,7 @@ export default class DbcParser extends Parser {
 
   private addSignalComment(dbc: DbcData, data: SignalComment) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const msgName = this.getMessageNameFromId(dbc, canId);
     if (msgName) {
       const msg = dbc.messages.get(msgName);
@@ -298,7 +303,7 @@ export default class DbcParser extends Parser {
 
   private addMessageComment(dbc: DbcData, data: MessageComment) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const msgName = this.getMessageNameFromId(dbc, canId);
     if (msgName) {
       const msg = dbc.messages.get(msgName);
@@ -338,7 +343,7 @@ export default class DbcParser extends Parser {
     for (const [key, value] of dbc.messages) {
       const msg = dbc.messages.get(key);
       const can = new Can();
-      const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+      const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
       if (msg && msg.id === canId) {
         const signals = msg.signals;
         const signal = signals.get(data.name);
@@ -473,7 +478,7 @@ export default class DbcParser extends Parser {
 
     attr.value = data.value;
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const msgName = this.getMessageNameFromId(dbc, canId);
     switch (data.type) {
       // Add existing attribute to proper type
@@ -518,13 +523,13 @@ export default class DbcParser extends Parser {
 
   private addMessageTransmitter(dbc: DbcData, data: MessageTransmitter) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     dbc.networkBridges.set(canId, data.nodes);
   }
 
   private addSignalGroup(dbc: DbcData, data: CanSignalGroup) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const name = this.getMessageNameFromId(dbc, canId);
     if (name) {
       const msg = dbc.messages.get(name);
@@ -542,7 +547,7 @@ export default class DbcParser extends Parser {
 
   private addSignalValType(dbc: DbcData, data: SigValType) {
     const can = new Can();
-    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id): data.id;
+    const canId = can.isIdExtended(data.id) ? can.unsetExtendedFlag(data.id) : data.id;
     const msgName = this.getMessageNameFromId(dbc, canId);
     if (msgName) {
       const msg = dbc.messages.get(msgName);

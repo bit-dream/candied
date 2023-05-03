@@ -4,11 +4,13 @@ import {
   DbcData,
   EnvironmentVariable,
   Message,
-  NetworkBridges, Signal,
-  SignalGroup, TxMessages,
-  ValueTable
-} from "./DbcTypes";
-import Can from "../can/Can";
+  NetworkBridges,
+  Signal,
+  SignalGroup,
+  TxMessages,
+  ValueTable,
+} from './DbcTypes';
+import Can from '../can/Can';
 
 class Writer {
   dbcString: string;
@@ -144,7 +146,7 @@ class Writer {
 
       // Need to encode extended ID flag if message is extended
       const can = new Can();
-      const canId = message.extended ? can.setExtendedFlag(message.id) : message.id
+      const canId = message.extended ? can.setExtendedFlag(message.id) : message.id;
 
       const lineContent = `BO_ ${canId.toString()} ${message.name}: ${message.dlc.toString()} ${node}`;
       this.writeLine(lineContent);

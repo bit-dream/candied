@@ -1,8 +1,7 @@
 import { EndianType } from '../shared/DataTypes';
-import { CAN_EFF_FLAG, CAN_EFF_MASK } from "./const";
+import { CAN_EFF_FLAG, CAN_EFF_MASK } from './const';
 
 class BitUtils {
-
   /**
    * Returns a boolean value indicating whether the provided CAN id is extended or standard
    * @param id Number
@@ -17,7 +16,7 @@ class BitUtils {
    * @param id
    */
   public setExtendedFlag(id: number): number {
-    return (id | CAN_EFF_FLAG) >>> 0
+    return (id | CAN_EFF_FLAG) >>> 0;
   }
 
   /**
@@ -25,7 +24,7 @@ class BitUtils {
    * @param id
    */
   public unsetExtendedFlag(id: number): number {
-    return (id & CAN_EFF_MASK) >>> 0
+    return (id & CAN_EFF_MASK) >>> 0;
   }
 
   protected bitGet(num: number, idx: number) {

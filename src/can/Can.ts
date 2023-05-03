@@ -1,7 +1,7 @@
 import { InvalidPayloadLength } from './Errors';
 import BitUtils from './BitUtils';
 import { EndianType } from '../shared/DataTypes';
-import {DbcData, Message, Signal} from "../dbc/DbcTypes";
+import { DbcData, Message, Signal } from '../dbc/DbcTypes';
 
 /**
  * The Can class offers utility functions that aid in the processing of general CAN data/information

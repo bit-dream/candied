@@ -1,7 +1,7 @@
 import DbcParser from '../parser/dbcParser';
 import Writer from './Writer';
-import {MessageDoesNotExist, SignalDoesNotExist} from './Errors';
-import {computeDataType, DataType, EndianType} from '../shared/DataTypes';
+import { MessageDoesNotExist, SignalDoesNotExist } from './Errors';
+import { computeDataType, DataType, EndianType } from '../shared/DataTypes';
 import {
   AdditionalAttributeObjects,
   AdditionalMessageOptions,
@@ -18,8 +18,8 @@ import {
   Signal,
   SignalGroups,
   Signals,
-  ValueTable
-} from "./DbcTypes";
+  ValueTable,
+} from './DbcTypes';
 
 /**
  * Creates a DBC instance that allows for parsing/loading of an existing DBC file
@@ -660,4 +660,3 @@ class Dbc {
   }
 }
 export default Dbc;
-
