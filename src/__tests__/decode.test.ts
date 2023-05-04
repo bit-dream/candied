@@ -1,5 +1,5 @@
 import Can from '../can/Can';
-import { DbcData } from '../dbc/Dbc';
+import { DbcData } from '../dbc/DbcTypes';
 
 /*
 All the expected data in the following toBe functions are not
@@ -47,7 +47,7 @@ test('Can Frame Creation', () => {
     payload: [100, 100, 100],
   });
   expect(can.createFrame(54092340, [100, 100, 100, 10], true)).toStrictEqual({
-    id: 54092340,
+    id: 2201575988, // createFrame will encode the extended flag into the ID, so the provided input ID will not match
     dlc: 4,
     isExtended: true,
     payload: [100, 100, 100, 10],

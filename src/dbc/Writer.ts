@@ -9,7 +9,8 @@ import {
   SignalGroup,
   TxMessages,
   ValueTable,
-} from './Dbc';
+} from './DbcTypes';
+import Can from '../can/Can';
 
 class Writer {
   dbcString: string;
@@ -142,7 +143,12 @@ class Writer {
         // Default that is typically generated from CANDB++ (from Vector)
         node = 'Vector___XXX';
       }
-      const lineContent = `BO_ ${message.id.toString()} ${message.name}: ${message.dlc.toString()} ${node}`;
+
+      // Need to encode extended ID flag if message is extended
+      const can = new Can();
+      const canId = message.extended ? can.setExtendedFlag(message.id) : message.id;
+
+      const lineContent = `BO_ ${canId.toString()} ${message.name}: ${message.dlc.toString()} ${node}`;
       this.writeLine(lineContent);
 
       // Extract signals and exand in file

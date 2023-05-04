@@ -2,7 +2,7 @@ import Dbc from '../dbc/Dbc';
 
 test('Create Simple Message Object', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8);
+  const msg = dbc.createMessage('TestMessage', 100, 8, false);
 
   expect(msg).toMatchObject({
     name: 'TestMessage',
@@ -18,7 +18,7 @@ test('Create Simple Message Object', () => {
 
 test('Create Complex Message Object', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8, {
+  const msg = dbc.createMessage('TestMessage', 100, 8, false, {
     description: 'Test Description',
     sendingNode: 'Node1',
   });
@@ -95,7 +95,7 @@ test('Create Complex Signal Object', () => {
 
 test('Add Simple Message to Data', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8);
+  const msg = dbc.createMessage('TestMessage', 100, 8, false);
 
   dbc.addMessage(msg);
   expect(dbc.getMessageByName('TestMessage')).toEqual(msg);
@@ -103,7 +103,7 @@ test('Add Simple Message to Data', () => {
 
 test('Add Simple Signal to Data', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8);
+  const msg = dbc.createMessage('TestMessage', 100, 8, false);
   const signal = dbc.createSignal('TestSignal', 0, 32);
 
   dbc.addMessage(msg);
@@ -113,9 +113,9 @@ test('Add Simple Signal to Data', () => {
 
 test('Add and Remove Messages', () => {
   const dbc = new Dbc();
-  const msg1 = dbc.createMessage('TestMessage', 100, 8);
-  const msg2 = dbc.createMessage('TestMessage2', 100, 8);
-  const msg3 = dbc.createMessage('TestMessage3', 100, 8);
+  const msg1 = dbc.createMessage('TestMessage', 100, 8, false);
+  const msg2 = dbc.createMessage('TestMessage2', 100, 8, false);
+  const msg3 = dbc.createMessage('TestMessage3', 100, 8, false);
 
   dbc.addMessage([msg1, msg2, msg3]);
   expect(dbc.data.messages.size).toBe(3);
@@ -126,7 +126,7 @@ test('Add and Remove Messages', () => {
 
 test('Add and Remove Signals', () => {
   const dbc = new Dbc();
-  const msg = dbc.createMessage('TestMessage', 100, 8);
+  const msg = dbc.createMessage('TestMessage', 100, 8, false);
   dbc.addMessage(msg);
 
   const sig1 = dbc.createSignal('TestSignal1', 0, 8);
