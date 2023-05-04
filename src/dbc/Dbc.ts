@@ -1,4 +1,4 @@
-import DbcParser from '../parser/dbcParser';
+import DbcParser from '../parser/DbcParser';
 import Writer from './Writer';
 import { MessageDoesNotExist, SignalDoesNotExist } from './Errors';
 import { computeDataType, DataType, EndianType } from '../shared/DataTypes';

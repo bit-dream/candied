@@ -374,7 +374,7 @@ export default class DbcParser extends Parser {
       case 'HEX':
         return 'HEX';
       default:
-        // Uknown type encountered, conver to string so the remaining props are not parsed
+        // Uknown type encountered, convert to string so the remaining props are not parsed
         return 'STRING';
     }
   }

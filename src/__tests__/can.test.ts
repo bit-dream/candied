@@ -1,6 +1,7 @@
-import Can, { BoundSignal } from '../can/Can';
+import Can from '../can/Can';
 import Dbc from '../dbc/Dbc';
 import dbcReader from '../filesystem/DbcReader';
+import { BoundSignal } from '../can/CanTypes';
 
 // All return values validated using Kvaser CANKing
 test('SimpleDBC: Decode TestMessageStandard', (done) => {

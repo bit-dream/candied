@@ -1,5 +1,5 @@
 import { EndianType } from '../shared/DataTypes';
-import { CAN_EFF_FLAG, CAN_EFF_MASK } from './const';
+import { CAN_EFF_FLAG, CAN_EFF_MASK } from './Const';
 
 class BitUtils {
   /**
