@@ -159,7 +159,6 @@ const data = dbc.load(fileContent);
 import {dbcReader} from "candied/lib/filesystem/DbcWebFs";
 // dbcReader expects a file based/blob based input
 // interface File extends Blob
-const fileContent = dbcReader(file);
 dbcReader(file, (fileContent) => {
     const data = dbc.load(fileContent);
 
