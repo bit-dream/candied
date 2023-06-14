@@ -151,16 +151,20 @@ import {Dbc} from 'candied';
 const dbc = new Dbc();
 
 // Node based file loading
-import dbcReader from "dbc-can/lib/filesystem/DbcReader"
+import dbcReader from "candied/lib/filesystem/DbcReader"
 const fileContent = dbcReader('example.dbc');
 const data = dbc.load(fileContent);
 
 // Browser based file loading
-import {dbcReader} from "dbc-can/lib/filesystem/DbcWebFs";
+import {dbcReader} from "candied/lib/filesystem/DbcWebFs";
 // dbcReader expects a file based/blob based input
 // interface File extends Blob
 const fileContent = dbcReader(file);
-const data = dbc.load(fileContent);
+dbcReader(file, (fileContent) => {
+    const data = dbc.load(fileContent);
+
+    // your code
+});
 
 
 ```
