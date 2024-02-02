@@ -94,7 +94,7 @@ class BitUtils {
     } else {
       // Need to account for sawtooth bit numbering in CAN messages
       startOfBit = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
-      if (((startOfBit + bitRange + 1) % 8) != 0) {
+      if (((startOfBit + bitRange + 1) % 8) !== 0) {
         // still unhandled
       }
     }
