@@ -92,10 +92,11 @@ class BitUtils {
     if (endian === 'Intel') {
       startOfBit = binary.length - startBit - bitRange;
     } else {
-      const endOfBitField = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
       // Need to account for sawtooth bit numbering in CAN messages
-      startOfBit = endOfBitField - bitRange + 1;
-      // startOfBit = binary.length - (binary.length - startBit + bitRange);
+      startOfBit = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
+      if (((startOfBit + bitRange + 1) % 8) !== 0) {
+        // still unhandled
+      }
     }
     return binary.slice(startOfBit, startOfBit + bitRange);
   }
