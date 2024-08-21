@@ -111,6 +111,37 @@ class Can extends BitUtils {
     };
   }
 
+  /**
+   * General purpose CAN message encode function. Expects a BoundMessage and will return a
+   * CAN Frame with the encoded payload.
+   *
+   * A database needs to be loaded using the database setter before messages can be encoded,
+   * otherwise an error is returned.
+   *
+   * @param boundMessage BoundMessage
+   * @returns Frame
+   */
+  encode(boundMessage: BoundMessage): Frame {
+    if (this._database === undefined) {
+      throw new Error('No database is attached to class instance');
+    }
+
+    const msg = this.getMessageById(boundMessage.id);
+    if (!msg) {
+      throw new Error(`Message with ID ${boundMessage.id} not found in database`);
+    }
+
+    // Create a payload array filled with 0s, the size is based on the message's DLC
+    const payload = new Array(msg.dlc).fill(0);
+
+    // Encode each signal into the appropriate position in the payload
+    for (const boundSignal of boundMessage.boundSignals.values()) {
+      this.encodeSignal(payload, boundSignal);
+    }
+
+    return this.createFrame(boundMessage.id, payload, boundMessage.boundData.frame.isExtended);
+  }
+
   private getMessageById(id: number): Message | undefined {
     return this.idMap.get(id);
   }
@@ -183,6 +214,23 @@ class Can extends BitUtils {
   }
 
   /**
+   * Encodes a single bound signal into a CAN message payload.
+   *
+   * @param payload number[]
+   * @param boundSignal BoundSignal
+   */
+  encodeSignal(payload: Payload, boundSignal: BoundSignal) {
+    const signal = boundSignal.boundData.signal;
+    const value = boundSignal.value;
+
+    // Apply inverse of scaling and offset
+    const rawValue = Math.round((value - signal.offset) / signal.factor);
+
+    // Insert value to payload
+    this.insertValToPayload(payload, rawValue, signal.startBit, signal.length, signal.endian, signal.signed);
+  }
+
+  /**
    *
    * Generalized function for extracting an individual value from a CAN message payload.
    *
@@ -210,6 +258,35 @@ class Can extends BitUtils {
     }
 
     return prcValue;
+  }
+
+  insertValToPayload(
+    payload: Payload,
+    value: number,
+    startBit: number,
+    signalLength: number,
+    endian: EndianType,
+    signed: boolean,
+  ): Payload {
+    // Convert value to a binary string, taking sign into account if necessary
+    let valBitField = signed ? this.dec2binSigned(value, signalLength) : this.dec2bin(value, signalLength);
+
+    // Ensure bitField matches the length of the signal
+    valBitField = valBitField.slice(-signalLength);
+
+    // Get the binary representation of the payload
+    let bitField = this.payload2Binary(payload, endian);
+
+    // Insert the bitField into the payload bitField
+    bitField = this.insertBitRange(bitField, valBitField, startBit, signalLength, endian);
+
+    // Convert the updated binary array back into bytes and store them in the payload
+    const updatedPayload = this.binary2Payload(bitField, endian);
+
+    for (let i = 0; i < payload.length; i++) {
+      payload[i] = updatedPayload[i];
+    }
+    return payload;
   }
 
   setSignalValues() {
