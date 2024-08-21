@@ -169,7 +169,7 @@ dbcReader(file, (fileContent) => {
 ```
 
 #### Decoding CAN Messages
-Candied has the ability to  CAN frames to its real world values.
+Candied has the ability to decode CAN frames to its real world values.
 
 ```ts
 import {Dbc, Can} from 'candied';
