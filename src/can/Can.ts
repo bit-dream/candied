@@ -121,7 +121,7 @@ class Can extends BitUtils {
    * @param boundMessage BoundMessage
    * @returns Frame
    */
-  encode(boundMessage: BoundMessage): Frame | undefined {
+  encode(boundMessage: BoundMessage): Frame {
     if (this._database === undefined) {
       throw new Error('No database is attached to class instance');
     }
