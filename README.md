@@ -215,6 +215,41 @@ Map(7) {
 }
 ```
 
+#### Encoding CAN Messages
+Candied has the ability to encode real world values to CAN frames.
+
+```ts
+import {Dbc, Can} from 'candied';
+import dbcReader from "dbc-can/lib/filesystem/DbcReader"
+
+const dbc = new Dbc();
+const fileContent = dbcReader('tesla_can.dbc');
+const data = dbc.load(fileContent)
+
+// Can() class allows for creation of CAN frames as well as message decoding
+const can = new Can();
+can.database = data;
+
+const msg = dbc.getMessageById(264);
+if (msg) {
+    const payload = new Array(msg.dlc).fill(0);
+    const boundMessage = can.createBoundMessage(msg, { payload, isExtended: false });
+
+    boundMessage.setSignalValue('DI_torqueDriver', 522);
+    boundMessage.setSignalValue('DI_torque1Counter', 6);
+    boundMessage.setSignalValue('DI_torqueMotor', 750);
+    boundMessage.setSignalValue('DI_soptState', 4);
+    boundMessage.setSignalValue('DI_motorRPM', -233);
+    boundMessage.setSignalValue('DI_pedalPos', 26.4);
+    boundMessage.setSignalValue('DI_torque1Checksum', 12);
+
+    const encodedFrame = can.encode(boundMessage);
+    console.log(encodedFrame.payload);
+}
+/* RETURNS */
+[10, 194, 238, 130, 23, 255, 26, 12]
+```
+
 ### Exporting to JSON
 Candied allows you to export loaded or created DBC data directly from the class instance
 

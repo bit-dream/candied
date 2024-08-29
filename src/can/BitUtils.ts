@@ -55,6 +55,25 @@ class BitUtils {
     return parseInt(bin, 2);
   }
 
+  // Utility function to convert decimal to binary string
+  protected dec2bin(dec: number, length: number): string {
+    return (dec >>> 0).toString(2).padStart(length, '0');
+  }
+
+  /**
+   * Converts a signed decimal number to a binary string.
+   *
+   * @param dec number
+   * @param length number
+   * @returns string
+   */
+  protected dec2binSigned(dec: number, length: number): string {
+    if (dec < 0) {
+      dec = (1 << length) + dec; // Convert negative number to two's complement
+    }
+    return dec.toString(2).padStart(length, '0');
+  }
+
   protected uint8ToBinary(dec: number): string {
     const paddedBin = '000000000' + (dec >>> 0).toString(2);
     return paddedBin.substring(paddedBin.length - 8);
@@ -87,17 +106,66 @@ class BitUtils {
     return bitField;
   }
 
-  protected extractBitRange(binary: string[], startBit: number, bitRange: number, endian: EndianType): string[] {
+  /**
+   * Convert a binary string array into a byte array
+   *
+   * @param binaryArray string[]
+   * @returns number[]
+   */
+  protected binary2Payload(binaryArray: string[], endian: EndianType): number[] {
+    const byteArray = [];
+    for (let i = 0; i < binaryArray.length; i += 8) {
+      byteArray.push(parseInt(binaryArray.slice(i, i + 8).join(''), 2));
+    }
+    if (endian === 'Intel') {
+      return byteArray.reverse();
+    }
+    return byteArray;
+  }
+
+  protected getStartOfBit(length: number, startBit: number, bitRange: number, endian: EndianType): number {
     let startOfBit: number;
     if (endian === 'Intel') {
-      startOfBit = binary.length - startBit - bitRange;
+      startOfBit = length - startBit - bitRange;
     } else {
       const endOfBitField = 8 * Math.floor(startBit / 8) + (7 - (startBit % 8));
       // Need to account for sawtooth bit numbering in CAN messages
       startOfBit = endOfBitField - bitRange + 1;
-      // startOfBit = binary.length - (binary.length - startBit + bitRange);
+      // startOfBit = length - (length - startBit + bitRange);
     }
+    return startOfBit;
+  }
+
+  protected extractBitRange(binary: string[], startBit: number, bitRange: number, endian: EndianType): string[] {
+    let startOfBit: number;
+    startOfBit = this.getStartOfBit(binary.length, startBit, bitRange, endian);
     return binary.slice(startOfBit, startOfBit + bitRange);
+  }
+
+  /**
+   * Inserts a bitField into a specific range within the binary string array.
+   *
+   * @param binary string[]
+   * @param bitField string
+   * @param startBit number
+   * @param bitRange number
+   * @param endian EndianType ('Motorola' or 'Intel')
+   * @returns string[]
+   */
+  protected insertBitRange(
+    binary: string[],
+    bitField: string,
+    startBit: number,
+    bitRange: number,
+    endian: EndianType,
+  ): string[] {
+    let startOfBit: number;
+
+    startOfBit = this.getStartOfBit(binary.length, startBit, bitRange, endian);
+    for (let i = 0; i < bitRange; i++) {
+      binary[startOfBit + i] = bitField[i] || '0';
+    }
+    return binary;
   }
 }
 export default BitUtils;

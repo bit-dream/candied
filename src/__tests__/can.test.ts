@@ -64,3 +64,57 @@ test('SimpleDBC: Decode TestMessageStandard', (done) => {
     done();
   }
 });
+
+test('SimpleDBC: Encode TestMessageStandard', (done) => {
+  const dbc = new Dbc();
+  const fileContent = dbcReader('src/__tests__/testFiles/SimpleDBC.dbc');
+  const data = dbc.load(fileContent);
+  const can = new Can();
+  can.database = data;
+
+  const msg = dbc.getMessageByName('TestMessageStandard');
+  if (msg) {
+    const payload = new Array(msg.dlc).fill(0);
+    const boundMessage = can.createBoundMessage(msg, { payload, isExtended: false });
+
+    boundMessage.setSignalValue('TestSignal5', 100);
+    boundMessage.setSignalValue('TestSignal6', 100);
+    boundMessage.setSignalValue('TestSignal7', -1);
+    boundMessage.setSignalValue('TestSignal8', 55);
+
+    const encodedFrame = can.encode(boundMessage);
+    const expectedPayload = [100, 100, 255, 55, 0, 0, 0, 0];
+
+    expect(encodedFrame.payload).toEqual(expectedPayload);
+    done();
+  }
+});
+
+// Return value validated using MATLAB Vehicle Network Toolbox
+test('tesla_can: Encode 264', (done) => {
+  const dbc = new Dbc();
+  const fileContent = dbcReader('src/__tests__/testFiles/tesla_can.dbc');
+  const data = dbc.load(fileContent);
+  const can = new Can();
+  can.database = data;
+
+  const msg = dbc.getMessageById(264);
+  if (msg) {
+    const payload = new Array(msg.dlc).fill(0);
+    const boundMessage = can.createBoundMessage(msg, { payload, isExtended: false });
+
+    boundMessage.setSignalValue('DI_torqueDriver', 522);
+    boundMessage.setSignalValue('DI_torque1Counter', 6);
+    boundMessage.setSignalValue('DI_torqueMotor', 750);
+    boundMessage.setSignalValue('DI_soptState', 4);
+    boundMessage.setSignalValue('DI_motorRPM', -233);
+    boundMessage.setSignalValue('DI_pedalPos', 26.4);
+    boundMessage.setSignalValue('DI_torque1Checksum', 12);
+
+    const encodedFrame = can.encode(boundMessage);
+    const expectedPayload = [10, 194, 238, 130, 23, 255, 26, 12];
+
+    expect(encodedFrame.payload).toEqual(expectedPayload);
+    done();
+  }
+});
