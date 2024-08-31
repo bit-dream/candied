@@ -8,7 +8,8 @@ export type DataType =
   | 'uint64'
   | 'int64'
   | 'float'
-  | 'double';
+  | 'double'
+  | 'unknown';
 
 export type EndianType = 'Intel' | 'Motorola';
 
@@ -40,7 +41,7 @@ export const computeDataType = (numOfBits: number, isSigned: boolean, isFloat: b
     }
     return 'int64';
   } else if (numOfBits > 64) {
-    throw new Error(`Number of bits ${numOfBits} exceeds maximum possible data type`);
+    return 'unknown';
   } else {
     throw new Error(
       `Could not compute data type from inputs: bits ->${numOfBits} signed-> ${isSigned} float ->${isFloat}`,
